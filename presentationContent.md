@@ -1,4 +1,4 @@
-# Presenation Content 
+# Presentation Content 
  
 ACS and TfJob are moving rapidly, so this content might change a bit depending on the availability of new features.  
 We expect AKS to be out and supporting GPUs.  
