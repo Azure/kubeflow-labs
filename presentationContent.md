@@ -11,10 +11,14 @@ If not we will have to fallback on acs-engine and remove some content to stay in
   * Very basic knowledge of Docker is definitly a plus, but not required
 
 ## Summary
-1. Introduction
+
+**Part 2 to 8 will be delived interactively through a GitHub repository and markdown documentation so that different attendees can go at different paces**
+
+1. Introduction (PowerPoint)
    - Current typical workflow in ML
    - Shortcomings of this Workflow (data/model versioning, slow training, scalability etc.)
-1. Introduction to Containers and Docker
+   - How containers and kubernetes can help
+1. Introduction to Containers and Docker (At 
    - Basics of containers
      - The goal here is to bring everyone to a level where they can understand what is happening in the rest of the session with Kubernetes, and pick their interest in containers so that they can learn more about them by themselves.
    - Why containers are useful (reproducibility, scalability, packaging...)
@@ -59,6 +63,6 @@ If not we will have to fallback on acs-engine and remove some content to stay in
    - Autoscaling your cluster
    - Pachyderm
    - NFS
-1. Other MS tools
+1. Other MS tools (PowerPoint
    - Azure Batch AI training
    - Vienna
