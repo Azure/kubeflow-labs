@@ -6,5 +6,5 @@
 - How many Attendees ?
 - Azure Sub. for everyone ? or Azure Pass like at TR ?
 - 3/4 proctors or more (depending to number or attendees)
-- 3 GPU / cluster (2 will work)
+- 3 GPU / cluster (2 will work but not ideal)
 - One cluster per attendees or teams ? if team 2/3
