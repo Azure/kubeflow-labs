@@ -25,7 +25,7 @@ If not we will have to fallback on acs-engine and remove some content to stay in
    - Basics of containers
      - The goal here is to bring everyone to a level where they can understand what is happening in the rest of the session with Kubernetes, and pick their interest in containers so that they can learn more about them by themselves.
    - Why containers are useful (reproducibility, scalability, packaging...)
-   - DockerHub
+   - DockerHub (Introduce Docker registry, at least mention ACR as another option for hosting private Docker images)
      - **P**: Creating an account to host our images
      - Discovering existing images (Tensorflow, CNTK etc.) and their different version (tags)
 1. Introduction to Kubernetes *25 min*
@@ -66,6 +66,7 @@ If not we will have to fallback on acs-engine and remove some content to stay in
    - Autoscaling your cluster
    - Pachyderm
    - NFS
+   - Azure blob storage sdk as another option to store data
 
 # Timeframe
 
