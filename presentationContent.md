@@ -12,7 +12,7 @@ If not we will have to fallback on acs-engine and remove some content to stay in
 
 ## Summary
 
-**Part 2 to 8 will be delived interactively through a GitHub repository and markdown documentation so that different attendees can go at different paces**
+**Part 2 to 8 will be delivered interactively. This is a self-directed lab through a GitHub repository and markdown documentation so that different attendees can go at different paces**
 
 1. Introduction (PowerPoint) - *10 min*
    - Current typical workflow in ML
