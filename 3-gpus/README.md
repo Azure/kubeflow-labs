@@ -4,14 +4,14 @@
 * [Docker Basics](../1-docker)
 * [Kubernetes Basics and cluster created](../2-kubernetes)
 
-> **Note**: If you created a cluster without GPU agent you won't be able to complete the exercices in this module, but it still contains valuable informations.
-
 ## Summary
 
 In this tutorial you will learn how to:
 * Create a Pod that is using GPU.
   * Requesting a GPU
   * Mounting the NVIDIA drivers into the container
+
+> **Note**: If you created a cluster without GPU agent you won't be able to complete the exercices in this module, but it still contains valuable informations.
 
 ## How GPU works with Kubernetes
 
@@ -93,7 +93,7 @@ Finally we may also need to update some environment variable to reflect where th
 
 ## Excercices and Useful Links
 
-#### 1. NVIDIA-SMI
+### 1. NVIDIA-SMI
 In this first exercice we are simply going to schedule a `Job` that will run `nvidia-smi`, printing details about our GPU from inside the container and exit.
 You don't need to build a custom image, instead, simply use the official `nvidia/cuda` docker image.
 
@@ -106,8 +106,12 @@ Your K8s YAML template should have the following caracteristics:
 #### Useful Links
 * [Microsoft Azure Container Service Engine - Using GPUs with Kubernetes](https://github.com/Azure/acs-engine/blob/master/docs/kubernetes/gpu.md)
 
+#### Validation
+
+Doing a `kubectl logs <pod-name>` should show...
+
 <details>
-<summary><strong>Expected Template (expand to see)</strong></summary>
+<summary><strong>Solution (expand to see)</strong></summary>
 <p>
 
 ```yaml
@@ -146,12 +150,7 @@ spec:
 </p>
 </details>
 
+### 2. Running TensorFlow with GPU
 
-
-
-
-
-
-### Validation
-
-Doing a `kubectl logs <pod-name>` should show...
+## Next Step
+[4 - Helm](../4-helm/README.md)
