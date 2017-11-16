@@ -2,7 +2,6 @@
 
 # Bring your laptop
 1. All participants should have a valid Microsoft Azure subscription allowing the creation of an ACS cluster.
-ACS or AKS cluster? NC SKUs required? 
 2. Docker client installed: [Installing Docker](https://www.docker.com/community-edition)
 3. Azure-cli  (2.0) installed: [Install the Azure CLI 2.0 | Microsoft Docs](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest)
 4. Understand the basic concepts of Docker: [Docker 101: Getting to Know Docker - Docker Blog](https://blog.docker.com/2016/05/docker-101-getting-to-know-docker/)
