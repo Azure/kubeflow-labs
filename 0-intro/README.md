@@ -7,10 +7,9 @@ Machine learning model development and operationalization currently has very few
 However in traditional application development, DevOps practices are becoming ubiquitous. 
 We can benefit from many of this practices by applying them to model developement and operationalization.
 
-Here are a subset of pain points that exists in a typical ML workflow:
-![Typical Workflow](workflow.png)
+Here are a subset of pain points that exists in a typical ML workflow.
 #### A Typical (Simplified) ML Workflow and It's Pain Points
-
+![Typical Workflow](workflow.png)
 
 This workshop is going to focus on improving the training process by leveraging  containers and Kubernetes.
 
@@ -38,3 +37,6 @@ Using Kubernetes we can alleviate many of this pain-points:
 
 
 *While autoscaling is very powerful, it is outside the scope of this workshop. However we will give you resources and pointer to get started with it.
+
+## Next Step
+[Module 1: Docker](../1-docker/README.md)

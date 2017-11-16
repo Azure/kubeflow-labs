@@ -1,7 +1,7 @@
 # Kubernetes
 
 ### Prerequisites  
-* [Docker Basics](../1-docker)
+* [Docker Basics](../1-docker/README.md)
 
 ### Summary
 
@@ -108,4 +108,4 @@ Capacity:
 
 
 ## Next Step
-[Module 3: GPUs](../3-GPUs)
+[Module 3: GPUs](../3-gpus/README.md)
