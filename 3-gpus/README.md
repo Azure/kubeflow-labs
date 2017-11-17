@@ -128,10 +128,10 @@ spec:
       volumes: # Where the NVIDIA driver libraries and binaries are located on the host (note that libcuda is not needed to run nvidia-smi)
       - name: bin
         hostPath: 
-          path: /usr/lib/nvidia-378/bin
+          path: /usr/lib/nvidia-384/bin
       - name: lib
         hostPath: 
-          path: /usr/lib/nvidia-378
+          path: /usr/lib/nvidia-384
       containers:
       - name: nvidia-smi
         image: nvidia/cuda # Which image to run        
