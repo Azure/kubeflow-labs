@@ -36,7 +36,7 @@ With:
 | Parameter | Description |
 | --- | --- | 
 | RESOURCE_GROUP_NAME | Name of the resource group where the cluster will be deployed.  |
-| LOCATION | Name of the region where the cluster should be deployed. If you are going to use GPUs, make sure you target one of the region with GPU availability (such as `southcentralus`, `westus`, `eastus` etc.). |
+| LOCATION | Name of the region where the cluster should be deployed. If you are going to use GPUs, make sure you target one of the region with GPU availability (such as `southcentralus`, `westus`, `eastus` etc.), also make sure you have enough cores available in your sub. |
 
 
 #### Creating the cluster  
