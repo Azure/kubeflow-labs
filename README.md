@@ -20,3 +20,4 @@ Before anything, make sure you have installed all the [**prerequisites**](./prer
 |6| **[Distributed Tensorflow](6-distributed-tensorflow)** | |
 |7| **[Hyper-parameters Sweeping](7-hyper-param-sweeping)** | |
 |8| **[Jupyter Notebooks](8-jupyter)** | |
+|9| **[Going Further](9-going-further)** | Autoscaling, Azure Fuse, GlusterFS etc. |
