@@ -9,7 +9,7 @@ In this module you will learn :
 * The basic concepts of Kubernetes
 * How to create a Kubernetes cluster on Azure
 
-> *Important* : Kubernetes is very often abbreviated to **K8s**. This the name we are going to use in this workshop.
+> *Important* : Kubernetes is very often abbreviated to **K8s**. This is the name we are going to use in this workshop.
 
 
 ## Provisioning a Kubernetes cluster
