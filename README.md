@@ -5,10 +5,9 @@
 ## [Room Organization](./roomOrganization.md) -->
 
 
-Before anything, make sure you have installed all the prerequisites:
-### [Prerequisites](./prerequisites.md)
+Before anything, make sure you have installed all the [**prerequisites**](./prerequisites.md).
 
-## Content
+## Content Sumary
 
 | | Module | Description |
 | --- | --- | --- |

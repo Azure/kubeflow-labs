@@ -34,9 +34,14 @@ Using Kubernetes, we can alleviate many of these pain points:
   * Kubernetes allows for resource pooling while at the same time ensuring that any training job can run without waiting for another one to finish.
   * With autoscaling the cluster can automatically scale out or in to ensure maximum utilization, thus keeping the cost as low as possible.
 
-
-
 *While autoscaling is very powerful, it is outside the scope of this workshop. However we will give you resources and pointer to get started with it.
+
+
+## OpenAI: Building the Infrastructure that Powers the Future of AI 
+
+During KubeCon 2017, Vicki Cheung and Jonas Schneider delivered a keynote explaining how OpenAI manage to handle training at very large scale with Kubernetes, it is worth listening to: 
+
+<a href="https://www.youtube.com/watch?v=v4N3Krzb8Eg">![OpenAI](./thumbnail.png)</a>
 
 ## Next Step
 [Module 1: Docker](../1-docker/README.md)
