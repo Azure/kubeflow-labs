@@ -1,4 +1,4 @@
-# Introduction and Setting Up
+# Introduction
 
 ## Motivations
 
