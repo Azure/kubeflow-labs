@@ -91,7 +91,7 @@ Finally we may also need to update some environment variable to reflect where th
 > See [Define Environment Variables for a Container](https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/).
 
 
-## Excercices and Useful Links
+## Excercices
 
 ### 1. NVIDIA-SMI
 In this first exercice we are simply going to schedule a `Job` that will run `nvidia-smi`, printing details about our GPU from inside the container and exit.
