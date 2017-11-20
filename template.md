@@ -5,13 +5,13 @@
 [Link to previous necessary module (if any)]
 
 ## Summary
-[Summary of what is going to be teached in this module]
+[Summary of what is going to be teached in this module]  
+  
+## < CONTENT>
 
-## <CONTENT>
+### < SUB-CONTENT-1 >
 
-### <SUB-CONTENT-1>
-
-### <SUB-CONTENT-2>
+### < SUB-CONTENT-2 >
 
 ## Exercices
 
