@@ -1,12 +1,12 @@
 # GPUs And Kubernetes
 
 ## Prerequisites  
-* [Docker Basics](../1-docker)
-* [Kubernetes Basics and cluster created](../2-kubernetes)
+* [1 - Docker Basics](../1-docker)
+* [2 - Kubernetes Basics and cluster created](../2-kubernetes)
 
 ## Summary
 
-In this tutorial you will learn how to:
+In this module you will learn how to:
 * Create a Pod that is using GPU.
   * Requesting a GPU
   * Mounting the NVIDIA drivers into the container
