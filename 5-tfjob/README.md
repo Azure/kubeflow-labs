@@ -248,14 +248,18 @@ example-tfjob   TfJob.v1alpha1.tensorflow.org
 As well as a `Job`, which was actually created by the operator:
 
 ```console
-> kubectl get job
+kubectl get job
+```
+```
 NAME            DESIRED   SUCCESSFUL   AGE
 master-i0x6-0   1         0            2m
 ```
 and a `Pod`:
 
 ```console
-> kubectl get pod
+kubectl get pod
+```
+```
 NAME                                READY     STATUS      RESTARTS   AGE
 master-i0x6-0-65nbv                 1/1       Running   0          2m
 ```
@@ -265,12 +269,12 @@ Note that the `Pod` might take a few minutes before actually running, the docker
 Once the `Pod`'s status is either `Running` or `Completed` we can start looking at it's logs:
 
 ```console 
-> kubectl logs <your-pod-name>
+kubectl logs <your-pod-name>
 ```
 
 This container is pretty verbose, but you should see a TensorFlow training happening: 
 
-````
+```
 INFO:tensorflow:2017-11-20 20:57:22.314198: Step 480: Cross entropy = 0.142486
 INFO:tensorflow:2017-11-20 20:57:22.370080: Step 480: Validation accuracy = 85.0% (N=100)
 INFO:tensorflow:2017-11-20 20:57:22.896383: Step 490: Train accuracy = 98.0%
