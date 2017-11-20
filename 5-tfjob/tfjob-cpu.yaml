@@ -1,0 +1,12 @@
+apiVersion: tensorflow.org/v1alpha1
+kind: TfJob
+metadata:
+  name: example-tfjob
+spec:
+  replicaSpecs:
+    - template:
+        spec:
+          containers:
+            - image: wbuchwalter/tensorflow-for-poets:cpu
+              name: tensorflow
+          restartPolicy: OnFailure

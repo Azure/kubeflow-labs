@@ -112,7 +112,7 @@ spec:
             - image: wbuchwalter/<SAMPLE IMAGE>
               name: tensorflow
               resources:
-                limits:
+                requests:
                   alpha.kubernetes.io/nvidia-gpu: 1
           restartPolicy: OnFailure
 ```
@@ -126,12 +126,12 @@ As we saw earlier, when we installed the Helm chart for `tensorflow/k8s`, 3 reso
 * A `Deployment`
 * And a `Pod` named `tf-job-operator`
 
-The `tf-job-operator` pod (simply called the operator, or `TfJob` operator), is going to monitor your cluster, and everytime you create a new resource of type `TfJob`, the will know what to do with it.    
+The `tf-job-operator` pod (simply called the operator, or `TfJob` operator), is going to monitor your cluster, and everytime you create a new resource of type `TfJob`, the operator will know what to do with it.    
 Specifically, when you create a new `TfJob`, the operator will create a new Kubernetes `Job` for it, and automatically mount the drivers and update the environment variable if needed (i.e. when you request a GPU).  
 
 You may wonder how the operator knows which directory needs to be mounted in the container for the NVIDIA drivers: that's where the `ConfigMap` comes into play.  
 
-In K8s, a `ConfigMap` is a simple object that contains key-value pairs. This `ConfigMap` can then be linked with a container to inject some configuration.   
+In K8s, a [`ConfigMap`](https://kubernetes.io/docs/tasks/configure-pod-container/configmap/) is a simple object that contains key-value pairs. This `ConfigMap` can then be linked with a container to inject some configuration.   
 
 When we installed the Helm chart, we specified which cloud provider we are running on by doing `--set cloud=azure`. 
 This creates a `ConfigMap` that contains configuration options specific for Azure, including the list of directory to mount, and which environment variable to update.
@@ -176,10 +176,117 @@ If you want to know more:
 * [tensorflow/k8s](https://github.com/tensorflow/k8s) GitHub repository
 * [Introducing Operators](https://coreos.com/blog/introducing-operators.html), a blog post by CoreOS explaining the Operator pattern
 
-### Trying `TfJob`
+## Exercices 
 
+### 1. A Simple `TfJob`
+
+Let's schedule a very simple TensorFlow job using `TfJob` first.  
+
+
+Depending on wether or not your cluster has GPU, choose the correct template:
+
+<details>
+<summary><strong>CPU Only</strong></summary>  
+  
+```yaml
+apiVersion: tensorflow.org/v1alpha1
+kind: TfJob
+metadata:
+  name: example-tfjob
+spec:
+  replicaSpecs:
+    - template:
+        spec:
+          containers:
+            - image: wbuchwalter/tensorflow-for-poets:cpu
+              name: tensorflow
+          restartPolicy: OnFailure
+```
+
+</details>
+
+<details>
+<summary><strong>With GPU</strong></summary>  
+
+When using GPU, we need to request for one (or multiple), and the image we are using also needs to be based on TensorFlow's GPU image.
+
+```yaml
+apiVersion: tensorflow.org/v1alpha1
+kind: TfJob
+metadata:
+  name: example-tfjob
+spec:
+  replicaSpecs:
+    - template:
+        spec:
+          containers:
+            - image: wbuchwalter/tensorflow-for-poets:gpu
+              name: tensorflow
+              resources:
+                requests:
+                  alpha.kubernetes.io/nvidia-gpu: 1
+          restartPolicy: OnFailure
+```
+
+</details>
+
+Save the template that applies to you in a file, and create the `TfJob`:
+```console
+kubectl create -f <template-path>
+````
+
+Let's look at what has been created in our cluster.
+
+First a `TfJob` was created:
+
+```console
+> kubectl get tfjob
+NAME            KIND
+example-tfjob   TfJob.v1alpha1.tensorflow.org
+```
+
+As well as a `Job`, which was actually created by the operator:
+
+```console
+> kubectl get job
+NAME            DESIRED   SUCCESSFUL   AGE
+master-i0x6-0   1         0            2m
+```
+and a `Pod`:
+
+```console
+> kubectl get pod
+NAME                                READY     STATUS      RESTARTS   AGE
+master-i0x6-0-65nbv                 1/1       Running   0          2m
+```
+
+Note that the `Pod` might take a few minutes before actually running, the docker image needs to be pulled on the node first.
+
+Once the `Pod`'s status is either `Running` or `Completed` we can start looking at it's logs:
+
+```console 
+> kubectl logs <your-pod-name>
+```
+
+This container is pretty verbose, but you should see a TensorFlow training happening: 
+
+````
+INFO:tensorflow:2017-11-20 20:57:22.314198: Step 480: Cross entropy = 0.142486
+INFO:tensorflow:2017-11-20 20:57:22.370080: Step 480: Validation accuracy = 85.0% (N=100)
+INFO:tensorflow:2017-11-20 20:57:22.896383: Step 490: Train accuracy = 98.0%
+INFO:tensorflow:2017-11-20 20:57:22.896600: Step 490: Cross entropy = 0.075210
+INFO:tensorflow:2017-11-20 20:57:22.945611: Step 490: Validation accuracy = 91.0% (N=100)
+INFO:tensorflow:2017-11-20 20:57:23.407756: Step 499: Train accuracy = 94.0%
+INFO:tensorflow:2017-11-20 20:57:23.407980: Step 499: Cross entropy = 0.170348
+INFO:tensorflow:2017-11-20 20:57:23.457325: Step 499: Validation accuracy = 89.0% (N=100)
+INFO:tensorflow:Final test accuracy = 88.4% (N=353)
+```
 
 ## Exercices
+
+* Creating a simple TfJob
+* Creating a simple TfJob with azure file volumes
+* Adding TensorBoard
 
 ### Exercice 1
 
