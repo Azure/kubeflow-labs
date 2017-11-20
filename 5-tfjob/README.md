@@ -2,7 +2,8 @@
 
 * Create actual docker image with simple training
 * update example templates with this image
-
+* explain what is happening in the image
+* replace azure file share and secret creation by official doc? (https://docs.microsoft.com/en-in/azure/aks/azure-files)
 
 # `tensorflow/k8s` and `TfJob`
 
@@ -140,7 +141,7 @@ We can take a look at what is inside our `tf-job-operator-config` by doing:
 
 ```console
 kubectl describe configmaps tf-job-operator-config
-````
+```
 
 The output is:
 
@@ -233,14 +234,17 @@ spec:
 Save the template that applies to you in a file, and create the `TfJob`:
 ```console
 kubectl create -f <template-path>
-````
+```
 
 Let's look at what has been created in our cluster.
 
 First a `TfJob` was created:
 
 ```console
-> kubectl get tfjob
+kubectl get tfjob
+```
+Returns:
+```
 NAME            KIND
 example-tfjob   TfJob.v1alpha1.tensorflow.org
 ```
@@ -250,6 +254,7 @@ As well as a `Job`, which was actually created by the operator:
 ```console
 kubectl get job
 ```
+Returns:
 ```
 NAME            DESIRED   SUCCESSFUL   AGE
 master-i0x6-0   1         0            2m
@@ -259,6 +264,7 @@ and a `Pod`:
 ```console
 kubectl get pod
 ```
+Returns:
 ```
 NAME                                READY     STATUS      RESTARTS   AGE
 master-i0x6-0-65nbv                 1/1       Running   0          2m
@@ -286,26 +292,114 @@ INFO:tensorflow:2017-11-20 20:57:23.457325: Step 499: Validation accuracy = 89.0
 INFO:tensorflow:Final test accuracy = 88.4% (N=353)
 ```
 
-## Exercices
+Once your job is completed, clean it up:
 
-* Creating a simple TfJob
-* Creating a simple TfJob with azure file volumes
-* Adding TensorBoard
+```console
+kubectl delete tfjob example-tfjob
+```
 
-### Exercice 1
+> That's great and all, but how do we grab our trained model and TensorFlow's summaries?  
 
-[Assignement & Useful links here]
+Well currently we can't. As soon as the training is complete, the container stops and everything inside it, including model and logs are lost.  
 
-#### Validation
+Thanksfully, Kubernetes `Volumes` can help us here.  
+If you remember, we quickly introduced `Volumes` in module [2 - Kubernetes](../2-kubernetes/), and that's what we already used to mount the drivers from the node into the container.  
+But `Volumes` are not just for mounting things from a node, we can also use them to mount a lot of different storage solutions, you can see the full list [here](https://kubernetes.io/docs/concepts/storage/volumes/).  
 
-#### Solution
+In our case we are going to use Azure Files, as it is really easy to use with Kubernetes.
+
+
+## 2. Azure Files to the Rescue
+
+### Creating a New File Share and Kubernetes Secret
+
+In the official documentation: [Using Azure Files with Kubernetes](https://docs.microsoft.com/en-in/azure/aks/azure-files), follow the steps listed under `Create an Azure file share` and `Create Kubernetes Secret`, but be aware of a few details first:
+* It is **very** important that you create you storage account (hence your resource group) in the **same** region as your Kubernetes cluster: because Azure File uses the `SMB` protocol it won't work cross-regions. `AKS_PERS_LOCATION` should be updated accordingly.
+* While this document specifically refers to AKS, it will work for any K8s cluster
+* Name your file share `tensorflow`. While the share could be named anything, it will make it easier to follow the examples later on. `AKS_PERS_SHARE_NAME` should be updated accordingly.
+
+Once you completed all the steps, run:
+```console
+kubectl get secrets
+```
+
+Which sould return:
+```
+NAME                  TYPE                                  DATA      AGE
+azure-secret          Opaque                                2         4m
+```
+
+
+### Updating our example to use our Azure File Share
+
+Now we need to mount our new file share into our container so the model and the summaries can be persisted.  
+Turns out mounting an Azure File share into a container is really easy, we simply need to reference our secret in the `Volume` definition:
+
+```yaml
+[...]
+ containers:
+  - image: <IMAGE>
+    name: tensorflow
+    volumeMounts:
+      - name: azurefile
+        mountPath: <MOUNT_PATH>
+ volumes:
+  - name: azurefile
+    azureFile:
+      secretName: azure-secret
+      shareName: tensorflow
+      readOnly: false
+```
+
+Update your template from exercice 1 to mount the Azure File share into your container,and create your new job.
+Note that by default our container saves everything into `/app/tf_files` so that's the value you will want to use for `MOUNT_PATH`.
+
+Once the container starts running, if you go to the Azure Portal, into your storage account, and browse your `tensorflow` file share, you should see something like that:
+
+![file-share](./file-share.png)
+
+This means that when we run a training, all the important data is now stored in Azure File and is still available as long as we don't delete the file share.
+
+> Great, but what if I want to check out the training in TensorBoard, do I need to download everything on my machine?
+
+Actually no, you don't. `TfJob` provides a very handy mechanism to monitor your trainings with TensorBaord easily!  
+We will try that in our third excercice.
+
+#### Solutions for Exercice 2
 
 <details>
-<summary><strong>Solution (expand to see)</strong></summary>
-<p>
-    [solution]
-</p>
+<summary><strong>CPU Only</strong></summary>  
+
+When using GPU, we need to request for one (or multiple), and the image we are using also needs to be based on TensorFlow's GPU image.
+
+```yaml
+apiVersion: tensorflow.org/v1alpha1
+kind: TfJob
+metadata:
+  name: example-tfjob
+spec:
+  replicaSpecs:
+    - template:
+        spec:
+           containers:
+              - image: wbuchwalter/tensorflow-for-poets:cpu
+                name: tensorflow
+                volumeMounts:
+                  - name: azurefile
+                    mountPath: /app/tf_files
+            volumes:
+              - name: azurefile
+                azureFile:
+                  secretName: azure-secret
+                  shareName: tensorflow
+                  readOnly: false
+          restartPolicy: OnFailure
+```
+
 </details>
+
+
+### Adding TensorBoard
 
 
 ## Next Step
