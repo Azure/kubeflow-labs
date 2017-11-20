@@ -107,6 +107,7 @@ We will describe the most important command to start with in this section.
     COMMAND (Optional) : Command to run inside your container
 
     Examples
+    
     |Command|Description|
     |-|-|
     |`docker run -it --rm --name myUbuntuContainer ubuntu /bin/bash`|Run an official Ubuntu image in an interactive mode with the bash|
