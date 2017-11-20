@@ -1,8 +1,5 @@
 # Docker
 
-### Prerequisites  
-* [Understand the learning objectives](../learningObjectives.md)
-
 ### Summary
 
 In this section you will learn about :
@@ -17,44 +14,6 @@ The official documentation from *docs.docker.com* is very well detailed for sett
 * [Mac](https://docs.docker.com/docker-for-mac/)
 * [Linux](https://docs.docker.com/engine/installation/linux/) 
 * [Windows](https://docs.docker.com/docker-for-windows/)
-
-Once you are done installing Docker, test your Docker installation by running the following from the docker-cli (Terminal or Powershell):
-```bash
-$ docker run -it --rm hello-world
-```
-
-You should see the following results : 
-```bash
-$ docker run -it --rm hello-world
-Unable to find image 'hello-world:latest' locally
-latest: Pulling from library/hello-world
-5b0f327be733: Pull complete
-Digest: sha256:07d5f7800dfe37b8c2196c7b1c524c33808ce2e0f74e7aa00e603295ca9a0972
-Status: Downloaded newer image for hello-world:latest
-
-Hello from Docker!
-This message shows that your installation appears to be working correctly.
-
-To generate this message, Docker took the following steps:
- 1. The Docker client contacted the Docker daemon.
- 2. The Docker daemon pulled the "hello-world" image from the Docker Hub.
- 3. The Docker daemon created a new container from that image which runs the
-    executable that produces the output you are currently reading.
- 4. The Docker daemon streamed that output to the Docker client, which sent it
-    to your terminal.
-
-To try something more ambitious, you can run an Ubuntu container with:
- $ docker run -it ubuntu bash
-
-Share images, automate workflows, and more with a free Docker ID:
- https://cloud.docker.com/
-
-For more examples and ideas, visit:
- https://docs.docker.com/engine/userguide/
-...
-```
-
-This command will run a container locally from the image named : `hello-world`
 
 ### Basics of Docker
 
@@ -79,6 +38,8 @@ If you look at the [Docker Hub](https://hub.docker.com/) and do some search you 
 
 We will explain later how build locally you own image.
 
+# NOTE : ADD a section to explain the usage of docker apply to ML.
+
 #### Command line
 
 We will describe the most important command to start with in this section.
@@ -94,7 +55,7 @@ We will describe the most important command to start with in this section.
     |-it|Interactive mode (-i and -t combined)|When you need a prompt in the container
     |-d|Detached|When you want to run you container in the background such as scripts or server.
     |-P|Map the necessary port in the container to the host using random one|When you want to reach a port in your container, for example the port 80 for a web server
-    |-P|Map some specific port in the container to specific host one |When you want to reach a port in your container, for example the port 80 for a web server
+    |-p|Map some specific port in the container to specific host one |When you want to reach a port in your container, for example the port 80 for a web server
     |-e|Inject a environment variable|When you are using environement variables in your script such as connection string
     |-v|Mount a folder from the host in the container|When you want to modify files in your container such as configuration or codes for example, without to restart a new one
     |--name|Give a name to the container|When you want to identify your containers
@@ -191,16 +152,152 @@ We will describe the most important command to start with in this section.
 
     > You can manage your images by removing them using `docker rmi IMAGENAME` or pulling new one with `docker pull IMAGENAME`
 
-#### Building and Pushing a Image
-
-    Building and pushing a custom image to a repository
-    - Building a python base image
-
 #### Containerizing a simple application
 
-    From a local python code to a container.
-        - Previous base image
-        - Mounting local folder to build from it
+Now that we understand the basics of Docker, we will apply it to a concrete example by running and containerizing a simple application.
+
+In this example we will write a basic python web application, using the [Flask framework](http://flask.pocoo.org/), so we will need to make sure that we have the python libraries installed. We will also use a ubuntu base image simce it is a simple linux distribution to understand.
+
+Like in the previous section, we will automated the following steps :
+- Use Ubuntu as base image
+- Install the python package manager pip
+- Copy our custom code
+- Execute it when we launch our container
+
+We will introduce the concept of Dockerfile.
+
+A Dockerfile is a simple definition file of the layers that we need to run our application in a container.
+
+This use some specific keywords, you can find more information [in the official documentation](https://docs.docker.com/engine/reference/builder/), we will describe the most used one in the following section :
+
+1. `FROM`
+
+    `FROM` is the first keyword prerequisite to define the base image that we will use to start from.
+
+1. `WORKDIR`
+
+    The `WORKDIR` instruction sets the working directory for any `RUN`, `CMD`, `ENTRYPOINT`, `COPY` and `ADD` instructions that follow it in the Dockerfile. If the `WORKDIR` doesn’t exist, it will be created even if it’s not used in any subsequent Dockerfile instruction.
+
+1. `RUN`
+
+    The `RUN` instruction will execute any commands in a new layer on top of the current image and commit the results. The resulting committed image will be used for the next step in the Dockerfile.
+
+    You can run multiple commands in the same line to avoid multiple layers for optimizations.
+
+1. `ADD`
+
+    The ADD instruction copies new files, directories or remote file URLs from <src> and adds them to the filesystem of the image at the path <dest>
+
+1. `EXPOSE`
+
+    The `EXPOSE` instruction informs Docker that the container listens on the specified network ports at runtime. You can specify whether the port listens on TCP or UDP, and the default is TCP if the protocol is not specified.
+
+1. `ENV`
+
+    The `ENV` instruction sets the environment variable <key> to the value <value>.
+
+1. `ENTRYPOINT`
+
+    An `ENTRYPOINT` allows you to configure a container that will run as an executable.
+
+#### Dockerfile applied to our example :
+
+Let's pretend you are developing locally our Flask application. We have a repository named `src` with a file named `app.py` with the following code :
+
+```python
+from flask import Flask
+app = Flask(__name__)
+
+@app.route('/')
+def hello_world():
+    return 'Hello, World!'
+```
+
+We are creating a file named Dockerfile a the root of our repository.
+
+With the previous concepts applied to our example, this file should looks like :
+
+```Dockerfile
+# Base image to start from. We are specifying the version that we want (16.04) using a tag
+FROM ubuntu:16.04
+# Working directory where to run all the next commands
+WORKDIR app
+# Commands to exectute in the image, installation of pip and the flask package from pip
+RUN apt-get update && apt-get -y upgrade && apt-get install -y python3-pip
+RUN pip3 install Flask
+# Copy the local folder named src into the container (Inside the workdir)
+COPY src .
+# Expose the default Flask port
+EXPOSE 5000
+# Set environements variable with default values, needed for Flask 
+ENV LC_ALL C.UTF-8
+ENV LANG C.UTF-8
+ENV FLASK_APP app.py
+# Default command to execute at the launch
+CMD ["flask", "run", "--host=0.0.0.0"]
+```
+
+We have now the following structure :
+
+```
+.
+├── src
+|   ├── app.py
+├── Dockerfile
+```
+
+#### Building and Pushing a Image
+
+The next step is to build our image to be able to run it using docker. For that we will use the command `docker build`.
+
+You can find the [official documentation](https://docs.docker.com/engine/reference/commandline/build/) on the official website.
+
+From our application repository, we can run the command : `docker build -t mypythonapp .`
+
+> The `-t` command allow to **tag** the image with a specific custom name.
+
+You should the build process inside your terminal who will run the commands one by one
+
+```
+...
+Step 7/8 : ENV MyVAlue Hello MLADS !
+ ---> Running in f7d115bdfce4
+ ---> 0cd4ff7ad04b
+Removing intermediate container f7d115bdfce4
+Step 8/8 : ENTRYPOINT python3 app.py
+ ---> Running in 8f8da115cfed
+ ---> 5963706e6232
+Removing intermediate container 8f8da115cfed
+Successfully built 5963706e6232
+Successfully tagged mypythonapp:latest
+```
+
+When you have the successfully message, you should be able now to see if your image is locally available with the commands `docker images` described earlier.
+
+Now we can try to run it locally using the `docker run` command :
+
+```bash
+$ docker run -it -d -P mypythonapp
+2cd43118545d23d361e0892abe94cb9c06ad25a449b07e7ab9a8b3bcbfa3f472
+```
+
+> As reminder this command will run the docker image named `mypythonapp` in a detached mode and exposing the port necessary described in the dockerfile.
+> The terminal is answering with the name id of the container : `2cd43...`
+
+You should be able to see if your container is correctly running with the `docker ps` command.
+
+```bash
+$ docker ps
+CONTAINER ID        IMAGE               COMMAND                  CREATED              STATUS              PORTS                     NAMES
+2cd43118545d        mypythonapp         "flask run --host=..."   About a minute ago   Up About a minute   0.0.0.0:32773->5000/tcp   awesome_fermi
+```
+As we can see the status fo the container is **UP** and using the port 32773 on the host to redirect to the port 5000 in the container.
+
+We can now open a browser on the page [http://localhost:32773](http://localhost:32773) to see our application running.
+
+The next step is to publish this image to a repository. Doing that we will able to pull from anywhere.
+
+# SECTION ABOUT THE PUBLISH STEPS
 
 ### Exercices
 
