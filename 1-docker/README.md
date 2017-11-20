@@ -107,7 +107,7 @@ We will describe the most important command to start with in this section.
     COMMAND (Optional) : Command to run inside your container
 
     Examples
-    
+
     |Command|Description|
     |-|-|
     |`docker run -it --rm --name myUbuntuContainer ubuntu /bin/bash`|Run an official Ubuntu image in an interactive mode with the bash|
@@ -191,11 +191,21 @@ We will describe the most important command to start with in this section.
 
     > You can manage your images by removing them using `docker rmi IMAGENAME` or pulling new one with `docker pull IMAGENAME`
 
-#### Containerizing a simple application
 #### Building and Pushing a Image
+
+    Building and pushing a custom image to a repository
+    - Building a python base image
+
+#### Containerizing a simple application
+
+    From a local python code to a container.
+        - Previous base image
+        - Mounting local folder to build from it
 
 ### Exercices
 
+    - Run NGINX image locally
+    - Run a TF Local image (We have to discuss in term of pulling size...)
 
 
 ### Useful Links
