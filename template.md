@@ -5,6 +5,7 @@
 [Link to previous necessary module (if any)]
 
 ## Summary
+[Summary of what is going to be teached in this module]
 
 ## <CONTENT>
 
@@ -16,9 +17,11 @@
 
 ### Exercice 1
 
-[Assignement & Useful links here]
+[Assignement description & Useful things/links here]
 
 #### Validation
+
+[steps to ensure verify success]
 
 #### Solution
 
