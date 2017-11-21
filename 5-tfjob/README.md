@@ -263,7 +263,9 @@ spec:
           restartPolicy: OnFailure
 ```
 
-</details>
+</details>  
+  
+
 
 Save the template that applies to you in a file, and create the `TfJob`:
 ```console
@@ -394,11 +396,6 @@ Once the container starts running, if you go to the Azure Portal, into your stor
 
 This means that when we run a training, all the important data is now stored in Azure File and is still available as long as we don't delete the file share.
 
-> Great, but what if I want to check out the training in TensorBoard, do I need to download everything on my machine?
-
-Actually no, you don't. `TfJob` provides a very handy mechanism to monitor your trainings with TensorBaord easily!  
-We will try that in our third excercice.
-
 #### Solution for Exercice 2
 
 *For brievety, the solution show here is for CPU-only training. If you are using GPU, don't forget to update the image tag as well as adding a GPU request.*
@@ -435,6 +432,13 @@ spec:
 </details>
 
 
+**Don't forget to delete the completed `TfJob` once it is complete!**
+
+> Great, but what if I want to check out the training in TensorBoard, do I need to download everything on my machine?
+
+Actually no, you don't. `TfJob` provides a very handy mechanism to monitor your trainings with TensorBaord easily!  
+We will try that in our third excercice.
+
 ### Excercice 3: Adding TensorBoard
 
 So far, we have a TensorFlow training running, and it's model and summaries are persisted to an Azure File share.  
@@ -464,9 +468,12 @@ Let's look at it:
 | VolumeMounts | [`VolumeMount`]() array | Pod volumes to mount into the container's filesystem. |
 
 
-`Volumes` and `VolumeMounts` should feel pretty familiar, this is exactly what we just did in exercice 2. 
-
-
+Let's add TensorBoard to our job then.
+Here is hiw this will work: We will keep the same TensorFlow training job as in exercice 2. This `TfJob` will write the model and summaries in the Azure File share.  
+We will also set up the configuration for TensorBoard so that it reads the summaries from the same Azure File share:
+* `Volumes` and `VolumeMounts` in `TensorBoardSpec` should be updated adequatly.
+* For `ServiceType`, you should use `LoadBalancer`, this will create a public IP so it will be easier to access.
+* `LogDir` will depend on how you configure `VolumeMounts`, but on your file share, the summaries will be under the `training_summaries` sub directory.
 
 #### Solution3 for Exercice 3
 
@@ -482,26 +489,24 @@ metadata:
   name: "example-job-tb-azure"
 spec:
   tensorboard:
-    logDir: /tmp/tensorflow
+    logDir: /tmp/tensorflow/training_summaries
     serviceType: LoadBalancer
     volumes:
       - name: azurefile
         azureFile:
             secretName: azure-secret
-            shareName: data
-            readOnly: false
+            shareName: tensorflow
     volumeMounts:
-      - mountPath: /tmp/tensorflow
+      - mountPath: /tmp/tensorflow #This could be any other path. All that maters is that LogDir reflects it.
         name: azurefile
   replicaSpecs:
-    - tfReplicaType: MASTER
-      template:
+    - template:
         spec:
           volumes:
             - name: azurefile
               azureFile:
                   secretName: azure-secret
-                  shareName: data
+                  shareName: tensorflow
                   readOnly: false
           containers:
             - image: wbuchwalter/tensorflow-for-poets:cpu
@@ -512,6 +517,26 @@ spec:
           restartPolicy: OnFailure
 ```
 </details>
+
+
+#### Validation
+
+If you updated the `TfJob` template correctly, when doing:
+```console
+kubectl get services
+```
+You should see something like:
+```
+NAME               CLUSTER-IP     EXTERNAL-IP     PORT(S)        AGE
+kubernetes         10.0.0.1       <none>          443/TCP        14d
+master-pj6i-0      10.0.126.11    <none>          2222/TCP       5m
+tensorboard-pj6i   10.0.199.170   104.42.193.76   80:31770/TCP   5m
+```
+Note that provisioning a public IP on Azure can take a few minutes. During this time the `EXTERNAL-IP` for TensorBoard's service will show as `<pending>`.  
+
+Once the public IP is provisioned, browse it, and you should land on a working TensorBoard instance with live monitoring of the training job running.
+
+![TensorBoard](./tensorboard.png)
 
 ## Next Step
 
