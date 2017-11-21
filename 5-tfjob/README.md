@@ -70,6 +70,7 @@ Before going further, let's take a look at what the `TfJob` object and it's cons
 > Note: Some of the fields are not described here for brievety purpose. 
 
 **`TfJob` Object**
+  
 | Field | Type| Description |
 |-------|-----|-------------| 
 | apiVersion | `string` | Versioned schema of this representation of an object. In our case, it's `tensorflow.org/v1alpha1` |
@@ -79,19 +80,21 @@ Before going further, let's take a look at what the `TfJob` object and it's cons
 
 `spec` is the most important part, so let's look at it too:
 
-**`TfJobSpec` Object**
+**`TfJobSpec` Object**  
+
 | Field | Type| Description |
 |-------|-----|-------------|
 | ReplicaSpecs | `TfReplicaSpec` array | Specification for a set of TensorFlow processes, defined below |
 
 Let's go deeper: 
 
-**`TfReplicaSpec` Object**
-| Field | Type| Description | Default Value (if any) |
-|-------|-----|-------------|---------------| 
-| TfReplicaType | `string` | What type of replica are we defining? Can be `MASTER`, `WORKER` or `PS`. When not doing distributed TensorFlow, we just use `MASTER` | `MASTER` | 
-| Replicas | `int` | Number of replicas of `TfReplicaType`. Again this is useful only for distributed TensorFLow. | `1` |
-| Template | [`PodTemplateSpec`](https://kubernetes.io/docs/api-reference/v1.8/#podtemplatespec-v1-core) | Describes the pod that will be created when executing a job. This is the standard Pod description that we have been using everywhere.  | |
+**`TfReplicaSpec` Object**  
+
+| Field | Type| Description |
+|-------|-----|-------------|
+| TfReplicaType | `string` | What type of replica are we defining? Can be `MASTER`, `WORKER` or `PS`. When not doing distributed TensorFlow, we just use `MASTER` which happens to be the default value. | 
+| Replicas | `int` | Number of replicas of `TfReplicaType`. Again this is useful only for distributed TensorFLow. Default value is `1`. |
+| Template | [`PodTemplateSpec`](https://kubernetes.io/docs/api-reference/v1.8/#podtemplatespec-v1-core) | Describes the pod that will be created when executing a job. This is the standard Pod description that we have been using everywhere.  |
 
 
 As a refresher, here is what a simple TensorFlow training would look like using "vanilla" kubernetes:
@@ -441,7 +444,8 @@ Turns out `TfJob` can also help us with that.
 When we looked at the `TfJob` specification at the beginning of this module, we omitted some fields in `TfJobSpec` descriptions.
 Here is a still incomplete but more accurate representation with one additional field:
 
-**`TfJobSpec` Object**
+**`TfJobSpec` Object**  
+
 | Field | Type| Description |
 |-------|-----|-------------|
 | ReplicaSpecs | `TfReplicaSpec` array | Specification for a set of TensorFlow processes. |
@@ -450,7 +454,8 @@ Here is a still incomplete but more accurate representation with one additional 
 That's right, `TfJobSpec` contains an object of type `TensorBoadSpec` which allows us to describe a TensorBoard instance!  
 Let's look at it:
 
-**`TensorBoardSpec` Object**
+**`TensorBoardSpec` Object**  
+
 | Field | Type| Description |
 |-------|-----|-------------|
 | LogDir | `string` | Location of TensorFlow summaries in the TensorBoard container. |
