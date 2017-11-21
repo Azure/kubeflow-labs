@@ -3,7 +3,7 @@
 * Create actual docker image with simple training
 * update example templates with this image
 * explain what is happening in the image
-* replace azure file share and secret creation by official doc? (https://docs.microsoft.com/en-in/azure/aks/azure-files)
+* describe full TfJob specification beforehand ?
 
 # `tensorflow/k8s` and `TfJob`
 
@@ -62,6 +62,37 @@ We will see in just a moment what each of them do.
 
 Kubernetes has a concept of [Custom Resources](https://kubernetes.io/docs/concepts/api-extension/custom-resources/) (often abreviated CRD) that allows us to create custom object that we will then be able to use.  
 In the case of `tensorflow/k8s`, after installation a new `TfJob` object will be available in our cluster. This object allows us to easily describe TensorFlow trainings.
+
+#### `TfJob` Specifications
+
+Before going further, let's take a look at what the `TfJob` object and it's constituant looks like:
+
+> Note: Some of the fields are not described here for brievety purpose. 
+
+**`TfJob` Object**
+| Field | Type| Description |
+|-------|-----|-------------| 
+| apiVersion | `string` | Versioned schema of this representation of an object. In our case, it's `tensorflow.org/v1alpha1` |
+| kind | `string` |  Value representing the REST resource this object represents. In our case it's `TfJob` |
+| metadata | [`ObjectMeta`](https://github.com/kubernetes/community/blob/master/contributors/devel/api-conventions.md#metadata)| Standard object's metadata. |
+| spec | `TfJobSpec` | The actual specification of our TensorFlow job, defined below. |
+
+`spec` is the most important part, so let's look at it too:
+
+**`TfJobSpec` Object**
+| Field | Type| Description |
+|-------|-----|-------------|
+| ReplicaSpecs | `TfReplicaSpec` array | Specification for a set of TensorFlow processes, defined below |
+
+Let's go deeper: 
+
+**`TfReplicaSpec` Object**
+| Field | Type| Description | Default Value (if any) |
+|-------|-----|-------------|---------------| 
+| TfReplicaType | `string` | What type of replica are we defining? Can be `MASTER`, `WORKER` or `PS`. When not doing distributed TensorFlow, we just use `MASTER` | `MASTER` | 
+| Replicas | `int` | Number of replicas of `TfReplicaType`. Again this is useful only for distributed TensorFLow. | `1` |
+| Template | [`PodTemplateSpec`](https://kubernetes.io/docs/api-reference/v1.8/#podtemplatespec-v1-core) | Describes the pod that will be created when executing a job. This is the standard Pod description that we have been using everywhere.  | |
+
 
 As a refresher, here is what a simple TensorFlow training would look like using "vanilla" kubernetes:
 
@@ -179,7 +210,7 @@ If you want to know more:
 
 ## Exercices 
 
-### 1. A Simple `TfJob`
+### Exercice 1: A Simple `TfJob`
 
 Let's schedule a very simple TensorFlow job using `TfJob` first.  
 
@@ -309,7 +340,7 @@ But `Volumes` are not just for mounting things from a node, we can also use them
 In our case we are going to use Azure Files, as it is really easy to use with Kubernetes.
 
 
-## 2. Azure Files to the Rescue
+## Exercice 2: Azure Files to the Rescue
 
 ### Creating a New File Share and Kubernetes Secret
 
@@ -365,10 +396,12 @@ This means that when we run a training, all the important data is now stored in 
 Actually no, you don't. `TfJob` provides a very handy mechanism to monitor your trainings with TensorBaord easily!  
 We will try that in our third excercice.
 
-#### Solutions for Exercice 2
+#### Solution for Exercice 2
+
+*For brievety, the solution show here is for CPU-only training. If you are using GPU, don't forget to update the image tag as well as adding a GPU request.*
 
 <details>
-<summary><strong>CPU Only</strong></summary>  
+<summary><strong>Solution</strong></summary>  
 
 When using GPU, we need to request for one (or multiple), and the image we are using also needs to be based on TensorFlow's GPU image.
 
@@ -399,8 +432,81 @@ spec:
 </details>
 
 
-### Adding TensorBoard
+### Excercice 3: Adding TensorBoard
 
+So far, we have a TensorFlow training running, and it's model and summaries are persisted to an Azure File share.  
+But having TensorBoard monitoring the training would be pretty useful as well.
+Turns out `TfJob` can also help us with that.
+
+When we looked at the `TfJob` specification at the beginning of this module, we omitted some fields in `TfJobSpec` descriptions.
+Here is a still incomplete but more accurate representation with one additional field:
+
+**`TfJobSpec` Object**
+| Field | Type| Description |
+|-------|-----|-------------|
+| ReplicaSpecs | `TfReplicaSpec` array | Specification for a set of TensorFlow processes. |
+| **TensorBoard** | `TensorBoardSpec` | Configuration to start a TensorBoard deployment associated to our training job. Defined below. |
+
+That's right, `TfJobSpec` contains an object of type `TensorBoadSpec` which allows us to describe a TensorBoard instance!  
+Let's look at it:
+
+**`TensorBoardSpec` Object**
+| Field | Type| Description |
+|-------|-----|-------------|
+| LogDir | `string` | Location of TensorFlow summaries in the TensorBoard container. |
+| ServiceType | [`ServiceType`]() | What kind of service should expose TensorBoard. Usually `ClusterIP` (Only reachable from within the cluster) or `LoadBalancer` (Exposes the service externally using a cloud provider’s load balancer. ) |
+| Volumes | [`Volume`]() array | List of volumes that can be mounted.  |
+| VolumeMounts | [`VolumeMount`]() array | Pod volumes to mount into the container's filesystem. |
+
+
+`Volumes` and `VolumeMounts` should feel pretty familiar, this is exactly what we just did in exercice 2. 
+
+
+
+#### Solution3 for Exercice 3
+
+*For brievety, the solution show here is for CPU-only training. If you are using GPU, don't forget to update the image tag as well as adding a GPU request.*
+
+<details>
+<summary><strong>Solution</strong></summary>  
+
+```yaml
+apiVersion: "tensorflow.org/v1alpha1"
+kind: "TfJob"
+metadata:
+  name: "example-job-tb-azure"
+spec:
+  tensorboard:
+    logDir: /tmp/tensorflow
+    serviceType: LoadBalancer
+    volumes:
+      - name: azurefile
+        azureFile:
+            secretName: azure-secret
+            shareName: data
+            readOnly: false
+    volumeMounts:
+      - mountPath: /tmp/tensorflow
+        name: azurefile
+  replicaSpecs:
+    - tfReplicaType: MASTER
+      template:
+        spec:
+          volumes:
+            - name: azurefile
+              azureFile:
+                  secretName: azure-secret
+                  shareName: data
+                  readOnly: false
+          containers:
+            - image: wbuchwalter/tensorflow-for-poets:cpu
+              name: tensorflow
+              volumeMounts:
+                - mountPath: /app/tf_files
+                  name: azurefile
+          restartPolicy: OnFailure
+```
+</details>
 
 ## Next Step
 
