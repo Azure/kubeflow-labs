@@ -246,7 +246,7 @@ We have now the following structure :
 ├── Dockerfile
 ```
 
-#### Building and Pushing a Image
+#### Build an Image
 
 The next step is to build our image to be able to run it using docker. For that we will use the command `docker build`.
 
@@ -272,7 +272,7 @@ Successfully built 5963706e6232
 Successfully tagged mypythonapp:latest
 ```
 
-When you have the successfully message, you should be able now to see if your image is locally available with the commands `docker images` described earlier.
+When you have the successfully built message, you should be able now to see if your image is locally available with the command `docker images` described earlier.
 
 Now we can try to run it locally using the `docker run` command :
 
@@ -295,14 +295,135 @@ As we can see the status fo the container is **UP** and using the port 32773 on 
 
 We can now open a browser on the page [http://localhost:32773](http://localhost:32773) to see our application running.
 
-The next step is to publish this image to a repository. Doing that we will able to pull from anywhere.
+The next step is to publish this image to a repository to be able to pull it from anywhere.
 
-# SECTION ABOUT THE PUBLISH STEPS
+#### Publish an Image
+
+Our image is now built and run it locally, but what about to share it to use it from anywhere by everybody ?
+
+We already introduced the concept of repository, we will now talk about the `push` action.
+
+Using the command `docker push` we will able to publish our image to a repository.
+
+For this example, we will use the [Docker Hub](https://hub.docker.com/) public repository. You need to be register to use it.
+
+When you are able to be connected on your [Docker Hub](https://hub.docker.com/) page you can run locally the command `docker login` using the same credentials.
+
+```bash
+$ docker login
+Login with your Docker ID to push and pull images from Docker Hub. If you don't have a Docker ID, head over to https://hub.docker.com to create one.
+Username : wbuchwalter
+Password: *************
+Login Succeeded
+```
+
+The next step will be to tag your image correctly before to publish it using the `docker tag` command. 
+
+The image should have the following structure name `<DockerHUBUserName>\<ImageName>:<Tag>`. In our case we will name our image with following structure : `wbuchwalter\mypythonapp`
+
+```bash
+$ docker tag mypythonapp wbuchwalter/mypythonapp
+```
+
+You can verify it running the `docker images` command 
+
+```bash
+$ docker images
+REPOSITORY                                      TAG                 IMAGE ID            CREATED             SIZE
+wbuchwalter/mypythonapp                     latest              78344eed0d30        20 hours ago        451MB
+mypythonapp                                     latest              78344eed0d30        20 hours ago        451MB
+ubuntu                                          16.04               20c44cd7596f        3 days ago          123MB
+ubuntu                                          latest              20c44cd7596f        3 days ago          123MB
+
+```
+
+We are now ready to push our image.
+
+```bash
+docker push wbuchwalter/mypythonapp
+```
 
 ### Exercices
 
-    - Run NGINX image locally
-    - Run a TF Local image (We have to discuss in term of pulling size...)
+### 1. Run a local docker image
+
+In this first exercice you will pull and run an official `nginx` image on your local docker environenement.
+
+#### Validation
+
+Since `nginx` is a web server, you will need to expose the port 80. You should be able to see following webpage from your browser :
+
+![](defaultnginx.png)
+
+
+#### Solution
+
+<details>
+<summary><strong>Solution (expand to see)</strong></summary>
+<p>
+
+```bash
+# All solutions accepted
+docker run -it -P nginx
+docker run -it -p 80:80 nginx
+docker run -it --rm -p 80:80 nginx
+docker run -it -d --rm -p 80:80 nginx
+...
+```
+
+</p>
+</details>
+
+### 1. Build and push your own image to a repository
+
+In this second exercice you will have to create your own image and push it to [Docker Hub](https://hub.docker.com).
+
+#### Validation
+
+- This image have to print a custom message in the console such as : `Hello <YourName>`
+- This message will call an environement variable name NAME_MESSAGE
+- We will able to modify this variable to customize the message with our own name. For example : `Hello Julien`
+- If this variable is not set when we start to container it will take the value : `World`. This will print the message `Hello World`
+- Don't think to complicated, use `bash` to create you script.
+
+#### Solution
+
+<details>
+<summary><strong>Solution (expand to see)</strong></summary>
+<p>
+
+We are creating a file named `app.sh` which contain:
+```bash
+#!/bin/bash
+while true; do
+    echo Hello $NAME_MESSAGE
+    sleep 1
+done
+```
+
+Dockerfile :
+
+```Dockerfile
+FROM ubuntu
+ENV NANE_MESSAGE World
+WORKDIR src
+ADD app.sh .
+CMD ["sh","app.sh"]
+...
+```
+
+Docker command to build, run and publish :
+```bash
+# Build the image
+docker build -t wbuchwalter/myawesomecontainer .
+# Execute it locally
+docker run -it -e NANE_MESSAGE=Will wbuchwalter/myawesomecontainer
+# Push to Docker Hub
+docker push wbuchwalter/myawesomecontainer
+```
+
+</p>
+</details>
 
 
 ### Useful Links
