@@ -1,0 +1,33 @@
+apiVersion: tensorflow.org/v1alpha1
+kind: TfJob
+metadata:
+  name: example-job-tb-azure
+spec:
+  tensorboard:
+    logDir: /tmp/tensorflow/training_summaries
+    serviceType: LoadBalancer
+    volumes:
+      - name: azurefile
+        azureFile:
+            secretName: azure-secret
+            shareName: tensorflow
+    volumeMounts:
+      - mountPath: /tmp/tensorflow #This could be any other path. All that maters is that LogDir reflects it.
+        name: azurefile
+  replicaSpecs:
+    - template:
+        spec:
+          volumes:
+            - name: azurefile
+              azureFile:
+                  secretName: azure-secret
+                  shareName: tensorflow
+                  readOnly: false
+          containers:
+            - image: wbuchwalter/tensorflow-for-poets:cpu
+              name: tensorflow
+              imagePullPolicy: Always
+              volumeMounts:
+                - mountPath: /app/tf_files
+                  name: azurefile
+          restartPolicy: OnFailure
