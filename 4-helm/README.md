@@ -13,7 +13,7 @@ In this module you will learn :
   
 ## Context
 
-As you saw in the second module [Kubernetes Basics and cluster created](../2-kubernetes), the default way to deploy objects in Kubernetes is by using `yaml` files.
+As you saw in the second module [Kubernetes Basics and cluster created](../2-kubernetes), the default way to deploy objects in Kubernetes is by using `kubectl` with `yaml` files.
 
 For example, if we want to deploy a `pod` running `nginx` and then make it available from an external IP using a `service` you will need to describe at least these two objects such as :
 
@@ -55,7 +55,7 @@ spec:
     app: nginx
 ```
 
-The problem using those, is the settings flexibility.
+The problem with this approach is that when you need to make an update to your solution, you will need to update it across different yaml files.
 
 Let's say you want to change the name of the app from `nginx` to `nginx-production`. You have to change it in a few places in the deployment and not forget to change the selector setting in the service as well.
 
@@ -163,7 +163,7 @@ helm install . --name my-custom-chart
 
 ## Exercises
 
-### Exercise 1 - Deploy an official Chart : Ghost
+### Exercise 1 - Deploy an official Chart : DokuWiki
 
 From the [official Chart repository](https://github.com/kubernetes/charts/tree/master) you have to deploy a DokuWiki environment.
 
