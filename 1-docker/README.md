@@ -374,7 +374,7 @@ docker run -it -d --rm -p 80:80 nginx
 </p>
 </details>
 
-### 1. Build and push your own image to a repository
+### 2. Build and push your own image to a repository
 
 In this second exercice you will have to create your own image and push it to [Docker Hub](https://hub.docker.com).
 
