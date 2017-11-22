@@ -8,14 +8,14 @@
 ## Summary
 
 In this module you will learn :
-* What is Helm and to use it
+* What is Helm and how to use it
 * What is a Chart and how to create one
   
 ## Context
 
-As you saw in the second module [Kubernetes Basics and cluster created](../2-kubernetes) the default way to deploy objects in Kubernetes is by using `yaml` files.
+As you saw in the second module [Kubernetes Basics and cluster created](../2-kubernetes), the default way to deploy objects in Kubernetes is by using `yaml` files.
 
-For example, if you we want to deploy a `pod` running `nginx` and then make it available from a external IP using a `service` you will need to describe at least those two objects such as :
+For example, if we want to deploy a `pod` running `nginx` and then make it available from an external IP using a `service` you will need to describe at least these two objects such as :
 
 Deployment : 
 ```yaml
@@ -55,11 +55,11 @@ spec:
     app: nginx
 ```
 
-The problem using those is the flexibility to change some settings in it. 
+The problem using those, is the settings flexibility.
 
-Let's say you want to change the name of the app from `nginx` to `nginx-production` ? You have to change it at few places in the deployment and don't forget to also change the selector setting in the service.
+Let's say you want to change the name of the app from `nginx` to `nginx-production`. You have to change it in a few places in the deployment and not forget to change the selector setting in the service as well.
 
-This is one of the example on what Helm is try to fix by beeing able to create and use templates.
+This is one example among others where Helm is fixing the issue by being able to create and use templates.
 
 ## Helm and Chart
 
@@ -67,19 +67,19 @@ Helm is the [package manager for Kubernetes](https://deis.com/blog/2016/trusting
 
 A package is named a **Chart**. 
 
-You can either create you own one, or pull and install some official one such as Wordpress, GitLab, Apache Spark, etc...
+You can either create you own, or pull and install an official one such as Wordpress, GitLab, Apache Spark, etc...
 
-You can find a list of the official one here : [https://github.com/kubernetes/charts/tree/master/stable](https://github.com/kubernetes/charts/tree/master/stable)
+You can find a list of the official ones here : [https://github.com/kubernetes/charts/tree/master/stable](https://github.com/kubernetes/charts/tree/master/stable)
 
 To use Helm, you need to have the [CLI installed on your machine](https://github.com/kubernetes/helm/blob/master/docs/install.md)
 
-Let's try to deploy a official Chart such as the popular [Wordpress](https://github.com/kubernetes/charts/tree/master/stable/wordpress)
+Let's try to deploy an official Chart such as the popular [Wordpress](https://github.com/kubernetes/charts/tree/master/stable/wordpress)
 
 ```bash
 helm install stable/wordpress
 ```
 
-After few seconds you should see the following answer in your terminal :
+After a few seconds you should see the following output in your terminal :
 
 ```bash
 ...
@@ -120,11 +120,11 @@ cloying-crocodile-wordpress  LoadBalancer  10.0.168.104  <pending>    80:31549/T
 ...
 ```
 
-You can see all the objects necessary to run our Wordpress application in my Kubernetes cluster deployed such as **pods**, **services**, **secrets** etc... And even more, since you we need a MariaDB engine to run Wordpress, he also automatically deployed it as dependency in my cluster !
+You can see all the objects that are necessary to run our Wordpress application in your Kubernetes cluster deployed such as **pods**, **services**, **secrets** etc... Furthermore, since we need a MariaDB engine to run Wordpress, Helm did also automatically deploy it as a dependency in the cluster !
 
-As you can see inside the [Wordpress's Chart documentation](https://github.com/kubernetes/charts/tree/master/stable/wordpress) you can overide some values such as the image, the database name or the smtp server for example.
+As you can see inside the [Wordpress's Chart documentation](https://github.com/kubernetes/charts/tree/master/stable/wordpress) you can override some values such as the image, the database name or the SMTP server for example.
 
-You just have to use the `--set` command during the `install` command, such as :
+You just have to use the `--set` option during the `install` command, like so :
 
 ```bash
 helm install --name my-wordpress \
@@ -136,7 +136,7 @@ helm install --name my-wordpress \
 
 You can also create your own Chart by using the scafolding command `helm create mychart`
 
-This will create a folder with all the files necessary to create your own package :
+This will create a folder which includes all the files necessary to create your own package :
 
 ```bash
 ├── Chart.yaml
@@ -149,23 +149,23 @@ This will create a folder with all the files necessary to create your own packag
 └── values.yaml
 ```
 
-All the objects that you want to deploy are stored inside the templates folder in different .yaml file.
+All the objects that you want to deploy are stored inside the templates folder in different .yaml files.
 
-You can find more informartions on how to create your own chart here : [https://deis.com/blog/2016/getting-started-authoring-helm-charts/](https://deis.com/blog/2016/getting-started-authoring-helm-charts/)
+You can find more information on how to create your own chart here : [https://deis.com/blog/2016/getting-started-authoring-helm-charts/](https://deis.com/blog/2016/getting-started-authoring-helm-charts/)
 
-When you are done with your package, helm is providing a linting command line `helm lint mychart` to help you find issues in it.
+When you are done with your package, Helm provides a linting tool `helm lint mychart` to help you find issues in it.
 
-If you want to deploy it into your cluster, you can run the following command from the repository where the files are:
+If you want to deploy it into your cluster, you can run the following command from the repository folder:
 
 ```bash
 helm install . --name my-custom-chart
 ```
 
-## Exercices
+## Exercice
 
 ### Exercice 1 - Deploy an official Chart : Ghost
 
-From the [official Chart repository](https://github.com/kubernetes/charts/tree/master) you have to deploy a DokuWiki environement.
+From the [official Chart repository](https://github.com/kubernetes/charts/tree/master) you have to deploy a DokuWiki environment.
 
 [DokuWiki](https://www.dokuwiki.org/) is a standards-compliant, simple to use wiki optimized for creating documentation. It is targeted at developer teams, workgroups, and small companies. All data is stored in plain text files, so no database is required.
 
@@ -173,7 +173,7 @@ From the [official Chart repository](https://github.com/kubernetes/charts/tree/m
 
 We want to be able to define a custom Wiki name such as `Hello MLADS` at the deployment.
 
-You should see be able to see the following web page from your deployment :
+You should see the following web page from your deployment :
 
 ![](dokuwiki.png)
 
