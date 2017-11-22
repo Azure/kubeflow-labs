@@ -211,9 +211,9 @@ If you want to know more:
 * [tensorflow/k8s](https://github.com/tensorflow/k8s) GitHub repository
 * [Introducing Operators](https://coreos.com/blog/introducing-operators.html), a blog post by CoreOS explaining the Operator pattern
 
-## Exercices 
+## Exercises 
 
-### Exercice 1: A Simple `TfJob`
+### Exercise 1: A Simple `TfJob`
 
 Let's schedule a very simple TensorFlow job using `TfJob` first.  
 
@@ -345,7 +345,7 @@ But `Volumes` are not just for mounting things from a node, we can also use them
 In our case we are going to use Azure Files, as it is really easy to use with Kubernetes.
 
 
-## Exercice 2: Azure Files to the Rescue
+## Exercise 2: Azure Files to the Rescue
 
 ### Creating a New File Share and Kubernetes Secret
 
@@ -387,7 +387,7 @@ Turns out mounting an Azure File share into a container is really easy, we simpl
       readOnly: false
 ```
 
-Update your template from exercice 1 to mount the Azure File share into your container,and create your new job.
+Update your template from exercise 1 to mount the Azure File share into your container,and create your new job.
 Note that by default our container saves everything into `/app/tf_files` so that's the value you will want to use for `MOUNT_PATH`.
 
 Once the container starts running, if you go to the Azure Portal, into your storage account, and browse your `tensorflow` file share, you should see something like that:
@@ -396,7 +396,7 @@ Once the container starts running, if you go to the Azure Portal, into your stor
 
 This means that when we run a training, all the important data is now stored in Azure File and is still available as long as we don't delete the file share.
 
-#### Solution for Exercice 2
+#### Solution for Exercise 2
 
 *For brievety, the solution show here is for CPU-only training. If you are using GPU, don't forget to update the image tag as well as adding a GPU request.*
 
@@ -469,13 +469,13 @@ Let's look at it:
 
 
 Let's add TensorBoard to our job then.
-Here is hiw this will work: We will keep the same TensorFlow training job as in exercice 2. This `TfJob` will write the model and summaries in the Azure File share.  
+Here is hiw this will work: We will keep the same TensorFlow training job as in exercise 2. This `TfJob` will write the model and summaries in the Azure File share.  
 We will also set up the configuration for TensorBoard so that it reads the summaries from the same Azure File share:
 * `Volumes` and `VolumeMounts` in `TensorBoardSpec` should be updated adequatly.
 * For `ServiceType`, you should use `LoadBalancer`, this will create a public IP so it will be easier to access.
 * `LogDir` will depend on how you configure `VolumeMounts`, but on your file share, the summaries will be under the `training_summaries` sub directory.
 
-#### Solution3 for Exercice 3
+#### Solution for Exercise 3
 
 *For brievety, the solution show here is for CPU-only training. If you are using GPU, don't forget to update the image tag as well as adding a GPU request.*
 

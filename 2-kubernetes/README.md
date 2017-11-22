@@ -99,7 +99,7 @@ With:
 ```console
 az acs create --agent-vm-size <AGENT_SIZE> --resource-group <RG> --name <NAME> 
 --orchestrator-type Kubernetes --agent-count <AGENT_COUNT> 
---location <LOCATION> --generate_ssh_keys True
+--location <LOCATION> --generate-ssh-keys
 ```
 
 With:  
