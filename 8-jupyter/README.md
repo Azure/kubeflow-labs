@@ -58,31 +58,31 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: tensorflow-server
-  name: tensorflow-server
+    app: jupyter-server
+  name: jupyter-server
 spec:
   ports:
   - port: 8888
     targetPort: 8888
   selector:
-    app: tensorflow-server
+    app: jupyter-server
   type: LoadBalancer
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: tensorflow-server
+  name: jupyter-server
 spec:
   replicas: 1
   template:
     metadata:
       labels:
-        app: tensorflow-server
+        app: jupyter-server
     spec:
       containers:
       - args:
         image: tensorflow/tensorflow
-        name: tensorflow
+        name: jupyter-server
         ports:
         - containerPort: 8888
 ```
@@ -99,50 +99,56 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: tensorflow-server
-  name: tensorflow-server
+    app: jupyter-server
+  name: jupyter-server
 spec:
   ports:
   - port: 8888
     targetPort: 8888
   selector:
-    app: tensorflow-server
+    app: jupyter-server
   type: LoadBalancer
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: tensorflow-server
+  name: jupyter-server
 spec:
   replicas: 1
   template:
     metadata:
       labels:
-        app: tensorflow-server
+        app: jupyter-server
     spec:
-      volumes:
-      - name: binaries
-        hostPath:
-          path: /usr/bin/
-      - name: libraries
-        hostPath:
-          path: /usr/lib/x86_64-linux-gnu
       containers:
-      - args:
-        command: ["/bin/sh", "-c"]
-        args: ["export LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu_custom:$LD_LIBRARY_PATH;"]
+      - name: jupyter-server
         image: tensorflow/tensorflow:latest-gpu
-        name: tensorflow
         ports:
-        - containerPort: 8888
+        - containerPort: 8888     
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: LD_LIBRARY_PATH
+          value: /usr/lib/nvidia:/usr/lib/x86_64-linux-gnu
         resources:
-          limits:
+          requests:
             alpha.kubernetes.io/nvidia-gpu: 1
         volumeMounts:
-        - mountPath: /usr/bin/
-          name: binaries
-        - mountPath: /usr/lib/x86_64-linux-gnu_custom
-          name: libraries
+        - mountPath: /usr/local/nvidia/bin
+          name: bin
+        - mountPath: /usr/lib/nvidia
+          name: lib
+        - mountPath: /usr/lib/x86_64-linux-gnu/libcuda.so.1
+          name: libcuda
+      volumes:
+        - name: bin
+          hostPath: 
+            path: /usr/lib/nvidia-384/bin
+        - name: lib
+          hostPath: 
+            path: /usr/lib/nvidia-384
+        - name: libcuda
+          hostPath:
+            path: /usr/lib/x86_64-linux-gnu/libcuda.so.1
 ```
 
 </p>
@@ -161,7 +167,7 @@ After the deployment is created, a pod running tensorflow will be created, along
 To verify, run the following to view the output log to get the URL and the token for the hosted Jupyter notebook:
 
 ```console
-kubectl log tensorflow-server-xxxxx
+kubectl log jupyter-server-xxxxx
 
 # sample output
 
@@ -172,7 +178,7 @@ http://localhost:8888/?token=2e7c875bd4e72137911d33e209c91d01f7a7b44868cf664d
 Next to get the public ip for the new service created for Jupyter Notebook, run:
 
 ```console
-kubectl get svc tensorflow-server -o jsonpath={.status.loadBalancer.ingress[0].ip}
+kubectl get svc jupyter-server -o jsonpath={.status.loadBalancer.ingress[0].ip}
 
 xx.xx.xx.xx
 ```
