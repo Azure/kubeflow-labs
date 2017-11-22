@@ -15,15 +15,30 @@ In this module you will learn :
 
 As you saw in the second module [Kubernetes Basics and cluster created](../2-kubernetes) the default way to deploy an object in Kubernetes is by using a `yaml` file.
 
-Let's pretend we want to deploy a `pod` running `nginx` and then make it available from the outside using a `service` we will need two 
-
-### Helm
+If you we want to deploy a `pod` running `nginx` and then make it available from the outside using a `service` you will need to describe at least those two objects 
 
 ## Chart
 
 ## Exercices
 
-### Exercice 1
+### Exercice 1 - Deploy an official Chart
+
+[Assignement description & Useful things/links here]
+
+#### Validation
+
+[steps to ensure verify success]
+
+#### Solution
+
+<details>
+<summary><strong>Solution (expand to see)</strong></summary>
+<p>
+    [solution]
+</p>
+</details>
+
+### Exercice 2 - Create your own Chart
 
 [Assignement description & Useful things/links here]
 
