@@ -2,16 +2,24 @@
 
 ## Prerequisites
 
-[Link to previous necessary module (if any)]
+* [Docker Basics](../1-docker/README.md)
+* [Kubernetes Basics and cluster created](../2-kubernetes)
 
 ## Summary
-[Summary of what is going to be teached in this module]  
+
+In this module you will learn :
+* What is Helm and to use it
+* What is a Chart and how to create one
   
-## < CONTENT>
+## Helm
 
-### < SUB-CONTENT-1 >
+As you saw in the second module [Kubernetes Basics and cluster created](../2-kubernetes) the default way to deploy an object in Kubernetes is by using a `yaml` file.
 
-### < SUB-CONTENT-2 >
+Let's pretend we want to deploy a `pod` running `nginx` and then make it available from the outside using a `service` we will need two 
+
+### Helm
+
+## Chart
 
 ## Exercices
 
