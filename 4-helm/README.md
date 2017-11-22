@@ -73,15 +73,6 @@ You can find a list of the official one here : [https://github.com/kubernetes/ch
 
 To use Helm, you need to have the [CLI installed on your machine](https://github.com/kubernetes/helm/blob/master/docs/install.md)
 
-To use it from your Kubernetes cluster, you have to enable it by doing :
-
-```bash
-helm repo add incubator https://kubernetes-charts-incubator.storage.googleapis.com/
-"incubator" has been added to your repositories
-```
-
-To use Helm, you need to have the [CLI installed on your machine](https://github.com/kubernetes/helm/blob/master/docs/install.md)
-
 Let's try to deploy a official Chart such as the popular [Wordpress](https://github.com/kubernetes/charts/tree/master/stable/wordpress)
 
 ```bash
