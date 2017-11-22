@@ -161,9 +161,9 @@ If you want to deploy it into your cluster, you can run the following command fr
 helm install . --name my-custom-chart
 ```
 
-## Exercice
+## Exercises
 
-### Exercice 1 - Deploy an official Chart : Ghost
+### Exercise 1 - Deploy an official Chart : Ghost
 
 From the [official Chart repository](https://github.com/kubernetes/charts/tree/master) you have to deploy a DokuWiki environment.
 

@@ -13,9 +13,9 @@
 
 ### < SUB-CONTENT-2 >
 
-## Exercices
+## Exercises
 
-### Exercice 1
+### Exercise 1
 
 [Assignement description & Useful things/links here]
 

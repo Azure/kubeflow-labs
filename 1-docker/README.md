@@ -343,11 +343,11 @@ We are now ready to push our image.
 docker push wbuchwalter/mypythonapp
 ```
 
-### Exercices
+### Exercises
 
 ### 1. Run a local docker image
 
-In this first exercice you will have to pull and run an official `nginx` image on your local docker environement.
+In this first exercise, you will have to pull and run an official `nginx` image on your local docker environement.
 
 #### Validation
 
@@ -376,7 +376,7 @@ docker run -it -d --rm -p 80:80 nginx
 
 ### 2. Build and push your own image to a repository
 
-In this second exercice you will have to create your own image and push it to [Docker Hub](https://hub.docker.com).
+In this second exercise you will have to create your own image and push it to [Docker Hub](https://hub.docker.com).
 
 #### Validation
 
