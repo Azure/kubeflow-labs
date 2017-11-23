@@ -152,7 +152,7 @@ spec:
           restartPolicy: OnFailure
 ```
 
-No need to mount drivers nor specify any environment variable anymore.
+No need to mount drivers nor specify any environment variable anymore. Note that we are note specifying `TfReplicaType` or `Replicas` as the default values are already what we want.
 
 #### How does this work?
 
