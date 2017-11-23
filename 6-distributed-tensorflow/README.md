@@ -194,30 +194,124 @@ server = tf.train.Server(server_def)
 # checking if this process is the chief (also called master). The master has the responsibility of creating the session, saving the summaries etc.
 is_chief = (job_name == 'master')
 
-# If this process has been assigned a parameter server task, we just join the server and wait.
-if job_name == 'ps':
-    server.join()
+# Notice that we are not handling the case where job_name == 'ps'. That is because `TfJob` will take care of the parameter servers for us by default.
 ```
 
 As for any distributed TensorFlow training, you will then also need to modify your model to split the operations and variables among the workers and parameter servers as well as create on session on the master.
 
 ## Exercices
 
-### Exercice 1
+### 1 - Modifying Our MNIST Example to Support Distributed Training
 
-[Assignement description & Useful things/links here]
+#### 1. a.
+Starting from the MNIST sample we have been working with so far, modify it to work with distributed TensorFlow and `TfJob`.
+You will then need to build the image and push it (you should push it under a different name or tag to avoid overwriting what you did before).
+
+#### 1. b.
+
+Modify the yaml template from module [5 - TfJob](../5-tfjob), to instead deploy 1 master, 2 workers and 1 PS.  
+Note that Since our model is very simple, TensorFlow will likely use only 1 of the workers, but it will still work fine.  
+Don't forget to update the image image or tag.
 
 #### Validation
 
-[steps to ensure verify success]
+```console
+kubectl get pods
+```
+
+Should yield:
+
+```
+NAME                                                 READY     STATUS    RESTARTS   AGE
+distributed-mnist-master-5oz2-0-r9rb5                1/1       Running   0          1m
+distributed-mnist-ps-5oz2-0-4kz7z                    1/1       Running   0          1m
+distributed-mnist-worker-5oz2-0-lmbll                1/1       Running   0          1m
+distributed-mnist-worker-5oz2-1-zrkrj                1/1       Running   0          1m
+distributed-mnist-tensorboard-5oz2-408823794-1m9nr   1/1       Running   0          1m
+tf-job-dashboard-23632363-z891v                      1/1       Running   0          23h
+tf-job-operator-1878936166-5wzs1                     1/1       Running   1          23h
+```
+
+looking at the logs of the master with:
+
+```console
+kubectl logs <master-pod-name>
+```
+
+Should yield:
+
+```
+Initialize GrpcChannelCache for job master -> {0 -> localhost:2222}
+Initialize GrpcChannelCache for job ps -> {0 -> distributed-mnist-ps-5oz2-0:2222}
+Initialize GrpcChannelCache for job worker -> {0 -> distributed-mnist-worker-5oz2-0:2222, 1 -> distributed-mnist-worker-5oz2-1:2222}
+```
+
+This indicates that the `ClusterSpec` was correctly exctracted from the environment variable and given to TensorFlow.
+
+After a few minutes, the status of both worker nodes should show as `Completed` when doing `kubectl get pods -a`.
 
 #### Solution
 
+**Code**:  
+A working code sample is availbe in [`solution-distributed-mnist](./solution-distributed-mnist).
+
+**`TfJob` Template**:
 <details>
-<summary><strong>Solution (expand to see)</strong></summary>
-<p>
-    [solution]
-</p>
+<summary><strong>Click to expand</strong></summary>  
+
+```yaml
+apiVersion: tensorflow.org/v1alpha1
+kind: TfJob
+metadata:
+  name: distributed-mnist
+spec:
+  tensorboard:
+    logDir: /tmp/tensorflow/logs
+    serviceType: LoadBalancer
+    volumes:
+      - name: azurefile
+        azureFile:
+            secretName: azure-secret
+            shareName: tensorflow3
+    volumeMounts:
+      - mountPath: /tmp/tensorflow 
+        name: azurefile
+  replicaSpecs:
+    - replicas: 1
+      tfReplicaType: MASTER
+      template:
+        spec:
+          volumes:
+            - name: azurefile
+              azureFile:
+                  secretName: azure-secret
+                  shareName: tensorflow3
+                  readOnly: false
+          containers:
+            - image: wbuchwalter/dist-mnist             
+              name: tensorflow
+              imagePullPolicy: Always
+              volumeMounts:
+                - mountPath: /tmp/tensorflow
+                  name: azurefile
+          restartPolicy: OnFailure
+    - replicas: 2
+      tfReplicaType: WORKER
+      template:
+        spec:
+          containers:
+            - image: wbuchwalter/dist-mnist              
+              name: tensorflow
+              imagePullPolicy: Always
+          restartPolicy: OnFailure
+    - replicas: 1  
+      tfReplicaType: PS
+```
+
+There are two things to notice here:
+* Since only the master will be saving the model and the summaries, we only need to mount the Azure File share on the master's `replicaSpec`, not on the `workers` or `ps`.
+* We are not specifying anything for the `PS` `replicaSpec` except the number of replicas. This is because `IsDefaultPS` is set to `true` by default. This means that the parmeter server(s) will be started with a pre-built docker image that is already configured to read the `TF_CONFIG` and act as a TensorFlow server, so we don't need to do anything here.
+
 </details>
 
 
