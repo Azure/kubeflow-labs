@@ -54,9 +54,6 @@ def train():
 
   is_chief = (job_name == 'master')
 
-  if job_name == 'ps':
-      server.join()
-
   # Import data
   mnist = input_data.read_data_sets(FLAGS.data_dir,
                                     one_hot=True,
