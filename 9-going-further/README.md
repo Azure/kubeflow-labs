@@ -8,7 +8,7 @@ All the previous modules
 
 Here are some more advanced concepts and resources
   
-## Distributed Storage and tools
+## Distributed Storage, tools and concepts
 
 Storage and statefull containers is a bit tricky in the containerization space.
 
@@ -47,3 +47,7 @@ This is well integrated with docker and kubernetes to run balanced computing pro
 A virtual file system adapter for Azure Blob storage.
 
 blobfuse is an open source project developed to provide a virtual filesystem backed by the Azure Blob storage. It uses the libfuse open source library to communicate with the Linux FUSE kernel module, and implements the filesystem operations using the Azure Storage Blob REST APIs.
+
+### Autoscaling
+
+[Autoscaling concepts with a Kubernetes cluster on Azure](https://medium.com/@wbuchwalter/autoscaling-a-kubernetes-cluster-created-with-acs-engine-on-azure-5e24ddc6402e)
