@@ -1,6 +1,7 @@
 # TODO
 
 * Describe how  to grab the `ClusterSpec`
+* Show TensorFlow graph in tensorboard with the different devices
 
 # Distributed TensorFlow with `TfJob`
 
