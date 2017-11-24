@@ -3,53 +3,49 @@
 {{- $chartname := .Chart.Name -}}
 {{- $chartversion := .Chart.Version -}}
 {{- $image := .Values.image -}}
-{{- $useGPU := .Values.useGPU}}
+{{- $useGPU := .Values.useGPU -}}
+{{- $shareName := .Values.shareName -}}
+
 
 {{- range $i, $lr := $lrlist }}
 {{- range $j, $nblayers := $nblayerslist }}
-apiVersion: "mlkube.io/v1beta1"
-kind: "TfJob"
+apiVersion: tensorflow.org/v1alpha1
+kind: TfJob
 metadata:
   name: tf-paint-sample-{{ $i }}-{{ $j }}
   labels:
     chart: "{{ $chartname }}-{{ $chartversion | replace "+" "_" }}"
 spec: 
   replicaSpecs:
-    - replicas: 1
-      tfPort: 2222
-      tfReplicaType: MASTER
-      template:
-        metadata:
-          labels:
-            app: tf-paint-sample-{{ $i }}-{{ $j }}
+    - template:
         spec:
           restartPolicy: OnFailure
           containers:
-          - name: tensorflow
-            image: {{ $image }}
-            env:
-            - name: LC_ALL
-              value: C.UTF-8
-            args:
-              - --learning-rate
-              - {{ $lr | quote }}
-              - --hidden-layers
-              - {{ $nblayers | quote }}
-              - --log-dir
-              - /tmp/tensorflow/tf-paint-lr{{ $lr }}-d-{{ $nblayers }}
+            - name: tensorflow
+              image: {{ $image }}
+              env:
+              - name: LC_ALL
+                value: C.UTF-8
+              args:
+                - --learning-rate
+                - {{ $lr | quote }}
+                - --hidden-layers
+                - {{ $nblayers | quote }}
+                - --logdir
+                - /tmp/tensorflow/tf-paint-lr{{ $lr }}-d-{{ $nblayers }}
 {{ if $useGPU }}
-            resources:
-              requests:
-                alpha.kubernetes.io/nvidia-gpu: 1 
+              resources:
+                requests:
+                  alpha.kubernetes.io/nvidia-gpu: 1 
 {{ end }}
-            volumeMounts:
-            - mountPath: /tmp/tensorflow
-              name: azurefile
+              volumeMounts:
+              - mountPath: /tmp/tensorflow
+                name: azurefile
           volumes:
             - name: azurefile
               azureFile:
                   secretName: azure-secret
-                  shareName: tensorflow
+                  shareName: {{ $shareName }}
                   readOnly: false
 ---
 {{- end }}
@@ -84,7 +80,7 @@ spec:
       - name: azurefile
         azureFile:
             secretName: azure-secret
-            shareName: tf-data
+            shareName: {{ $shareName }}
             readOnly: true      
       containers:
       - name: tensorboard
