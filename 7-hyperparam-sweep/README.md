@@ -1,12 +1,10 @@
-* http://cs.stanford.edu/people/karpathy/convnetjs/demo/image_regression.html
-
 # Hyper Parameters Sweep with `TfJob` and Helm
 
 ## Prerequisites
 
-[4 - Helm](../4-Helm)
-[5 - TfJob](../5-tfjob)
-
+* [4 - Helm](../4-Helm)
+* [5 - TfJob](../5-tfjob)
+  
 ### "Vanilla" Hyperparameter Sweep
 
 Just as distributed training, automated hyperparameter sweeping is also very rarely used in many organizations.  
@@ -14,7 +12,7 @@ The reasons are similar. It takes a lot of resources, or time, to run more than 
   * Either you run different hypothesis in parallel, which will likely requires a lot of resources and VMs. These VMs need to be managed by someone, the model need to be deployed, logs and checkpoints have to be gathered etc.
   * Or you run everything sequentially on a few number of VMs, which takes a lot of time before being able to compare result
 
-So in practice most people just run a few trainings based on their intuition of what the optimal hyperparameters should be and pick a winner.  
+So in practice most people just run a few trainings based on their intuition of what the optimal hyperparameters should be and pick a winner. 
 
 ### Kubernetes + Helm
 
@@ -59,7 +57,7 @@ That way, when installing the chart, 4 `TfJob` will actually get deployed:
 This is a very simple example (our model is also very simple), but hopefully you start to see the possibilities than Helm opens.
 
 In this excercise, we are going to use a new model based on [Andrej Karpathy's Image painting demo](http://cs.stanford.edu/people/karpathy/convnetjs/demo/image_regression.html).  
-This model objective is to to create a new picture as close as possible to the original one:
+This model objective is to to create a new picture as close as possible to the original one, The Starry Night by Vincent van Gogh:
 
 ![Starry](./src/starry.jpg)
 
