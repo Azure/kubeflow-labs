@@ -57,13 +57,13 @@ That way, when installing the chart, 4 `TfJob` will actually get deployed:
 This is a very simple example (our model is also very simple), but hopefully you start to see the possibilities than Helm opens.
 
 In this excercise, we are going to use a new model based on [Andrej Karpathy's Image painting demo](http://cs.stanford.edu/people/karpathy/convnetjs/demo/image_regression.html).  
-This model objective is to to create a new picture as close as possible to the original one, The Starry Night by Vincent van Gogh:
+This model objective is to to create a new picture as close as possible to the original one, "The Starry Night" by Vincent van Gogh:
 
 ![Starry](./src/starry.jpg)
 
 The source code is located in [src/](./src/).  
 
-Our model takes 3 parameters that we can tweak:
+Our model takes 3 parameters:
 
 | argument | description | default value |
 |------|-------------|---------------|
