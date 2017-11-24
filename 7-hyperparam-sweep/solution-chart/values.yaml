@@ -1,0 +1,10 @@
+# Default values for param-sweep.
+image: wbuchwalter/helm-tf-hyper-param-sweep
+useGPU: false
+hyperParamValues:
+  learningRate:
+    - 0.0001
+    - 0.001
+  hiddenLayers:
+    - 4
+    - 5
