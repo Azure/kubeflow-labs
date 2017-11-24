@@ -1,4 +1,4 @@
-# Train ML Models at Scale with Kubernetes on Azure
+# Train TensorFlow Models at Scale with Kubernetes on Azure
 
 <!-- ## [Learning Objectives](./learningObjectives.md)
 ## [Presentation Content](./presentationContent.md)
