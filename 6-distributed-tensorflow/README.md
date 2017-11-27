@@ -1,9 +1,3 @@
-# TODO
-
-* Frame problem: distributed is hard, easier with TfJob
-* Describe how  to grab the `ClusterSpec`
-* Show TensorFlow graph in tensorboard with the different devices
-
 # Distributed TensorFlow with `TfJob`
 
 ## Prerequisites
@@ -250,14 +244,15 @@ This indicates that the `ClusterSpec` was correctly exctracted from the environm
 
 After a few minutes, the status of both worker nodes should show as `Completed` when doing `kubectl get pods -a`.
 
+![TensorBoard]()
+
 #### Solution
 
-**Code**:  
+
 A working code sample is availbe in [`solution-distributed-mnist](./solution-distributed-mnist).
 
-**`TfJob` Template**:
 <details>
-<summary><strong>Click to expand</strong></summary>  
+<summary><strong>TfJob's Template</strong></summary>  
 
 ```yaml
 apiVersion: tensorflow.org/v1alpha1
@@ -272,7 +267,7 @@ spec:
       - name: azurefile
         azureFile:
             secretName: azure-secret
-            shareName: tensorflow3
+            shareName: tensorflow
     volumeMounts:
       - mountPath: /tmp/tensorflow 
         name: azurefile
@@ -285,7 +280,7 @@ spec:
             - name: azurefile
               azureFile:
                   secretName: azure-secret
-                  shareName: tensorflow3
+                  shareName: tensorflow
                   readOnly: false
           containers:
             - image: wbuchwalter/dist-mnist             

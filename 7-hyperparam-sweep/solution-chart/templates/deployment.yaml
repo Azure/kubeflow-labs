@@ -1,0 +1,96 @@
+{{- $lrlist := .Values.hyperParamValues.learningRate -}}
+{{- $nblayerslist := .Values.hyperParamValues.hiddenLayers -}}
+{{- $chartname := .Chart.Name -}}
+{{- $chartversion := .Chart.Version -}}
+{{- $image := .Values.image -}}
+{{- $useGPU := .Values.useGPU -}}
+{{- $shareName := .Values.shareName -}}
+
+
+{{- range $i, $lr := $lrlist }}
+{{- range $j, $nblayers := $nblayerslist }}
+apiVersion: tensorflow.org/v1alpha1
+kind: TfJob
+metadata:
+  name: tf-paint-sample-{{ $i }}-{{ $j }}
+  labels:
+    chart: "{{ $chartname }}-{{ $chartversion | replace "+" "_" }}"
+spec: 
+  replicaSpecs:
+    - template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: tensorflow
+              image: {{ $image }}
+              env:
+              - name: LC_ALL
+                value: C.UTF-8
+              args:
+                - --learning-rate
+                - {{ $lr | quote }}
+                - --hidden-layers
+                - {{ $nblayers | quote }}
+                - --logdir
+                - /tmp/tensorflow/tf-paint-lr{{ $lr }}-d-{{ $nblayers }}
+{{ if $useGPU }}
+              resources:
+                requests:
+                  alpha.kubernetes.io/nvidia-gpu: 1 
+{{ end }}
+              volumeMounts:
+              - mountPath: /tmp/tensorflow
+                name: azurefile
+          volumes:
+            - name: azurefile
+              azureFile:
+                  secretName: azure-secret
+                  shareName: {{ $shareName }}
+                  readOnly: false
+---
+{{- end }}
+{{- end }}
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: tensorboard
+  name: tensorboard
+spec:
+  ports:
+  - port: 80
+    targetPort: 6006
+  selector:
+    app: tensorboard
+  type: LoadBalancer
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: tensorboard
+  name: tensorboard
+spec:
+  template:
+    metadata:
+      labels:
+        app: tensorboard
+    spec:
+      volumes:
+      - name: azurefile
+        azureFile:
+            secretName: azure-secret
+            shareName: {{ $shareName }}
+            readOnly: true      
+      containers:
+      - name: tensorboard
+        command:
+          - /usr/local/bin/tensorboard
+          - --logdir=/tmp/tensorflow
+          - --host=0.0.0.0
+        image: tensorflow/tensorflow
+        ports:
+        - containerPort: 6006
+        volumeMounts:
+        - mountPath: /tmp/tensorflow
+          name: azurefile  
