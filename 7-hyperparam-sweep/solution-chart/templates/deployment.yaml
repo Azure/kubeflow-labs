@@ -1,12 +1,15 @@
+
+# First we copy the values of values.yaml in variable to make it easier to access them
 {{- $lrlist := .Values.hyperParamValues.learningRate -}}
 {{- $nblayerslist := .Values.hyperParamValues.hiddenLayers -}}
-{{- $chartname := .Chart.Name -}}
-{{- $chartversion := .Chart.Version -}}
 {{- $image := .Values.image -}}
 {{- $useGPU := .Values.useGPU -}}
 {{- $shareName := .Values.shareName -}}
+{{- $chartname := .Chart.Name -}}
+{{- $chartversion := .Chart.Version -}}
 
-
+# Then we loop over every value of $lrlist (learning rate) and $nblayerslist (hidden layer depth)
+# This will result in create 1 TfJob for every pair of learning rate and hidden layer depth
 {{- range $i, $lr := $lrlist }}
 {{- range $j, $nblayers := $nblayerslist }}
 apiVersion: tensorflow.org/v1alpha1
@@ -32,8 +35,8 @@ spec:
                 - --hidden-layers
                 - {{ $nblayers | quote }}
                 - --logdir
-                - /tmp/tensorflow/tf-paint-lr{{ $lr }}-d-{{ $nblayers }}
-{{ if $useGPU }}
+                - /tmp/tensorflow/tf-paint-lr{{ $lr }}-d-{{ $nblayers }} # We save the summaries in a different for every model
+{{ if $useGPU }}  # We only want to request GPUs if we asked for it in values.yaml with useGPU
               resources:
                 requests:
                   alpha.kubernetes.io/nvidia-gpu: 1 
@@ -50,6 +53,8 @@ spec:
 ---
 {{- end }}
 {{- end }}
+# We are not using TfJob integrated TensorBoard, because we want to create the Service and Deployment outside of the loop
+# since we only want one instance running for all our jobs, and not 1 per job.
 apiVersion: v1
 kind: Service
 metadata:

@@ -38,23 +38,22 @@ In this excercise, you will create a new Helm chart that will deploy a number of
 Here is what our `values.yaml` file could look like for example (you are free to go a different route):
 
 ```yaml
-image: <IMAGE>
-training:
-  LearningRateSweep:
-    - 0.0001
+image: wbuchwalter/helm-tf-hyperparam-sweep:cpu
+useGPU: false
+shareName: tensorflow
+hyperParamValues:
+  learningRate:
     - 0.001
-  hiddenLayersSweep:
-    - 4
+    - 0.01
+    - 0.1
+  hiddenLayers:
     - 5
+    - 6
+    - 7
 ```
 
-That way, when installing the chart, 4 `TfJob` will actually get deployed:
-* 4 hidden layers and learning rate of 0.0001
-* 4 hidden layers and learning rate of 0.001
-* 5 hidden layers and learning rate of 0.0001
-* 5 hidden layers and learning rate of 0.001
-
-This is a very simple example (our model is also very simple), but hopefully you start to see the possibilities than Helm opens.
+That way, when installing the chart, 9 `TfJob` will actually get deployed (3 x 3), testing all the combination of learning rate and hidden layers depth that we specified.  
+This is a very simple example (our model is also very simple), but hopefully you start to see the possibilities than Helm offers.
 
 In this excercise, we are going to use a new model based on [Andrej Karpathy's Image painting demo](http://cs.stanford.edu/people/karpathy/convnetjs/demo/image_regression.html).  
 This model objective is to to create a new picture as close as possible to the original one, "The Starry Night" by Vincent van Gogh:
@@ -82,14 +81,43 @@ If you are pretty new to Kubernetes and Helm and don't feel like building your o
 
 #### Validation
 
+Once you have created and deployed your chart, looking at the pods that were created, you should see a bunch of them, as well as a single TensorBoard instance monitoring all of them:
 
+```console
+kubectl get pods
+```
 
-<details>
-<summary><strong>Solution (expand to see)</strong></summary>
-<p>
-    
-</p>
-</details>
+```
+NAME                                      READY     STATUS    RESTARTS   AGE
+tensorboard-2184014798-ht4rb              1/1       Running   0          23s
+tf-job-dashboard-23632363-z891v           1/1       Running   0          4d
+tf-job-operator-1878936166-5wzs1          1/1       Running   1          4d
+tf-paint-sample-0-0-master-guwb-0-ghwr9   1/1       Running   0          15s
+tf-paint-sample-0-1-master-5z9e-0-q11wx   1/1       Running   0          15s
+tf-paint-sample-0-2-master-6d4j-0-0vnh4   1/1       Running   0          15s
+tf-paint-sample-1-0-master-b8ok-0-x989m   1/1       Running   0          14s
+tf-paint-sample-1-1-master-61e2-0-2zm6h   1/1       Running   0          15s
+tf-paint-sample-1-2-master-w2tv-0-f1d5b   1/1       Running   0          14s
+tf-paint-sample-2-0-master-1beh-0-5bq9h   1/1       Running   0          14s
+tf-paint-sample-2-1-master-ke19-0-kqsls   1/1       Running   0          15s
+tf-paint-sample-2-2-master-53xh-0-dw6sm   1/1       Running   0          15s
+```
+
+Looking at TensorBoard, you should see something similar to this:
+![TensorBoard](tensorboard.png)
+
+> Note that TensorBoard can take a while before correctly displaying images.
+
+Here we can see that some models are doing much better than others. Models with a learning rate of `0.1` for example are producing an all-black image, we are probably over-shooting.  
+After a few minutes, we can see that the two best performing models are:
+* 5 hidden layers and learning rate of `0.01`
+* 7 hidden layers and learning rate of `0.001`
+
+At this point we could decide to kill all the other models if we wanted to free some capacity in our cluster, or launch additional new experiments based on our initial findings.
+
+#### Solution
+
+Check out the commented solution chart: [./solution-chart/templates/deployment.yaml](./solution-chart/templates/deployment.yaml)
 
 
 ## Next Step
