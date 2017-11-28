@@ -1,4 +1,4 @@
-# Train ML Models at Scale with Kubernetes on Azure
+# Train TensorFlow Models at Scale with Kubernetes on Azure
 
 <!-- ## [Learning Objectives](./learningObjectives.md)
 ## [Presentation Content](./presentationContent.md)
@@ -22,9 +22,9 @@
 |1| **[Docker](1-docker)** | Docker and containers 101.|
 |2| **[Kubernetes](2-kubernetes)** | Kubernetes important concepts overview.|
 |3| **[GPUs](3-gpus)** | How to use GPUs with Kubernetes.|
-|4| **[Helm](4-helm)** | |
-|5| **[TfJob](5-tfjob)** | |
-|6| **[Distributed Tensorflow](6-distributed-tensorflow)** | |
-|7| **[Hyper-parameters Sweeping](7-hyper-param-sweeping)** | |
-|8| **[Jupyter Notebooks](8-jupyter)** | |
+|4| **[Helm](4-helm)** | Introduction to Helm |
+|5| **[TfJob](5-tfjob)** | How to use `tensorflow/k8s` and `TfJob` to deploy a simple TensorFlow training.|
+|6| **[Distributed Tensorflow](6-distributed-tensorflow)** | Going distributed with `TfJob`|
+|7| **[Hyperparameters Sweep with Helm](7-hyperparam-sweep)** | Using Helm to deploy a large number of training testing different hypothesis, monitoring and comparing them. |
+|8| **[Jupyter Notebooks](8-jupyter)** | Easily deploy a Jupyter Notebook instance on Kubernetes. |
 |9| **[Going Further](9-going-further)** | Autoscaling, Azure Fuse, GlusterFS etc. |

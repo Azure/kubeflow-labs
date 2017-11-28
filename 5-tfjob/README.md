@@ -1,10 +1,3 @@
-## TODO:
-
-* Create actual docker image with simple training
-* update example templates with this image
-* explain what is happening in the image
-* describe full TfJob specification beforehand ?
-
 # `tensorflow/k8s` and `TfJob`
 
 ## Prerequisites
