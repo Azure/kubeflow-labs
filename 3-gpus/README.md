@@ -194,5 +194,14 @@ spec:
 
 ### 2. Running TensorFlow with GPU
 
+In module 1 and 2, we first created a Docker image for our MNIST classifier and then ran a training on Kubernetes.  
+However, this training only used CPU. Let's make things much faster by accelerating our training with GPU.
+
+
+
+### Validation
+
+### Solution
+
 ## Next Step
 [4 - Helm](../4-helm/README.md)
