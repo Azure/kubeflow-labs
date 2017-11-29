@@ -5,7 +5,7 @@
 
 ### Summary
 
-In this module you will learn :
+In this module you will learn:
 * The basic concepts of Kubernetes
 * How to create a Kubernetes cluster on Azure
 
@@ -13,7 +13,7 @@ In this module you will learn :
 
 ## The basic concepts of Kubernetes
 
-While there are many options for running containerized distributed deep learning at scale, we have selected Kubernetes due to its superior cluster management technology and the huge developer community. [Kubernetes](https://kubernetes.io/) is an open-source technology that makes it easier to automate deployment, scale, and manage containerized applications in a clustered environment. The ability to use GPUs with Kubernetes allows the clusters to facilitate running frequent experimentations, using it for high-performing serving, and auto-scaling of deep learning models, and much more. 
+[Kubernetes](https://kubernetes.io/) is an open-source technology that makes it easier to automate deployment, scale, and manage containerized applications in a clustered environment. The ability to use GPUs with Kubernetes allows the clusters to facilitate running frequent experimentations, using it for high-performing serving, and auto-scaling of deep learning models, and much more. 
 
 ### Overview
 
@@ -80,6 +80,16 @@ AKS is currently still in preview and acs-engine is a bit more complex to setup,
 We are going to create a Linux-based K8s cluster.
 You can either create the cluster using the portal, or using Azure-CLI (`az`).
 
+### A Note on GPUs with Kubernetes
+
+As of this writing, GPUs are still in preview with ACS.  
+You can deploy an ACS cluster with GPU VMs (such as `Standard_NC6`) in `uswest2` or `uksouth` but you should be aware of some pitfalls:
+* Deploying a GPU cluster takes longer than a CPU cluster (about 10-15 minutes more) because the NVIDIA drivers need to be installed as well.
+* Since this is a preview, you might hit capacity issues if the location you chose does not have enough GPUs available to accomodate you.
+
+**Unless you are already pretty familiar with docker and Kubernetes, we recommend that you create a cluster with CPU VMs to save some time.**
+Only module 3 has an excercise which is specific for GPU VMs, all other modules can be followed on either CPU or GPU clusters.
+
 ### With the CLI
 
 #### Creating a resource group
@@ -92,8 +102,7 @@ With:
 | Parameter | Description |
 | --- | --- | 
 | RESOURCE_GROUP_NAME | Name of the resource group where the cluster will be deployed.  |
-| LOCATION | Name of the region where the cluster should be deployed. If you are going to use GPUs, make sure you target one of the region with GPU availability (such as `southcentralus`, `westus`, `eastus` etc.), also make sure you have enough cores available in your sub. |
-
+| LOCATION | Name of the region where the cluster should be deployed. |
 
 #### Creating the cluster  
 ```console
@@ -106,7 +115,7 @@ With:
   
 | Parameter | Description |
 | --- | --- | 
-| AGENT_SIZE | The size of K8s's agent VM. For this workshop use `Standard_NC6` if you want GPUs or `Standard_D2_v2` for CPU only. |
+| AGENT_SIZE | The size of K8s's agent VM. `Standard_D2_v2` is enough for this workshop. |
 | RG | Name of the resource group that was created in the previous step. |
 | NAME | Name of the ACS resource (can be whatever you want). | 
 | AGENT_COUNT | The number of agents (virtual machines) that you want in your cluster. 2 or 3 is recommended to play with hyper-parameter tuning and distributed TensorFlow | 
@@ -149,19 +158,15 @@ k8s-agent-ef2b999d-2    Ready     9d        v1.7.7
 k8s-master-ef2b999d-0   Ready     9d        v1.7.7
 ```
 
-If you provisioned GPU VM, describing one of the node with:
+If you provisioned GPU VM, describing one of the node should indicate the presence of GPU(s) on the node:
 ```console
-kubectl describe node <NODE_NAME>
-```
+> kubectl describe node <NODE_NAME>
 
-Should indicate the presence of GPU(s) on the node:
-```
 [...]
 Capacity:
  alpha.kubernetes.io/nvidia-gpu:	1
 [...]
  ```
-
 
 ## Next Step
 [Module 3: GPUs](../3-gpus/README.md)
