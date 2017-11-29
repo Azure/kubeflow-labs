@@ -1,0 +1,13 @@
+apiVersion: batch/v1
+kind: Job # Our training should be a Job since it is supposed to terminate at some point
+metadata:
+  name: mnist-training # Name of our job
+spec:
+  template: # Template of the Pod that is going to be run by the Job
+    metadata:
+      name: mnist-pod # Name of the pod
+    spec:
+      containers: # List of containers that should run inside the pod, in our case there is only one.
+      - name: tensorflow
+        image: wbuchwalter/tf-mnist # The image to run, you can replace by your own.
+        args: ["--max_steps", "500"] # Optional arguments to pass to our command. By default the command is defined by ENTRYPOINT in the Dockerfile
