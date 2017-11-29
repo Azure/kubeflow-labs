@@ -2,81 +2,26 @@
 
 ### Summary
 
-In this section you will learn about :
+In this section you will learn about:
 * Running Docker locally
 * Basics of Docker
 * Containerizing a simple application
 * Building and Pushing an Image
 
-### Setup Docker locally
 
-The official documentation from *docs.docker.com* is very well detailed for setting up Docker locally depending on your OS :
-* [Mac](https://docs.docker.com/docker-for-mac/)
-* [Linux](https://docs.docker.com/engine/installation/linux/) 
-* [Windows](https://docs.docker.com/docker-for-windows/)
 
-### Basics of Docker
+### Basics of Docker and Containers
 
-You can see all the commands running `docker --help` from your terminal or powershell.
+Docker has a very well structured six-part tutorial. 
+While for this workshop you don't need to go through all of them, part 1 and 2 are required:
+* [Get Started, Part 1: Orientation and setup](https://docs.docker.com/get-started)
+* [Get Started, Part 2: Containers](https://docs.docker.com/get-started/part2/)
 
-#### Base image and registry
+By the end of Part 2, you should have a simple container up and running, and understand the basic concepts of a container.
 
-All containers contain **layers**. Those layers are customizations, such as tools installations, scripts and more. 
+#### Additional Important Docker Command
 
-In a really high level example, if you want an ubuntu image with python3 installed and the Azure CLI, you have to think about the following steps :
-- Install ubuntu
-- Install python3 from apt-get
-- Install Azure CLI from a script
-
-With Docker, those 3 steps are considered as layers. Those layers can already be prebuilt, to avoid all the installation time, and called a **base image**.
-
-**Base images** can be built and used locally, or pulled from a **registry**. This **registry** could be either public or private. One of the most popular and official is called : [Docker Hub](https://hub.docker.com/)
-
-If you look at the [Docker Hub](https://hub.docker.com/) and do some search you can find multiple **official images** such as : Ubuntu, Redis, Nginx, Mongo and more...
-
-> You can also search from your terminal using the `docker search` command line.
-
-We will explain later how to locally build you own image.
-
-# NOTE : ADD a section to explain the usage of docker apply to ML.
-
-#### Command line
-
-We will describe the most important command to start with in this section.
-
-1. `docker run OPTIONS IMAGE COMMAND`
-    
-    The docker `run` command allows to start a container, with different options, from a base image.
-
-    Popular OPTIONS :
-
-    |Option|Description|Scenario|
-    |-|-|-|
-    |-it|Interactive mode (-i and -t combined)|When you need a prompt in the container
-    |-d|Detached|When you want to run you container in the background such as scripts or server.
-    |-P|Map the necessary port in the container to the host using a random one|When you want to reach a port in your container, for example the port 80 for a web server
-    |-p|Map a specific port in the container to a specific one on the host |When you want to reach a port in your container, for example the port 80 for a web server
-    |-e|Inject a environment variable|When you are using environement variables in your script such as connection string
-    |-v|Mount a folder from the host in the container|When you want to modify files in your container such as configuration or codes for example, without restarting a new one
-    |--name|Give a name to the container|When you want to identify your containers
-    |--rm|Automatically delete the process at the end of the execution|When you are frequently creating / removing your containers
-
-    > Those options can be combined
-
-    IMAGE : Base image that you want to use. An image also has a concept of `tags`, we will explain it later.
-
-    COMMAND (Optional) : Command to run inside your container
-
-    Examples
-
-    |Command|Description|
-    |-|-|
-    |`docker run -it --rm --name myUbuntuContainer ubuntu /bin/bash`|Run an official Ubuntu image in an interactive mode with the bash|
-    |`docker run -d --rm --name SimpleWebServer nginx`|Run an official Nginx image in a detached mode named SimpleWebServer|
-    |`docker run -d --rm -P nginx`|Run an official Nginx image in a detached mode and map open ports necessary to the host environment|
-    |`docker run -d --rm -p 8080:80 nginx`|Run an official Nginx image in a detached mode and map the port 8080 from my host to the port 80 in the container|
-    |`docker run  -v pwd:pwd -it ubuntu ls`|The -v flag mounts the current working directory into the container and lists the content of it|
-        
+Here a few other docker commands that are important to be aware of for the rest of this workshop:
 
 1. `docker ps`
 
@@ -152,285 +97,154 @@ We will describe the most important command to start with in this section.
 
     > You can manage your images by removing them using `docker rmi IMAGENAME` or pulling a new one with `docker pull IMAGENAME`
 
-#### Containerizing a simple application
+### Containerizing a TensorFlow model
 
-Now that we understand the basics of Docker, we will apply it to a concrete example by running and containerizing a simple application.
+Now that we understand the basics of Docker, let's containerize our first TensorFlow model that we will reuse in the following modules.  
+Our first model will be a very simple MNIST classifier. You can see the source code in `./src/main.py`.    
+As you can see there is nothing specific to containers in this code, you can run this script directly on your laptop or on a VM.
 
-In this example we will write a basic python web application, using the [Flask framework](http://flask.pocoo.org/), so we will need to make sure that we have the python libraries installed. We will also use an ubuntu base image since it is a simple linux distribution  and easy to understand.
+Now to have this run in a container, we need to build an image containing this code and it's dependencies.  
+As you saw in the tutorial, we will use a `Dockerfile` to do this.
 
-Like in the previous section, we will automate the following steps :
-- Use Ubuntu as a base image
-- Install the python package manager pip
-- Copy our custom code
-- Execute it when we launch our container
+Here is the (very simple) `Dockerfile` that we are going to use for this model (located in `./src/Dockerfile`):
 
-We will introduce the concept of Dockerfile.
+```dockerfile
+FROM tensorflow/tensorflow:1.4.0
+COPY main.py /app/main.py
 
-A Dockerfile is a simple file, which describes the layers that we want in our container. Those layers can be described as actions to execute in the latter.
-
-This file uses some specific keywords; you can find more information [in the official documentation](https://docs.docker.com/engine/reference/builder/). We will describe the most frequently used ones in the following section :
-
-1. `FROM`
-
-    `FROM` is the first keyword prerequisite to define the base image that we will use to start from.
-
-1. `WORKDIR`
-
-    The `WORKDIR` instruction sets the working directory for any `RUN`, `CMD`, `ENTRYPOINT`, `COPY` and `ADD` instructions that follow it in the Dockerfile. If the `WORKDIR` doesn’t exist, it will be created even if it’s not used in any subsequent Dockerfile instruction.
-
-1. `RUN`
-
-    The `RUN` instruction will execute any command in a new layer on top of the current image and commit the results. The resulting committed image will be used for the next step in the Dockerfile.
-
-    You can run multiple commands in the same line to avoid multiple layers for optimization.
-
-1. `ADD`
-
-    The ADD instruction copies new files, directories or remote file URLs from <src> and adds them to the filesystem of the image at the path <dest>
-
-1. `EXPOSE`
-
-    The `EXPOSE` instruction informs Docker that the container listens on the specified network ports at runtime. You can specify whether the port listens on TCP or UDP, and the default is TCP if the protocol is not specified.
-
-1. `ENV`
-
-    The `ENV` instruction sets the environment variable <key> to the value <value>.
-
-1. `CMD`
-
-    `CMD` allows you to configure a container that will run as an executable.
-
-#### Dockerfile applied to our example :
-
-Let's pretend you are developing locally a python application using the Flask framework. We have a repository named `src` where a file named `app.py` contains the following code :
-
-```python
-from flask import Flask
-app = Flask(__name__)
-
-@app.route('/')
-def hello_world():
-    return 'Hello, World!'
+ENTRYPOINT ["python", "/app/main.py"]
 ```
 
-We are creating a file named Dockerfile at the root of our repository.
+As you can see, we are not building a new image from scratch, instead we are using a base image from TensorFlow. Indeed, TensorFlow has a bunch of base images that you can start with.
+You can see the full list here: https://hub.docker.com/r/tensorflow/tensorflow/tags/.
 
-With the previous concepts applied to our example, this file should look like :
+What is important to note is that different tags need to be used depending on if you want to use GPU or not.  
+For example, if you wanted to run your model with TensorFlow 1.4.0 and CPU only, you would use `tensorflow/tensorflow:1.4.0`.  
+If instead you wanted to use GPU, you would start from `tensorflow/tensorflow:1.4.0-gpu`.
 
-```Dockerfile
-# Base image to start from. We are specifying the version that we want (16.04) using a tag
-FROM ubuntu:16.04
-# Working directory where to run all the next commands
-WORKDIR app
-# Commands to exectute in the image, installation of pip and the flask package from pip
-RUN apt-get update && apt-get -y upgrade && apt-get install -y python3-pip
-RUN pip3 install Flask
-# Copy the local folder named src into the container (Inside the workdir)
-COPY src .
-# Expose the default Flask port
-EXPOSE 5000
-# Set environments variableas with default values, needed for Flask 
-ENV LC_ALL C.UTF-8
-ENV LANG C.UTF-8
-ENV FLASK_APP app.py
-# Default command to execute at the launch
-CMD ["flask", "run", "--host=0.0.0.0"]
-```
+The two other instructions are pretty straightforward, first we copy our script into the container, and then we set this script as the entry point for our container, so that any argument passed to our container would actually get passed to our script.
 
-We now have the following structure :
+#### Building the image
 
-```
-.
-├── src
-|   ├── app.py
-├── Dockerfile
-```
-
-#### Build an Image
+> If you don't already have a Docker account, see [Log in with your Docker ID](https://docs.docker.com/get-started/part2/#log-in-with-your-docker-id).
 
 The next step is to build our image to be able to run it using docker. For that, we will use the command `docker build`.
 
-You can find the [official documentation](https://docs.docker.com/engine/reference/commandline/build/) on the official website.
+From the `./src` repository, we can build the image with
 
-From our application repository, we can run the command : `docker build -t mypythonapp .`
+```console
+docker build -t ${DOCKER_USERNAME}/tf-mnist .
+```
+> Reminder: the `-t` argument allows to **tag** the image with a specific name.  
 
-> The `-t` command allows to **tag** the image with a specific custom name.
+`${DOCKER_USERNAME}` should be your Docker username that you use to connect to Docker Hub.
 
-You should see the build process inside your terminal which should look like the following:
+The output from this command should look like this:
 
 ```
-...
-Step 7/8 : ENV MyVAlue Hello MLADS !
- ---> Running in f7d115bdfce4
- ---> 0cd4ff7ad04b
-Removing intermediate container f7d115bdfce4
-Step 8/8 : ENTRYPOINT python3 app.py
- ---> Running in 8f8da115cfed
- ---> 5963706e6232
-Removing intermediate container 8f8da115cfed
-Successfully built 5963706e6232
-Successfully tagged mypythonapp:latest
+Sending build context to Docker daemon  11.26kB
+Step 1/3 : FROM tensorflow/tensorflow:1.4.0
+ ---> a61a91cc0d1b
+Step 2/3 : COPY main.py /app/main.py
+ ---> b264d6e9a5ef
+Removing intermediate container fe8128425296
+Step 3/3 : ENTRYPOINT python /app/main.py
+ ---> Running in 7acb7aac7a9f
+ ---> 92c7ed17916b
+Removing intermediate container 7acb7aac7a9f
+Successfully built 92c7ed17916b
+Successfully tagged wbuchwalter/tf-mnist:latest
 ```
+Let's analyse this image full name:
+* `wbuchwalter` is the name of the repository (same as your docker hub username), this is where we can find the image
+* `tf-mnist` is the name of the image itself
+* `latest` is the tag. `latest` is the default tag if you don't specify any. Tags are usually used to denote different versions or flavors of a same image. For example you could have a tag `v1` and `v2` to denote different versions, or `cpu` and `gpu` to denote what hardware it can run on.  
 
 When you have the successfully built message, you should now be able to see if your image is locally available with the command `docker images` described earlier.
 
-Now we can try to run it locally using the `docker run` command :
+#### Running the image  
 
-```bash
-$ docker run -it -d -P mypythonapp
-2cd43118545d23d361e0892abe94cb9c06ad25a449b07e7ab9a8b3bcbfa3f472
+Now we can try to run it locally using the `docker run` command.
+
+```console
+docker run -it ${DOCKER_USERNAME}/tf-mnist
 ```
-
-> As a reminder, this command will run the docker image named `mypythonapp` in a detached mode and expose the port necessary described in the dockerfile.
-> The terminal is answering with the name id of the container : `2cd43...`
-
-You should be able to see if your container is correctly running with the `docker ps` command.
-
-```bash
-$ docker ps
-CONTAINER ID        IMAGE               COMMAND                  CREATED              STATUS              PORTS                     NAMES
-2cd43118545d        mypythonapp         "flask run --host=..."   About a minute ago   Up About a minute   0.0.0.0:32773->5000/tcp   awesome_fermi
-```
-As we can see, the status of the container is **UP** and using the port 32773 on the host to redirect to the port 5000 in the container.
-
-We can now open a browser on the page [http://localhost:32773](http://localhost:32773) to see our application running.
-
-The next step is to publish this image to a repository to be able to pull it from anywhere.
-
-#### Publish an Image
-
-Our image is now built and running locally, but what about sharing it to  be able to use it from anywhere by anyone ?
-
-We already introduced the concept of repository, we will now talk about the `push` action.
-
-Using the command `docker push` we will be able to publish our image to a repository.
-
-For this example, we will use the [Docker Hub](https://hub.docker.com/) public repository. You need to be registered to use it.
-
-When you are able to be connected on your [Docker Hub](https://hub.docker.com/) page you can run the command `docker login` locally, using the same credentials.
-
-```bash
-$ docker login
-Login with your Docker ID to push and pull images from Docker Hub. If you don't have a Docker ID, head over to https://hub.docker.com to create one.
-Username : wbuchwalter
-Password: *************
-Login Succeeded
-```
-
-The next step will be to tag your image correctly before publishing it, using the `docker tag` command. 
-
-The image should have the following name structure `<DockerHUBUserName>\<ImageName>:<Tag>`. In our case we will name our image with following structure : `wbuchwalter\mypythonapp`
-
-```bash
-$ docker tag mypythonapp wbuchwalter/mypythonapp
-```
-
-You can verify it by running the `docker images` command 
-
-```bash
-$ docker images
-REPOSITORY                                      TAG                 IMAGE ID            CREATED             SIZE
-wbuchwalter/mypythonapp                     latest              78344eed0d30        20 hours ago        451MB
-mypythonapp                                     latest              78344eed0d30        20 hours ago        451MB
-ubuntu                                          16.04               20c44cd7596f        3 days ago          123MB
-ubuntu                                          latest              20c44cd7596f        3 days ago          123MB
+If everything is okay you should see the model training:
 
 ```
-
-We are now ready to push our image.
-
-```bash
-docker push wbuchwalter/mypythonapp
+Successfully downloaded train-images-idx3-ubyte.gz 9912422 bytes.
+Extracting /tmp/tensorflow/input_data/train-images-idx3-ubyte.gz
+Successfully downloaded train-labels-idx1-ubyte.gz 28881 bytes.
+Extracting /tmp/tensorflow/input_data/train-labels-idx1-ubyte.gz
+Successfully downloaded t10k-images-idx3-ubyte.gz 1648877 bytes.
+Extracting /tmp/tensorflow/input_data/t10k-images-idx3-ubyte.gz
+Successfully downloaded t10k-labels-idx1-ubyte.gz 4542 bytes.
+Extracting /tmp/tensorflow/input_data/t10k-labels-idx1-ubyte.gz
+2017-11-29 17:40:37.383381: I tensorflow/core/platform/cpu_feature_guard.cc:137] Your CPU supports instructions that this TensorFlow binary was not compiled to use: SSE4.1 SSE4.2 AVX AVX2 FMA
+Accuracy at step 0: 0.1298
+Accuracy at step 10: 0.7397
+Accuracy at step 20: 0.8218
+Accuracy at step 30: 0.8578
+Accuracy at step 40: 0.882
+Accuracy at step 50: 0.8919
+Accuracy at step 60: 0.9039
+Accuracy at step 70: 0.9085
+Accuracy at step 80: 0.9134
+Accuracy at step 90: 0.9097
+Adding run metadata for 99
+Accuracy at step 100: 0.9162
+Accuracy at step 110: 0.9216
+Accuracy at step 120: 0.9252
+[...]
 ```
 
-### Exercises
+You can kill the process and exit the container with `ctrl + c`.
 
-### 1. Run a local docker image
+### Running the image with GPU
 
-In this first exercise, you will have to pull and run an official `nginx` image on your local docker environement.
+**Currently, running docker containers with GPU is only supported on Linux.**
 
-#### Validation
+First install [nvidia-docker](https://github.com/NVIDIA/nvidia-docker).  
 
-Since `nginx` is a web server, you will need to expose the port 80. You should be able to see the following webpage from your browser :
+You also need to make sure the image you are going to use is optimized for GPU.  
+In our example you need to modify the `Dockerfile` to use a TensorFlow image built for GPU:
 
-![](defaultnginx.png)
+```dockerfile 
+FROM tensorflow/tensorflow:1.4.0-gpu
+COPY main.py /app/main.py
 
-
-#### Solution
-
-<details>
-<summary><strong>Solution (expand to see)</strong></summary>
-<p>
-
-```bash
-# All solutions accepted
-docker run -it -P nginx
-docker run -it -p 80:80 nginx
-docker run -it --rm -p 80:80 nginx
-docker run -it -d --rm -p 80:80 nginx
-...
+ENTRYPOINT ["python", "/app/main.py"]
 ```
 
-</p>
-</details>
+Then simply rebuild the image with a new tag (you can use docker or nvidia-docker interchangeably for any command except run):
 
-### 2. Build and push your own image to a repository
-
-In this second exercise you will have to create your own image and push it to [Docker Hub](https://hub.docker.com).
-
-#### Validation
-
-- This image has to print a custom message in the console such as : `Hello <YourName>`
-- This message will call an environement variable name NAME_MESSAGE
-- We will be able to modify this variable to customize the message with our own name. For example : `Hello Julien`
-- If this variable is not set when we start to container, it will take the value : `World`. This will print the message `Hello World`
-- Use `bash` to create you script.
-
-#### Solution
-
-<details>
-<summary><strong>Solution (expand to see)</strong></summary>
-<p>
-
-We are creating a file named `app.sh` which contains:
-```bash
-#!/bin/bash
-while true; do
-    echo Hello $NAME_MESSAGE
-    sleep 1
-done
+```console
+docker build -t ${DOCKER_USERNAME}/tf-mnist:gpu
 ```
 
-Dockerfile :
+Finally run the container with nvidia-docker:
 
-```Dockerfile
-FROM ubuntu
-ENV NANE_MESSAGE World
-WORKDIR src
-ADD app.sh .
-CMD ["sh","app.sh"]
-...
+```console
+nvidia-docker run -it ${DOCKER_USERNAME}/tf-mnist:gpu
 ```
 
-Docker command to build, run and publish :
-```bash
-# Build the image
-docker build -t wbuchwalter/myawesomecontainer .
-# Execute it locally
-docker run -it -e NANE_MESSAGE=Will wbuchwalter/myawesomecontainer
-# Push to Docker Hub
-docker push wbuchwalter/myawesomecontainer
+#### Publish the Image
+
+Our image is now built and running locally, but what about sharing it to be able to use it from anywhere by anyone?  
+Most importantly we want to be able to reuse this image on the Kubernetes cluster we are going to create in module 2.
+So let's push our image to Docker Hub:
+
+```console
+docker push ${DOCKER_USERNAME}/tf-mnist
 ```
 
-</p>
-</details>
+If this comand doesn't look familiar to you, make sure you went through part 1 and 2 of Docker's tutorial, and more precisely: [Tutorial - Share your image](https://docs.docker.com/get-started/part2/#share-your-image)
 
-## Next Step
-[2 - Kubernetes](../2-kubernetes/README.md)
 
 ### Useful Links
 * [What is Docker ?](https://www.docker.com/what-docker)
-* [Docker for Mac](https://store.docker.com/editions/community/docker-ce-desktop-mac)
-* [Docker for Windows](https://store.docker.com/editions/community/docker-ce-desktop-windows)
-* [Docker for Ubuntu](https://store.docker.com/editions/community/docker-ce-server-ubuntu)
 * [Docker for beginner](https://github.com/docker/labs/blob/master/beginner/readme.md)
+
+
+## Next Step
+[2 - Kubernetes](../2-kubernetes/README.md)
