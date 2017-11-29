@@ -164,11 +164,13 @@ When you have the successfully built message, you should now be able to see if y
 
 #### Running the image  
 
-Now we can try to run it locally using the `docker run` command.
+Now we can try to run it locally using the `docker run` command.   
+By default the model will run 1000 training steps which can take a few minutes on a laptop. Let's reduce this number to 100 with the `--max_steps` argument. 
 
 ```console
-docker run -it ${DOCKER_USERNAME}/tf-mnist
+docker run -it ${DOCKER_USERNAME}/tf-mnist --max_steps 100
 ```
+
 If everything is okay you should see the model training:
 
 ```
@@ -180,25 +182,21 @@ Successfully downloaded t10k-images-idx3-ubyte.gz 1648877 bytes.
 Extracting /tmp/tensorflow/input_data/t10k-images-idx3-ubyte.gz
 Successfully downloaded t10k-labels-idx1-ubyte.gz 4542 bytes.
 Extracting /tmp/tensorflow/input_data/t10k-labels-idx1-ubyte.gz
-2017-11-29 17:40:37.383381: I tensorflow/core/platform/cpu_feature_guard.cc:137] Your CPU supports instructions that this TensorFlow binary was not compiled to use: SSE4.1 SSE4.2 AVX AVX2 FMA
-Accuracy at step 0: 0.1298
-Accuracy at step 10: 0.7397
-Accuracy at step 20: 0.8218
-Accuracy at step 30: 0.8578
-Accuracy at step 40: 0.882
-Accuracy at step 50: 0.8919
-Accuracy at step 60: 0.9039
-Accuracy at step 70: 0.9085
-Accuracy at step 80: 0.9134
-Accuracy at step 90: 0.9097
+2017-11-29 18:32:41.992194: I tensorflow/core/platform/cpu_feature_guard.cc:137] Your CPU supports instructions that this TensorFlow binary was not compiled to use: SSE4.1 SSE4.2 AVX AVX2 FMA
+Accuracy at step 0: 0.1292
+Accuracy at step 10: 0.7198
+Accuracy at step 20: 0.834
+Accuracy at step 30: 0.8698
+Accuracy at step 40: 0.8783
+Accuracy at step 50: 0.8968
+Accuracy at step 60: 0.9023
+Accuracy at step 70: 0.9059
+Accuracy at step 80: 0.9084
+Accuracy at step 90: 0.9154
 Adding run metadata for 99
-Accuracy at step 100: 0.9162
-Accuracy at step 110: 0.9216
-Accuracy at step 120: 0.9252
-[...]
 ```
 
-You can kill the process and exit the container with `ctrl + c`.
+You can kill the process and exit the container at any time with `ctrl + c`.
 
 ### Running the image with GPU
 
