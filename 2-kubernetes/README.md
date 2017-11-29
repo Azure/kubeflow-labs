@@ -189,16 +189,17 @@ Here is what this would look like in YAML format:
 apiVersion: batch/v1
 kind: Job # Our training should be a Job since it is supposed to terminate at some point
 metadata:
-  name: mnist-training # Name of our job
+  name: 1-mnist-training # Name of our job
 spec:
   template: # Template of the Pod that is going to be run by the Job
     metadata:
-      name: mnist-pod # Name of the pod
+      name: 1-mnist-training # Name of the pod
     spec:
       containers: # List of containers that should run inside the pod, in our case there is only one.
       - name: tensorflow
         image: ${DOCKER_USERNAME}/tf-mnist # The image to run, you can replace by your own.
         args: ["--max_steps", "500"] # Optional arguments to pass to our command. By default the command is defined by ENTRYPOINT in the Dockerfile
+      restartPolicy: OnFailure # restart the pod if it fails
 ```
 
 Save this template somewhere (or use [`training.yaml`](./training.yaml), and deploy it with:
@@ -258,6 +259,16 @@ Accuracy at step 30: 0.8606
 Accuracy at step 40: 0.8759
 Accuracy at step 50: 0.888
 [...]
+```
+
+After a few minutes, looking again at the Job should show that it has completed successfully:
+```console
+kubectl get job
+```
+
+```bash
+NAME                                DESIRED   SUCCESSFUL   AGE
+1-mnist-training                    1         1            3m
 ```
 
 ## Next Step
