@@ -11,7 +11,10 @@ In this module you will learn how to:
   * Requesting a GPU
   * Mounting the NVIDIA drivers into the container
 
-> **Note**: If you created a cluster without GPU agent you won't be able to complete the exercises in this module, but it still contains valuable informations.
+
+## Important Note
+
+If you created a cluster with CPU VMs only you won't be able to complete the exercises in this module, but it still contains valuable informations that you should read through nonetheless.
 
 ## How GPU works with Kubernetes
 
@@ -44,16 +47,16 @@ Also what's important to note, is that most deep leanring frameworks images are 
 
 ### Requesting GPU(s)
 
-K8s has a concept of resource `requests` allowing you to specify how much CPU, RAM and GPU should be reserved for a specific container, and `limits` allowing you to specify the maximum amount of resources a container should consume.  
-By default, if no `requests` and `limits` is specified for CPU or RAM on a container, K8s will schedule it on any node and run the container with unbounded CPU and memory limits.
+K8s has a concept of resource `requests` and `limits` allowing you to specify how much CPU, RAM and GPU should be reserved for a specific container.
+By default, if no `limits` is specified for CPU or RAM on a container, K8s will schedule it on any node and run the container with unbounded CPU and memory limits.
 
 > *To know more on K8s `requests` and `limits`, see [Managing Compute Resources for Containers](https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/).*
 
-However, things are different for GPUs. If no GPU is requested, K8s will run the pod on any node (with or without GPU), and will not expose the GPU even if the node has one. So you need to explicitly request the exact number of GPUs that should be assigned to your container.  
+However, things are different for GPUs. If no `limit` is defined for GPU, K8s will run the pod on any node (with or without GPU), and will not expose the GPU even if the node has one. So you need to explicitly set the `limit` to the exact number of GPUs that should be assigned to your container.  
 Also, not that while you can request for a fraction of a CPU, you cannot request a franction of a GPU. One GPU can thus only be assigned to one container at a time.
 The name for the GPU resource in K8s is `alpha.kubernetes.io/nvidia-gpu` for versions `1.8` and below and `nvidia.com/gpu` for versions > `1.9`. Note that currently only NVIDIA GPUs are supported.
 
-To request GPU, you should provide a value to `spec.containers[].resources.requests.alpha.kubernetes.io/nvidia-gpu`, in YAML this would looks like:
+To set the `limit` for GPU, you should provide a value to `spec.containers[].resources.limits.alpha.kubernetes.io/nvidia-gpu`, in YAML this would looks like:
 
 ```yaml
 [...]
@@ -61,7 +64,7 @@ containers:
       - name: tensorflow
         image: tensorflow/tensorflow:latest-gpu
         resources:
-          requests:
+          limits:
             alpha.kubernetes.io/nvidia-gpu: 1 
 [...]
 ```
@@ -99,16 +102,55 @@ You don't need to build a custom image, instead, simply use the official `nvidia
 
 Your K8s YAML template should have the following caracteristics:
 * It should be a `Job`
+* It should be name `2-nvidia-smi`
 * It should request 1 GPU
 * It should mount the drivers from the node into the container
-* It should run `nvidia-smi`
+* It should run the `nvidia-smi` executable
 
 #### Useful Links
 * [Microsoft Azure Container Service Engine - Using GPUs with Kubernetes](https://github.com/Azure/acs-engine/blob/master/docs/kubernetes/gpu.md)
 
 #### Validation
 
-Doing a `kubectl logs <pod-name>` should show...
+Once you have created your Job with `kubectl create -f <template-path>:
+
+```console
+kubectl get pods -a
+```
+The `-a` arguments tells K8s to also report pods that are already completed. Since the container exits as soon as you nvidia-smi finishes executing, it might already be completed by the tome you execute the command.
+
+```bash
+NAME                 READY     STATUS        RESTARTS   AGE
+2-nvidia-smi-p40vx   0/1       Completed     0          20s
+```
+
+Let's look at the logs of our pod
+
+```console 
+kubectl logs <nvidia-smi-pod-name>
+```
+```bash
+Wed Nov 29 23:43:03 2017
++-----------------------------------------------------------------------------+
+| NVIDIA-SMI 384.98                 Driver Version: 384.98                    |
+|-------------------------------+----------------------+----------------------+
+| GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |
+|===============================+======================+======================|
+|   0  Tesla K80           Off  | 0000E322:00:00.0 Off |                    0 |
+| N/A   39C    P0    70W / 149W |      0MiB / 11439MiB |      0%      Default |
++-------------------------------+----------------------+----------------------+
+
++-----------------------------------------------------------------------------+
+| Processes:                                                       GPU Memory |
+|  GPU       PID   Type   Process name                             Usage      |
+|=============================================================================|
+|  No running processes found                                                 |
++-----------------------------------------------------------------------------+
+```
+We can see that `nvidia-smi` has successfully detected a Tesla K80 with drivers version `384.98`.
+
+#### Solution
 
 <details>
 <summary><strong>Solution (expand to see)</strong></summary>
@@ -116,13 +158,13 @@ Doing a `kubectl logs <pod-name>` should show...
 
 ```yaml
 apiVersion: batch/v1
-kind: Job
+kind: Job # We want a Job
 metadata:
-  name: nvidia-smi
+  name: 2-nvidia-smi
 spec:
   template:
     metadata:
-      name: nvidia-smi
+      name: 2-nvidia-smi
     spec:
       restartPolicy: Never
       volumes: # Where the NVIDIA driver libraries and binaries are located on the host (note that libcuda is not needed to run nvidia-smi)
@@ -135,10 +177,10 @@ spec:
       containers:
       - name: nvidia-smi
         image: nvidia/cuda # Which image to run        
-        command:
-          - nvidia-smi # The command to run when the container starts
+        command: 
+          - nvidia-smi
         resources:
-          requests:
+          limits:
             alpha.kubernetes.io/nvidia-gpu: 1 # Requesting 1 GPU
         volumeMounts: # Where the NVIDIA driver libraries and binaries should be mounted inside our container
         - name: bin
