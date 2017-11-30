@@ -180,7 +180,7 @@ First, we need to create a YAML template to define what we want to deploy.
 We want our deployment to have a few caracteristics:
 * It should be a `Job` since we expect the training to finish successfully after some time.
 * It should run the image you created in module 1 (or `wbuchwalter/tf-mnist` if you skipped this module).
-* The `Job` should be named `1-mnist-training`.
+* The `Job` should be named `2-mnist-training`.
 * We want our training to run for `500` steps.
 
 Here is what this would look like in YAML format:
@@ -189,11 +189,11 @@ Here is what this would look like in YAML format:
 apiVersion: batch/v1
 kind: Job # Our training should be a Job since it is supposed to terminate at some point
 metadata:
-  name: 1-mnist-training # Name of our job
+  name: 2-mnist-training # Name of our job
 spec:
   template: # Template of the Pod that is going to be run by the Job
     metadata:
-      name: 1-mnist-training # Name of the pod
+      name: 2-mnist-training # Name of the pod
     spec:
       containers: # List of containers that should run inside the pod, in our case there is only one.
       - name: tensorflow
@@ -220,7 +220,7 @@ Should show your new job:
 
 ```bash
 NAME                                DESIRED   SUCCESSFUL   AGE
-1-mnist-training                      1         0            1m
+2-mnist-training                      1         0            1m
 ```
 
 Looking at the Pods:
@@ -230,7 +230,7 @@ kubectl get pods
 You should see your training running
 ```bash
 NAME                                      READY     STATUS      RESTARTS   AGE
-1-mnist-training-c5b8q                      1/1       Runing      0          1m
+2-mnist-training-c5b8q                      1/1       Runing      0          1m
 ```
 
 Finally you can look at the logs of your pod with:
@@ -268,7 +268,7 @@ kubectl get job
 
 ```bash
 NAME                                DESIRED   SUCCESSFUL   AGE
-1-mnist-training                    1         1            3m
+2-mnist-training                    1         1            3m
 ```
 
 ## Next Step
