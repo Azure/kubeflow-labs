@@ -102,7 +102,7 @@ You don't need to build a custom image, instead, simply use the official `nvidia
 
 Your K8s YAML template should have the following caracteristics:
 * It should be a `Job`
-* It should be name `2-nvidia-smi`
+* It should be name `4-nvidia-smi`
 * It should request 1 GPU
 * It should mount the drivers from the node into the container
 * It should run the `nvidia-smi` executable
@@ -121,7 +121,7 @@ The `-a` arguments tells K8s to also report pods that are already completed. Sin
 
 ```bash
 NAME                 READY     STATUS        RESTARTS   AGE
-2-nvidia-smi-p40vx   0/1       Completed     0          20s
+4-nvidia-smi-p40vx   0/1       Completed     0          20s
 ```
 
 Let's look at the logs of our pod
@@ -160,11 +160,11 @@ We can see that `nvidia-smi` has successfully detected a Tesla K80 with drivers 
 apiVersion: batch/v1
 kind: Job # We want a Job
 metadata:
-  name: 2-nvidia-smi
+  name: 4-nvidia-smi
 spec:
   template:
     metadata:
-      name: 2-nvidia-smi
+      name: 4-nvidia-smi
     spec:
       restartPolicy: Never
       volumes: # Where the NVIDIA driver libraries and binaries are located on the host (note that libcuda is not needed to run nvidia-smi)
@@ -215,7 +215,7 @@ Once you deployed
 apiVersion: batch/v1
 kind: Job # Our training should be a Job since it is supposed to terminate at some point
 metadata:
-  name: 3-mnist-training # Name of our job
+  name: 4-mnist-gpu-training # Name of our job
 spec:
   template: # Template of the Pod that is going to be run by the Job
     metadata:
@@ -228,4 +228,4 @@ spec:
 ```
 
 ## Next Step
-[4 - Helm](../4-helm/README.md)
+[5 - TfJob](../5-tfjob/README.md)

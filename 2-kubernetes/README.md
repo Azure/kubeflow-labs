@@ -162,6 +162,5 @@ Capacity:
 [...]
  ```
 
-
 ## Next Step
-[Module 3: GPUs](../3-gpus/README.md)
+[Module 3: Helm](../3-helm/README.md)

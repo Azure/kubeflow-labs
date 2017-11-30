@@ -193,4 +193,4 @@ You should see the following web page from your deployment :
 
 ## Next Step
 
-[5 - TfJob](../5-tfjob/README.md)
+[4 - GPUs](../4-gpus/README.md)
