@@ -188,7 +188,6 @@ spec:
         - name: lib
           mountPath: /usr/lib/nvidia
 ```
-
 </p>
 </details>
 
@@ -203,14 +202,64 @@ For this excercise, your tasks are to:
 * Modify our `Dockerfile` to use a base image compatible with GPU, such as `tensorflow/tensorflow:1.4.0-gpu`
 * Build and push this new image under a new tag, such as `${DOCKER_USERNAME}/tf-mnist:gpu`
 * Modify the [template we built in module 2](2-kubernetes/training.yaml) to add a GPU `limit`, mount the drivers and update the `LD_LIBRARY_PATH` environment variable
+  * Note: the value for `LD_LIBRARY_PATH` should be `/usr/local/cuda/extras/CUPTI/lib64:/usr/lib/nvidia:/usr/lib/x86_64-linux-gnu/`.
 * Deploy this new template.
 
 ### Validation
 
-Once you deployed 
+Once you deployed your template, take a look at the logs of your pod:
+
+```console
+kubectl logs <pod-name>
+```
+And you should see that your GPU is correctly detected and used by TensorFlow
+
+```bash
+2017-11-30 00:59:54.053227: I tensorflow/core/platform/cpu_feature_guard.cc:137] Your CPU supports instructions that this TensorFlow binary was not compiled to use: SSE4.1 SSE4.2 AVX AVX2 FMA
+2017-11-30 01:00:03.274198: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1030] Found device 0 with properties:
+name: Tesla K80 major: 3 minor: 7 memoryClockRate(GHz): 0.8235
+pciBusID: b2de:00:00.0
+totalMemory: 11.17GiB freeMemory: 11.10GiB
+2017-11-30 01:00:03.274238: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1120] Creating TensorFlow device (/device:GPU:0) -> (device: 0, name: Tesla K80, pci bus id: b2de:00:00.0, compute capability: 3.7)
+2017-11-30 01:00:08.000884: I tensorflow/stream_executor/dso_loader.cc:139] successfully opened CUDA library libcupti.so.8.0 locally
+Successfully downloaded train-images-idx3-ubyte.gz 9912422 bytes.
+Extracting /tmp/tensorflow/input_data/train-images-idx3-ubyte.gz
+Successfully downloaded train-labels-idx1-ubyte.gz 28881 bytes.
+Extracting /tmp/tensorflow/input_data/train-labels-idx1-ubyte.gz
+Successfully downloaded t10k-images-idx3-ubyte.gz 1648877 bytes.
+Extracting /tmp/tensorflow/input_data/t10k-images-idx3-ubyte.gz
+Successfully downloaded t10k-labels-idx1-ubyte.gz 4542 bytes.
+Extracting /tmp/tensorflow/input_data/t10k-labels-idx1-ubyte.gz
+Accuracy at step 0: 0.1245
+Accuracy at step 10: 0.6664
+Accuracy at step 20: 0.8227
+Accuracy at step 30: 0.8657
+Accuracy at step 40: 0.8815
+Accuracy at step 50: 0.892
+Accuracy at step 60: 0.9068
+[...]
+```
 
 
 ### Solution
+
+
+<details>
+<summary><strong>Solution (expand to see)</strong></summary>
+<p>
+
+First we need to modify the `Dockerfile`.
+We just need to change the tag of the TensorFlow base image to be one that support GPU:
+
+```dockerfile
+FROM tensorflow/tensorflow:1.4.0-gpu
+COPY main.py /app/main.py
+
+ENTRYPOINT ["python", "/app/main.py"]
+```
+
+Then we can create our Job template:
+
 ```yaml
 apiVersion: batch/v1
 kind: Job # Our training should be a Job since it is supposed to terminate at some point
@@ -223,9 +272,42 @@ spec:
     spec:
       containers: # List of containers that should run inside the pod, in our case there is only one.
       - name: tensorflow
-        image: wbuchwalter/tf-mnist # The image to run, you can replace by your own.
+        image: wbuchwalter/tf-mnist:gpu # The image to run, you can replace by your own.
         args: ["--max_steps", "500"] # Optional arguments to pass to our command. By default the command is defined by ENTRYPOINT in the Dockerfile
+        resources:
+          limits:
+            alpha.kubernetes.io/nvidia-gpu: 1
+        env:
+        - name: LD_LIBRARY_PATH # Update the LD_LIBRARY_PATH so that TensorFlow can find the driver's library
+          value: "/usr/local/cuda/extras/CUPTI/lib64:/usr/lib/nvidia:/usr/lib/x86_64-linux-gnu/"
+        volumeMounts: # Where the drivers should be mounted in the container
+        - name: bin
+          mountPath: /usr/local/nvidia/bin
+        - name: lib
+          mountPath: /usr/lib/nvidia
+        - name: libcuda
+          mountPath: /usr/lib/x86_64-linux-gnu/libcuda.so.1
+      restartPolicy: OnFailure
+      volumes: # Where the drivers are located on the node
+        - name: bin
+          hostPath: 
+            path: /usr/lib/nvidia-384/bin
+        - name: lib
+          hostPath: 
+            path: /usr/lib/nvidia-384
+        - name: libcuda
+          hostPath:
+            path: /usr/lib/x86_64-linux-gnu/libcuda.so.1
 ```
+
+And deploy it with 
+
+```console
+kubectl create -f <template-path>
+```
+
+</p>
+</details>
 
 ## Next Step
 [5 - TfJob](../5-tfjob/README.md)
