@@ -197,11 +197,35 @@ spec:
 In module 1 and 2, we first created a Docker image for our MNIST classifier and then ran a training on Kubernetes.  
 However, this training only used CPU. Let's make things much faster by accelerating our training with GPU.
 
+You'll find the code and the `Dockerfile` under [`./src`](./src).
 
+For this excercise, your tasks are to:
+* Modify our `Dockerfile` to use a base image compatible with GPU, such as `tensorflow/tensorflow:1.4.0-gpu`
+* Build and push this new image under a new tag, such as `${DOCKER_USERNAME}/tf-mnist:gpu`
+* Modify the [template we built in module 2](2-kubernetes/training.yaml) to add a GPU `limit`, mount the drivers and update the `LD_LIBRARY_PATH` environment variable
+* Deploy this new template.
 
 ### Validation
 
+Once you deployed 
+
+
 ### Solution
+```yaml
+apiVersion: batch/v1
+kind: Job # Our training should be a Job since it is supposed to terminate at some point
+metadata:
+  name: 3-mnist-training # Name of our job
+spec:
+  template: # Template of the Pod that is going to be run by the Job
+    metadata:
+      name: mnist-pod # Name of the pod
+    spec:
+      containers: # List of containers that should run inside the pod, in our case there is only one.
+      - name: tensorflow
+        image: wbuchwalter/tf-mnist # The image to run, you can replace by your own.
+        args: ["--max_steps", "500"] # Optional arguments to pass to our command. By default the command is defined by ENTRYPOINT in the Dockerfile
+```
 
 ## Next Step
 [4 - Helm](../4-helm/README.md)
