@@ -201,8 +201,7 @@ You'll find the code and the `Dockerfile` under [`./src`](./src).
 For this excercise, your tasks are to:
 * Modify our `Dockerfile` to use a base image compatible with GPU, such as `tensorflow/tensorflow:1.4.0-gpu`
 * Build and push this new image under a new tag, such as `${DOCKER_USERNAME}/tf-mnist:gpu`
-* Modify the [template we built in module 2](2-kubernetes/training.yaml) to add a GPU `limit`, mount the drivers and update the `LD_LIBRARY_PATH` environment variable
-  * Note: the value for `LD_LIBRARY_PATH` should be `/usr/local/cuda/extras/CUPTI/lib64:/usr/lib/nvidia:/usr/lib/x86_64-linux-gnu/`.
+* Modify the [template we built in module 2](2-kubernetes/training.yaml) to add a GPU `limit` and mount the drivers libraries.
 * Deploy this new template.
 
 ### Validation
@@ -277,21 +276,13 @@ spec:
         resources:
           limits:
             alpha.kubernetes.io/nvidia-gpu: 1
-        env:
-        - name: LD_LIBRARY_PATH # Update the LD_LIBRARY_PATH so that TensorFlow can find the driver's library
-          value: "/usr/local/cuda/extras/CUPTI/lib64:/usr/lib/nvidia:/usr/lib/x86_64-linux-gnu/"
         volumeMounts: # Where the drivers should be mounted in the container
-        - name: bin
-          mountPath: /usr/local/nvidia/bin
         - name: lib
-          mountPath: /usr/lib/nvidia
+          mountPath: /usr/local/nvidia/lib64
         - name: libcuda
           mountPath: /usr/lib/x86_64-linux-gnu/libcuda.so.1
       restartPolicy: OnFailure
       volumes: # Where the drivers are located on the node
-        - name: bin
-          hostPath: 
-            path: /usr/lib/nvidia-384/bin
         - name: lib
           hostPath: 
             path: /usr/lib/nvidia-384
