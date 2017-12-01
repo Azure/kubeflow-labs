@@ -1,7 +1,6 @@
-# Default values for param-sweep.
-image: wbuchwalter/helm-tf-hyperparam-sweep:cpu
+image: wbuchwalter/tf-paint:cpu
 useGPU: false
-shareName: tensorflow5
+shareName: tensorflow
 hyperParamValues:
   learningRate:
     - 0.001
