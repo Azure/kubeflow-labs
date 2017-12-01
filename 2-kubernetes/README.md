@@ -171,13 +171,13 @@ Capacity:
 
 ### Running our Model on Kubernetes
 
-> Note: If you didn't complete the exercise in module 1, you can use `wbuchwalter/tf-mnist` image for this exercise.
+> Note: If you didn't complete the exercise in module 1, you can use `wbuchwalter/tf-mnist` image for this exaercise.
 
 In module 1, we created an image for our MNIST classifier, ran a small training locally and pushed this image to Docker Hub.  
 Since we now have a running Kubernetes cluster, let's run our training on it!
 
 First, we need to create a YAML template to define what we want to deploy.
-We want our deployment to have a few caracteristics:
+We want our deployment to have a few characteristics:
 * It should be a `Job` since we expect the training to finish successfully after some time.
 * It should run the image you created in module 1 (or `wbuchwalter/tf-mnist` if you skipped this module).
 * The `Job` should be named `2-mnist-training`.
