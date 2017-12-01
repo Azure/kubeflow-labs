@@ -102,7 +102,7 @@ You don't need to build a custom image, instead, simply use the official `nvidia
 
 Your K8s YAML template should have the following caracteristics:
 * It should be a `Job`
-* It should be name `4-nvidia-smi`
+* It should be name `module4-ex1`
 * It should request 1 GPU
 * It should mount the drivers from the node into the container
 * It should run the `nvidia-smi` executable
@@ -121,13 +121,13 @@ The `-a` arguments tells K8s to also report pods that are already completed. Sin
 
 ```bash
 NAME                 READY     STATUS        RESTARTS   AGE
-4-nvidia-smi-p40vx   0/1       Completed     0          20s
+module4-ex1-p40vx   0/1       Completed     0          20s
 ```
 
 Let's look at the logs of our pod
 
 ```console 
-kubectl logs <nvidia-smi-pod-name>
+kubectl logs <pod-name>
 ```
 ```bash
 Wed Nov 29 23:43:03 2017
@@ -164,7 +164,7 @@ metadata:
 spec:
   template:
     metadata:
-      name: 4-nvidia-smi
+      name: module4-ex1
     spec:
       restartPolicy: Never
       volumes: # Where the NVIDIA driver libraries and binaries are located on the host (note that libcuda is not needed to run nvidia-smi)
@@ -211,7 +211,7 @@ Once you deployed your template, take a look at the logs of your pod:
 ```console
 kubectl logs <pod-name>
 ```
-And you should see that your GPU is correctly detected and used by TensorFlow
+And you should see that your GPU is correctly detected and used by TensorFlow ( `[...] Found device 0 with properties: name: Tesla K80 [...]`)
 
 ```bash
 2017-11-30 00:59:54.053227: I tensorflow/core/platform/cpu_feature_guard.cc:137] Your CPU supports instructions that this TensorFlow binary was not compiled to use: SSE4.1 SSE4.2 AVX AVX2 FMA
@@ -263,7 +263,7 @@ Then we can create our Job template:
 apiVersion: batch/v1
 kind: Job # Our training should be a Job since it is supposed to terminate at some point
 metadata:
-  name: 4-mnist-gpu-training # Name of our job
+  name: module4-ex2 # Name of our job
 spec:
   template: # Template of the Pod that is going to be run by the Job
     metadata:
