@@ -193,7 +193,7 @@ is_chief = (job_name == 'master')
 
 As for any distributed TensorFlow training, you will then also need to modify your model to split the operations and variables among the workers and parameter servers as well as create on session on the master.
 
-## Exercices
+## Exercises
 
 ### 1 - Modifying Our MNIST Example to Support Distributed Training
 

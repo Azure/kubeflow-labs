@@ -33,7 +33,7 @@ We will also want to deploy a single TensorBoard instance monitoring all these `
 ## Exercise
 
 ### Creating and Deploying the Chart
-In this excercise, you will create a new Helm chart that will deploy a number of `TfJobs` as well as a TensorBoard instance.
+In this exercise, you will create a new Helm chart that will deploy a number of `TfJobs` as well as a TensorBoard instance.
 
 Here is what our `values.yaml` file could look like for example (you are free to go a different route):
 
@@ -55,7 +55,7 @@ hyperParamValues:
 That way, when installing the chart, 9 `TfJob` will actually get deployed (3 x 3), testing all the combination of learning rate and hidden layers depth that we specified.  
 This is a very simple example (our model is also very simple), but hopefully you start to see the possibilities than Helm offers.
 
-In this excercise, we are going to use a new model based on [Andrej Karpathy's Image painting demo](http://cs.stanford.edu/people/karpathy/convnetjs/demo/image_regression.html).  
+In this exercise, we are going to use a new model based on [Andrej Karpathy's Image painting demo](http://cs.stanford.edu/people/karpathy/convnetjs/demo/image_regression.html).  
 This model objective is to to create a new picture as close as possible to the original one, "The Starry Night" by Vincent van Gogh:
 
 ![Starry](./src/starry.jpg)

@@ -36,7 +36,7 @@ The basic Kubernetes objects include:
 * Service - an abstraction which defines a logical set of Pods and a policy by which to access them.
 * Volume - an abstraction which allows data to be preserved across container restarts and allows data to be shared between different containers.
 * Namespace - a way to divide a physical cluster resources into multiple virtual clusters between multiple users.
-* Deployment - Manages pods and ensures a certain number of them are running. This is tipically used to deploy pods that should always be up, such as a web server.
+* Deployment - Manages pods and ensures a certain number of them are running. This is typically used to deploy pods that should always be up, such as a web server.
 * Job - A job creates one or more pods and ensures that a specified number of them successfully terminate. In other words, we use Job to run a task that finishes at some point, such as training a model.
 
 ### Creating a Kubernetes Object
@@ -57,7 +57,7 @@ spec: # Actual specifications of this deployment
       labels:
         app: nginx
     spec: # Specification for the Pod 
-      containers: # This are the containers running inside our Pod, in our case a single one
+      containers: # These are the containers running inside our Pod, in our case a single one
       - name: nginx # Name of this container
         image: nginx:1.7.9 # Image to run
         ports: # Ports to expose
@@ -65,7 +65,7 @@ spec: # Actual specifications of this deployment
 ```
 
 To create all the objects described in a Deployment using a `.yaml` file like the one above in your own Kubernetes cluster you can use Kubernetes' CLI (`kubectl`). 
-We will try creating a deployment in the excercise toward the end of this module, but first we need a cluster.
+We will be creating a deployment in the exercise toward the end of this module, but first we need a cluster.
 
 ## Provisioning a Kubernetes cluster on Azure
 
@@ -84,10 +84,10 @@ You can either create the cluster using the portal, or using Azure-CLI (`az`).
 As of this writing, GPUs are still in preview with ACS.  
 You can deploy an ACS cluster with GPU VMs (such as `Standard_NC6`) in `uswest2` or `uksouth` but you should be aware of some pitfalls:
 * Deploying a GPU cluster takes longer than a CPU cluster (about 10-15 minutes more) because the NVIDIA drivers need to be installed as well.
-* Since this is a preview, you might hit capacity issues if the location you chose does not have enough GPUs available to accomodate you.
+* Since this is a preview, you might hit capacity issues if the location you chose does not have enough GPUs available to accommodate you.
 
 **Unless you are already pretty familiar with docker and Kubernetes, we recommend that you create a cluster with CPU VMs to save some time.**
-Only module 3 has an excercise which is specific for GPU VMs, all other modules can be followed on either CPU or GPU clusters.
+Only module 3 has an exercise which is specific for GPU VMs, all other modules can be followed on either CPU or GPU clusters.
 
 ### With the CLI
 
@@ -167,11 +167,11 @@ Capacity:
 [...]
  ```
 
-## Excercise
+## Exercise
 
 ### Running our Model on Kubernetes
 
-> Note: If you didn't complete the exercise in module 1, you can use `wbuchwalter/tf-mnist` image for this excercise.
+> Note: If you didn't complete the exercise in module 1, you can use `wbuchwalter/tf-mnist` image for this exercise.
 
 In module 1, we created an image for our MNIST classifier, ran a small training locally and pushed this image to Docker Hub.  
 Since we now have a running Kubernetes cluster, let's run our training on it!
