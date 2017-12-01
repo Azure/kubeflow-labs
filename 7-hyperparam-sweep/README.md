@@ -119,4 +119,4 @@ Check out the commented solution chart: [./solution-chart/templates/deployment.y
 
 ## Next Step
 
-[Link to next module]
+[8 - Going Further](../8-going-further)
