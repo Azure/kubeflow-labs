@@ -2,13 +2,13 @@
 
 ## Prerequisites
 
-* [4 - Helm](../4-Helm)
+* [3 - Helm](../3-helm)
 * [5 - TfJob](../5-tfjob)
   
 ### "Vanilla" Hyperparameter Sweep
 
-Just as distributed training, automated hyperparameter sweeping is also very rarely used in many organizations.  
-The reasons are similar. It takes a lot of resources, or time, to run more than a couple training for the same model.
+Just as distributed training, hyperparameter sweep is barely used in many organizations.  
+The reasons are similar: It takes a lot of resources, or time, to run more than a couple training for the same model.
   * Either you run different hypothesis in parallel, which will likely requires a lot of resources and VMs. These VMs need to be managed by someone, the model need to be deployed, logs and checkpoints have to be gathered etc.
   * Or you run everything sequentially on a few number of VMs, which takes a lot of time before being able to compare result
 
@@ -23,7 +23,7 @@ In practice, this process is still rudimentary today as the technologies involve
 
 ### Why Helm?
 
-As we saw in module [4 - Helm](../4-helm), Helm enables us to package an application in a chart and parametrize it's deployment easily.  
+As we saw in module [3 - Helm](../3-helm), Helm enables us to package an application in a chart and parametrize it's deployment easily.  
 To do that, Helm allows us to use Golang templating engine in the chart definitions. This means we can use conditions, loops, variables and [much more](https://docs.helm.sh/chart_template_guide).  
 This will allow us to create complex deployment flow.   
 
@@ -38,7 +38,7 @@ In this exercise, you will create a new Helm chart that will deploy a number of 
 Here is what our `values.yaml` file could look like for example (you are free to go a different route):
 
 ```yaml
-image: wbuchwalter/helm-tf-hyperparam-sweep:cpu
+image: wbuchwalter/tf-paint:cpu
 useGPU: false
 shareName: tensorflow
 hyperParamValues:
@@ -52,7 +52,7 @@ hyperParamValues:
     - 7
 ```
 
-That way, when installing the chart, 9 `TfJob` will actually get deployed (3 x 3), testing all the combination of learning rate and hidden layers depth that we specified.  
+That way, when installing the chart, 9 `TfJob` will actually get deployed, testing all the combination of learning rate and hidden layers depth that we specified.  
 This is a very simple example (our model is also very simple), but hopefully you start to see the possibilities than Helm offers.
 
 In this exercise, we are going to use a new model based on [Andrej Karpathy's Image painting demo](http://cs.stanford.edu/people/karpathy/convnetjs/demo/image_regression.html).  
@@ -71,8 +71,8 @@ Our model takes 3 parameters:
 |`--log-dir` | Path to save TensorFlow's summaries | `None`| 
 
 For simplicity, docker images have already been created so you don't have to build and push yourself:
-* `wbuchwalter/helm-tf-hyperparam-sweep:cpu` for CPU only.
-* `wbuchwalter/helm-tf-hyperparam-sweep:gpu` for GPU.  
+* `wbuchwalter/tf-paint:cpu` for CPU only.
+* `wbuchwalter/tf-paint:gpu` for GPU.  
 
 The goal of this exercise is to create an Helm chart that will allow us to test as many variations and combinations of the two hyperparameters `--learning-rate`and `--hidden-layers` as we want by just adding them in our `values.yaml` file.   
 This chart should also deploy a single TensorBoard instance (and it's associated service), so we can quickly monitor and compare our different hypothesis.
@@ -89,18 +89,16 @@ kubectl get pods
 
 ```
 NAME                                      READY     STATUS    RESTARTS   AGE
-tensorboard-2184014798-ht4rb              1/1       Running   0          23s
-tf-job-dashboard-23632363-z891v           1/1       Running   0          4d
-tf-job-operator-1878936166-5wzs1          1/1       Running   1          4d
-tf-paint-sample-0-0-master-guwb-0-ghwr9   1/1       Running   0          15s
-tf-paint-sample-0-1-master-5z9e-0-q11wx   1/1       Running   0          15s
-tf-paint-sample-0-2-master-6d4j-0-0vnh4   1/1       Running   0          15s
-tf-paint-sample-1-0-master-b8ok-0-x989m   1/1       Running   0          14s
-tf-paint-sample-1-1-master-61e2-0-2zm6h   1/1       Running   0          15s
-tf-paint-sample-1-2-master-w2tv-0-f1d5b   1/1       Running   0          14s
-tf-paint-sample-2-0-master-1beh-0-5bq9h   1/1       Running   0          14s
-tf-paint-sample-2-1-master-ke19-0-kqsls   1/1       Running   0          15s
-tf-paint-sample-2-2-master-53xh-0-dw6sm   1/1       Running   0          15s
+module7-tensorboard-3609490657-6w7zf             1/1       Running   0          23s
+module7-tf-paint-0-0-master-tduk-0-zqngf     1/1       Running   0          2m
+module7-tf-paint-0-1-master-ub9a-0-3rlbr     1/1       Running   0          2m
+module7-tf-paint-0-2-master-ekw1-0-cp0l3     1/1       Running   0          2m
+module7-tf-paint-1-0-master-jr7r-0-6jkwc     1/1       Running   0          2m
+module7-tf-paint-1-1-master-rqh2-0-0t4zw     1/1       Running   0          2m
+module7-tf-paint-1-2-master-le5b-0-34q38     1/1       Running   0          2m
+module7-tf-paint-2-0-master-g7i9-0-jq1c1     1/1       Running   0          2m
+module7-tf-paint-2-1-master-1urb-0-sq92z     1/1       Running   0          2m
+module7-tf-paint-2-2-master-ay57-0-0qt2c     1/1       Running   0          2m
 ```
 
 Looking at TensorBoard, you should see something similar to this:
@@ -118,7 +116,6 @@ At this point we could decide to kill all the other models if we wanted to free 
 #### Solution
 
 Check out the commented solution chart: [./solution-chart/templates/deployment.yaml](./solution-chart/templates/deployment.yaml)
-
 
 ## Next Step
 

@@ -13,9 +13,9 @@
 {{- range $i, $lr := $lrlist }}
 {{- range $j, $nblayers := $nblayerslist }}
 apiVersion: tensorflow.org/v1alpha1
-kind: TfJob
+kind: TfJob # Each one of our trainings will be a separate TfJob
 metadata:
-  name: tf-paint-sample-{{ $i }}-{{ $j }}
+  name: module7-tf-paint-{{ $i }}-{{ $j }} # We give a unique name to each training
   labels:
     chart: "{{ $chartname }}-{{ $chartversion | replace "+" "_" }}"
 spec: 
@@ -25,17 +25,19 @@ spec:
           restartPolicy: OnFailure
           containers:
             - name: tensorflow
-              image: {{ $image }}
+              image: {{ $image }} 
               env:
               - name: LC_ALL
                 value: C.UTF-8
               args:
-                - --learning-rate
+                # Here we pass a unique learning rate and hidden layer count to each instance.
+                # We also put the values between quotes to avoid potential formatting issues
+                - --learning-rate  
                 - {{ $lr | quote }}
                 - --hidden-layers
                 - {{ $nblayers | quote }}
                 - --logdir
-                - /tmp/tensorflow/tf-paint-lr{{ $lr }}-d-{{ $nblayers }} # We save the summaries in a different for every model
+                - /tmp/tensorflow/tf-paint-lr{{ $lr }}-d-{{ $nblayers }} # We save the summaries in a different directory
 {{ if $useGPU }}  # We only want to request GPUs if we asked for it in values.yaml with useGPU
               resources:
                 requests:
@@ -43,6 +45,7 @@ spec:
 {{ end }}
               volumeMounts:
               - mountPath: /tmp/tensorflow
+                subPath: module7 # As usual we want to save everything in a separate subdirectory 
                 name: azurefile
           volumes:
             - name: azurefile
@@ -60,7 +63,7 @@ kind: Service
 metadata:
   labels:
     app: tensorboard
-  name: tensorboard
+  name: module7-tensorboard
 spec:
   ports:
   - port: 80
@@ -74,7 +77,7 @@ kind: Deployment
 metadata:
   labels:
     app: tensorboard
-  name: tensorboard
+  name: module7-tensorboard
 spec:
   template:
     metadata:
@@ -86,7 +89,7 @@ spec:
         azureFile:
             secretName: azure-secret
             shareName: {{ $shareName }}
-            readOnly: true      
+            readOnly: false      
       containers:
       - name: tensorboard
         command:
@@ -98,4 +101,5 @@ spec:
         - containerPort: 6006
         volumeMounts:
         - mountPath: /tmp/tensorflow
+          subPath: module7
           name: azurefile  
