@@ -21,8 +21,8 @@
 |0| **[Introduction](0-intro)** | Introduction to this workshop. Motivations and goals.|
 |1| **[Docker](1-docker)** | Docker and containers 101.|
 |2| **[Kubernetes](2-kubernetes)** | Kubernetes important concepts overview.|
-|3| **[GPUs](3-gpus)** | How to use GPUs with Kubernetes.|
-|4| **[Helm](4-helm)** | Introduction to Helm |
+|3| **[Helm](3-helm)** | Introduction to Helm |
+|4| **[GPUs](4-gpus)** | How to use GPUs with Kubernetes.|
 |5| **[TfJob](5-tfjob)** | How to use `tensorflow/k8s` and `TfJob` to deploy a simple TensorFlow training.|
 |6| **[Distributed Tensorflow](6-distributed-tensorflow)** | Going distributed with `TfJob`|
 |7| **[Hyperparameters Sweep with Helm](7-hyperparam-sweep)** | Using Helm to deploy a large number of training testing different hypothesis, monitoring and comparing them. |

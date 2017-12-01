@@ -276,3 +276,4 @@ module2-ex1                    1         1            3m
 Currently our training doesn't do anything interesting. We are not even saving the model and summaries anywhere, but don't worry we are going to dive into this starting in Module 4.
 
 [Module 3: GPUs](../3-gpus/README.md)
+
