@@ -7,12 +7,12 @@
 
 ## Summary
 
-In this module you will learn how `tensorflow/k8s` can greatly simplify our lives when running TensorFlow on Kubernetes.
+In this module you will learn how [`tensorflow/k8s`](https://github.com/tensorflow/k8s) can greatly simplify our lives when running TensorFlow on Kubernetes.
 
 ## `tensorflow/k8s`
 
 As we saw earlier, giving a container access to GPU is not exactly a breeze on Kubernetes: We need to manually mount the drivers from the node into the container and update some environment variables.    
-If you already tried to run a distributed TensorFlow training, you know that it's not easy either. Getting the `ClusterSpec` right can be painful if you have more than a couple VMs, and it's also quite brittle (we will look more into distributed TensorFlow in module [6 - Distributed TensorFlow](../6-distributed-tensorflow/README.md).
+If you already tried to run a distributed TensorFlow training, you know that it's not easy either. Getting the `ClusterSpec` right can be painful if you have more than a couple VMs, and it's also quite brittle (we will look more into distributed TensorFlow in module [6 - Distributed TensorFlow](../6-distributed-tensorflow/README.md)).
   
 `tensorflow/k8s` is a new project in TensorFlow's organization on GitHub that makes all of this much easier.  
 
@@ -54,13 +54,13 @@ We will see in just a moment what each of them do.
 ### Kubernetes Custom Resource Definition
 
 Kubernetes has a concept of [Custom Resources](https://kubernetes.io/docs/concepts/api-extension/custom-resources/) (often abreviated CRD) that allows us to create custom object that we will then be able to use.  
-In the case of `tensorflow/k8s`, after installation a new `TfJob` object will be available in our cluster. This object allows us to easily describe TensorFlow trainings.
+In the case of `tensorflow/k8s`, after installation, a new `TfJob` object will be available in our cluster. This object allows us to describe TensorFlow a training.
 
 #### `TfJob` Specifications
 
-Before going further, let's take a look at what the `TfJob` object and it's constituant looks like:
+Before going further, let's take a look at what the `TfJob` looks like:
 
-> Note: Some of the fields are not described here for brievety purpose. 
+> Note: Some of the fields are not described here for brievety. 
 
 **`TfJob` Object**
   
@@ -90,7 +90,7 @@ Let's go deeper:
 | Template | [`PodTemplateSpec`](https://kubernetes.io/docs/api-reference/v1.8/#podtemplatespec-v1-core) | Describes the pod that will be created when executing a job. This is the standard Pod description that we have been using everywhere.  |
 
 
-As a refresher, here is what a simple TensorFlow training would look like using "vanilla" kubernetes:
+As a refresher, here is what a simple TensorFlow training (with GPU) would look like using "vanilla" kubernetes:
 
 ```yaml
 apiVersion: batch/v1
@@ -145,7 +145,7 @@ spec:
           restartPolicy: OnFailure
 ```
 
-No need to mount drivers nor specify any environment variable anymore. Note that we are note specifying `TfReplicaType` or `Replicas` as the default values are already what we want.
+No need to mount drivers nor specify any environment variable anymore! Note that we are note specifying `TfReplicaType` or `Replicas` as the default values are already what we want.
 
 #### How does this work?
 
@@ -210,6 +210,7 @@ If you want to know more:
 
 Let's schedule a very simple TensorFlow job using `TfJob` first.  
 
+> Note: If you completed the excercise in Module 1 and 2, you can change the image to use the one you pushed instead.
 
 Depending on wether or not your cluster has GPU, choose the correct template:
 
@@ -220,13 +221,13 @@ Depending on wether or not your cluster has GPU, choose the correct template:
 apiVersion: tensorflow.org/v1alpha1
 kind: TfJob
 metadata:
-  name: example-tfjob
+  name: module5-ex1
 spec:
   replicaSpecs:
     - template:
         spec:
           containers:
-            - image: wbuchwalter/tensorflow-for-poets:cpu
+            - image: wbuchwalter/tf-mnist:cpu
               name: tensorflow
           restartPolicy: OnFailure
 ```
@@ -242,13 +243,13 @@ When using GPU, we need to request for one (or multiple), and the image we are u
 apiVersion: tensorflow.org/v1alpha1
 kind: TfJob
 metadata:
-  name: example-tfjob
+  name: module5-ex1-gpu
 spec:
   replicaSpecs:
     - template:
         spec:
           containers:
-            - image: wbuchwalter/tensorflow-for-poets:gpu
+            - image: wbuchwalter/tf-mnist:gpu
               name: tensorflow
               resources:
                 requests:
@@ -275,7 +276,7 @@ kubectl get tfjob
 Returns:
 ```
 NAME            KIND
-example-tfjob   TfJob.v1alpha1.tensorflow.org
+module5-ex1   TfJob.v1alpha1.tensorflow.org
 ```
 
 As well as a `Job`, which was actually created by the operator:
@@ -286,7 +287,7 @@ kubectl get job
 Returns:
 ```
 NAME            DESIRED   SUCCESSFUL   AGE
-master-i0x6-0   1         0            2m
+module5-ex1-master-xs4b-0   1         0            2m
 ```
 and a `Pod`:
 
@@ -296,7 +297,7 @@ kubectl get pod
 Returns:
 ```
 NAME                                READY     STATUS      RESTARTS   AGE
-master-i0x6-0-65nbv                 1/1       Running   0          2m
+module5-ex1-master-xs4b-0-6gpfn                 1/1       Running   0          2m
 ```
 
 Note that the `Pod` might take a few minutes before actually running, the docker image needs to be pulled on the node first.
@@ -310,6 +311,7 @@ kubectl logs <your-pod-name>
 This container is pretty verbose, but you should see a TensorFlow training happening: 
 
 ```
+[...]
 INFO:tensorflow:2017-11-20 20:57:22.314198: Step 480: Cross entropy = 0.142486
 INFO:tensorflow:2017-11-20 20:57:22.370080: Step 480: Validation accuracy = 85.0% (N=100)
 INFO:tensorflow:2017-11-20 20:57:22.896383: Step 490: Train accuracy = 98.0%
@@ -319,12 +321,13 @@ INFO:tensorflow:2017-11-20 20:57:23.407756: Step 499: Train accuracy = 94.0%
 INFO:tensorflow:2017-11-20 20:57:23.407980: Step 499: Cross entropy = 0.170348
 INFO:tensorflow:2017-11-20 20:57:23.457325: Step 499: Validation accuracy = 89.0% (N=100)
 INFO:tensorflow:Final test accuracy = 88.4% (N=353)
+[...]
 ```
 
 Once your job is completed, clean it up:
 
 ```console
-kubectl delete tfjob example-tfjob
+kubectl delete tfjob module5-ex1
 ```
 
 > That's great and all, but how do we grab our trained model and TensorFlow's summaries?  
@@ -336,7 +339,6 @@ If you remember, we quickly introduced `Volumes` in module [2 - Kubernetes](../2
 But `Volumes` are not just for mounting things from a node, we can also use them to mount a lot of different storage solutions, you can see the full list [here](https://kubernetes.io/docs/concepts/storage/volumes/).  
 
 In our case we are going to use Azure Files, as it is really easy to use with Kubernetes.
-
 
 ## Exercise 2: Azure Files to the Rescue
 
@@ -396,36 +398,42 @@ This means that when we run a training, all the important data is now stored in 
 <details>
 <summary><strong>Solution</strong></summary>  
 
-When using GPU, we need to request for one (or multiple), and the image we are using also needs to be based on TensorFlow's GPU image.
-
 ```yaml
 apiVersion: tensorflow.org/v1alpha1
 kind: TfJob
 metadata:
-  name: example-tfjob
+  name: module5-ex2
 spec:
   replicaSpecs:
     - template:
         spec:
-           containers:
-              - image: wbuchwalter/tensorflow-for-poets:cpu
-                name: tensorflow
-                volumeMounts:
-                  - name: azurefile
-                    mountPath: /app/tf_files
-            volumes:
-              - name: azurefile
-                azureFile:
-                  secretName: azure-secret
-                  shareName: tensorflow
-                  readOnly: false
+          containers:
+            - image: wbuchwalter/tf-mnist:cpu
+              name: tensorflow
+              volumeMounts:
+                # By default our classifier saves the summaries in /tmp/tensorflow,
+                # so that's where we want to mount our Azure File Share.
+                - name: azurefile
+                  # The subPath allows us to mount a subdirectory within the azure file share instead of root
+                  # this is useful so that we can save the logs for each run in a different subdirectory
+                  # instead of overwriting what was done before.
+                  subPath: module5-ex2
+                  mountPath: /tmp/tensorflow 
+          volumes:
+            - name: azurefile
+              azureFile:
+                # We reference the secret we created just earlier 
+                # so that the account name and key are passed securely and not directly in a template
+                secretName: azure-secret
+                shareName: tensorflow
+                readOnly: false
           restartPolicy: OnFailure
 ```
 
 </details>
 
 
-**Don't forget to delete the completed `TfJob` once it is complete!**
+**Don't forget to delete the `TfJob` once it is completed!**
 
 > Great, but what if I want to check out the training in TensorBoard, do I need to download everything on my machine?
 
@@ -462,7 +470,7 @@ Let's look at it:
 
 
 Let's add TensorBoard to our job then.
-Here is hiw this will work: We will keep the same TensorFlow training job as in exercise 2. This `TfJob` will write the model and summaries in the Azure File share.  
+Here is how this will work: We will keep the same TensorFlow training job as in exercise 2. This `TfJob` will write the model and summaries in the Azure File share.  
 We will also set up the configuration for TensorBoard so that it reads the summaries from the same Azure File share:
 * `Volumes` and `VolumeMounts` in `TensorBoardSpec` should be updated adequatly.
 * For `ServiceType`, you should use `LoadBalancer`, this will create a public IP so it will be easier to access.
@@ -476,22 +484,11 @@ We will also set up the configuration for TensorBoard so that it reads the summa
 <summary><strong>Solution</strong></summary>  
 
 ```yaml
-apiVersion: "tensorflow.org/v1alpha1"
-kind: "TfJob"
+apiVersion: tensorflow.org/v1alpha1
+kind: TfJob
 metadata:
-  name: "example-job-tb-azure"
+  name: module5-ex3
 spec:
-  tensorboard:
-    logDir: /tmp/tensorflow/training_summaries
-    serviceType: LoadBalancer
-    volumes:
-      - name: azurefile
-        azureFile:
-            secretName: azure-secret
-            shareName: tensorflow
-    volumeMounts:
-      - mountPath: /tmp/tensorflow #This could be any other path. All that maters is that LogDir reflects it.
-        name: azurefile
   replicaSpecs:
     - template:
         spec:
@@ -502,12 +499,25 @@ spec:
                   shareName: tensorflow
                   readOnly: false
           containers:
-            - image: wbuchwalter/tensorflow-for-poets:cpu
+            - image: wbuchwalter/tf-mnist:cpu
               name: tensorflow
               volumeMounts:
-                - mountPath: /app/tf_files
+                - mountPath: /tmp/tensorflow
+                  subPath: module5-ex3 # Again we isolate the logs in a new directory on Azure Files
                   name: azurefile
           restartPolicy: OnFailure
+  tensorboard:
+    logDir: /tmp/tensorflow/logs
+    serviceType: LoadBalancer # We request a public IP for our TensorBoard instance
+    volumes:
+      - name: azurefile
+        azureFile:
+            secretName: azure-secret
+            shareName: tensorflow
+    volumeMounts:
+      - mountPath: /tmp/tensorflow/ #This could be any other path. All that maters is that LogDir reflects it.
+        subPath: module5-ex3 # This should match the directory our Master is actually writing in
+        name: azurefile
 ```
 </details>
 
@@ -520,10 +530,10 @@ kubectl get services
 ```
 You should see something like:
 ```
-NAME               CLUSTER-IP     EXTERNAL-IP     PORT(S)        AGE
-kubernetes         10.0.0.1       <none>          443/TCP        14d
-master-pj6i-0      10.0.126.11    <none>          2222/TCP       5m
-tensorboard-pj6i   10.0.199.170   104.42.193.76   80:31770/TCP   5m
+NAME                           CLUSTER-IP     EXTERNAL-IP     PORT(S)        AGE
+kubernetes                     10.0.0.1       <none>          443/TCP        14d
+module5-ex3-master-7yqt-0      10.0.126.11    <none>          2222/TCP       5m
+module5-ex3-tensorboard-7yqt   10.0.199.170   104.42.193.76   80:31770/TCP   5m
 ```
 Note that provisioning a public IP on Azure can take a few minutes. During this time the `EXTERNAL-IP` for TensorBoard's service will show as `<pending>`.  
 
@@ -533,4 +543,4 @@ Once the public IP is provisioned, browse it, and you should land on a working T
 
 ## Next Step
 
-[Link to next module]
+[6 - Distributed TensorFlow](../6-distributed-tensorflow)
