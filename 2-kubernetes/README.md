@@ -189,11 +189,11 @@ Here is what this would look like in YAML format:
 apiVersion: batch/v1
 kind: Job # Our training should be a Job since it is supposed to terminate at some point
 metadata:
-  name: 2-mnist-training # Name of our job
+  name: module2-ex1 # Name of our job
 spec:
   template: # Template of the Pod that is going to be run by the Job
     metadata:
-      name: 2-mnist-training # Name of the pod
+      name: module2-ex1 # Name of the pod
     spec:
       containers: # List of containers that should run inside the pod, in our case there is only one.
       - name: tensorflow
@@ -202,7 +202,7 @@ spec:
       restartPolicy: OnFailure # restart the pod if it fails
 ```
 
-Save this template somewhere (or use [`training.yaml`](./training.yaml), and deploy it with:
+Save this template somewhere and deploy it with:
 
 ```console
 kubectl create -f <path-to-your-template>
@@ -220,7 +220,7 @@ Should show your new job:
 
 ```bash
 NAME                                DESIRED   SUCCESSFUL   AGE
-2-mnist-training                      1         0            1m
+module2-ex1                      1         0            1m
 ```
 
 Looking at the Pods:
@@ -230,7 +230,7 @@ kubectl get pods
 You should see your training running
 ```bash
 NAME                                      READY     STATUS      RESTARTS   AGE
-2-mnist-training-c5b8q                      1/1       Runing      0          1m
+module2-ex1-c5b8q                      1/1       Runing      0          1m
 ```
 
 Finally you can look at the logs of your pod with:
@@ -268,7 +268,7 @@ kubectl get job
 
 ```bash
 NAME                                DESIRED   SUCCESSFUL   AGE
-2-mnist-training                    1         1            3m
+module2-ex1                    1         1            3m
 ```
 
 ## Next Step
