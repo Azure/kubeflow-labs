@@ -76,7 +76,7 @@ The issues we saw in the first part of this module can be categorized in two gro
 The first group of issue is still very dependent on the processes in your company/group. If you need to go through a formal request to get access to extra VMs/GPU, it will still be a hassle and there is nothing Kubernetes can do about that.  
 However, Kubernetes makes this process much easier:
 * On ACS and AKS you can spin up new VMs with a single command: [`az <acs|aks> scale`](https://docs.microsoft.com/en-us/cli/azure/aks?view=azure-cli-latest#az_aks_scale)
-* On acs-engine you can setup autoscaling so that anytime you schedule a training on Kubernetes, the autoscaler will make sure your cluster has all the resources it need to run it, and when your training is completed, it will shut down any idle VMs, making this the best solution in term of cost and effort. While autoscaling is outside the scope of this workshop we will give you pointers in module [9 - Going Furter](../9-going-further).
+* On acs-engine you can setup autoscaling so that anytime you schedule a training on Kubernetes, the autoscaler will make sure your cluster has all the resources it need to run it, and when your training is completed, it will shut down any idle VMs, making this the best solution in term of cost and effort. While autoscaling is outside the scope of this workshop we will give you pointers in module [8 - Going Furter](../8-going-further).
 
 Setting up the training, however, is drastically simplified with Kubernetes and `TfJob`.
 

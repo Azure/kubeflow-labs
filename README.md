@@ -26,5 +26,5 @@
 |5| **[TfJob](5-tfjob)** | How to use `tensorflow/k8s` and `TfJob` to deploy a simple TensorFlow training.|
 |6| **[Distributed Tensorflow](6-distributed-tensorflow)** | Going distributed with `TfJob`|
 |7| **[Hyperparameters Sweep with Helm](7-hyperparam-sweep)** | Using Helm to deploy a large number of training testing different hypothesis, monitoring and comparing them. |
-|8| **[Going Further](9-going-further)** | Autoscaling, Azure Fuse, GlusterFS etc. |
-|9| **[Jupyter Notebooks](8-jupyter)** | Easily deploy a Jupyter Notebook instance on Kubernetes. |
+|8| **[Going Further](8-going-further)** | Links and resources to go further: Autoscaling, Azure Fuse, GlusterFS etc. |
+|9| **[Jupyter Notebooks](9-jupyter)** | Easily deploy a Jupyter Notebook instance on Kubernetes. |

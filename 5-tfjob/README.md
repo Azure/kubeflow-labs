@@ -2,8 +2,8 @@
 
 ## Prerequisites
 
-* [3 - GPUs](../3-gpus/README.md)  
-* [4 - Helm](../4-helm/README.md)
+* [3 - Helm](../3-helm/README.md)
+* [4 - GPUs](../4-gpus/README.md)  
 
 ## Summary
 
@@ -464,9 +464,9 @@ Let's look at it:
 | Field | Type| Description |
 |-------|-----|-------------|
 | LogDir | `string` | Location of TensorFlow summaries in the TensorBoard container. |
-| ServiceType | [`ServiceType`]() | What kind of service should expose TensorBoard. Usually `ClusterIP` (Only reachable from within the cluster) or `LoadBalancer` (Exposes the service externally using a cloud provider’s load balancer. ) |
-| Volumes | [`Volume`]() array | List of volumes that can be mounted.  |
-| VolumeMounts | [`VolumeMount`]() array | Pod volumes to mount into the container's filesystem. |
+| ServiceType | [`ServiceType`](https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services---service-types) | What kind of service should expose TensorBoard. Usually `ClusterIP` (Only reachable from within the cluster) or `LoadBalancer` (Exposes the service externally using a cloud provider’s load balancer. ) |
+| Volumes | [`Volume`](https://kubernetes.io/docs/api-reference/v1.8/#volume-v1-core) array | List of volumes that can be mounted.  |
+| VolumeMounts | [`VolumeMount`](https://kubernetes.io/docs/api-reference/v1.8/#volumemount-v1-core) array | Pod volumes to mount into the container's filesystem. |
 
 
 Let's add TensorBoard to our job then.
