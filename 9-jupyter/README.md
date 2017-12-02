@@ -188,8 +188,6 @@ From a browser, navigate to the Jupyter notebook with the following URL, replace
 http://<PUBLICIP>:8888/?token=2e7c875bd4e72137911d33e209c91d01f7a7b44868cf664d
 ```
 
-## Next Step
-[Module 9: Going Further](../9-going-further/README.md)
 
 
 
