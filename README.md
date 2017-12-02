@@ -13,6 +13,10 @@
 1. Kubectl installed: [Installing Kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
 1. Helm installed: [Installing Helm CLI](https://github.com/kubernetes/helm/blob/master/docs/install.md)
 
+Clone this repository somewhere so you can easily access the different source files:
+```console
+git clone https://github.com/wbuchwalter/tensorflow-k8s-azure
+```
 
 ## Content Sumary
 
