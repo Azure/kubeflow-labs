@@ -100,10 +100,10 @@ Here a few other docker commands that are important to be aware of for the rest 
 ### Containerizing a TensorFlow model
 
 Now that we understand the basics of Docker, let's containerize our first TensorFlow model that we will reuse in the following modules.  
-Our first model will be a very simple MNIST classifier. You can see the source code in `./src/main.py`.    
+Our first model will be a very simple MNIST classifier. You can see the source code in [`./src/main.py`](./src/main.py).    
 As you can see there is nothing specific to containers in this code, you can run this script directly on your laptop or on a VM.
 
-Now to have this run in a container, we need to build an image containing this code and it's dependencies.  
+Now, to have this run in a container, we need to build an image containing this code and it's dependencies.  
 As you saw in the tutorial, we will use a `Dockerfile` to do this.
 
 Here is the (very simple) `Dockerfile` that we are going to use for this model (located in [`./src/Dockerfile`](./src/Dockerfile)):
