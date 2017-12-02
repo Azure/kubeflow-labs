@@ -198,7 +198,7 @@ Adding run metadata for 99
 
 You can kill the process and exit the container at any time with `ctrl + c`.
 
-### Running the image with GPU
+### Running the image with the NVIDIA GPU of your machine (If you have one)
 
 **Currently, running docker containers with GPU is only supported on Linux.**
 
