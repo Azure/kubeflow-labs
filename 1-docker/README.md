@@ -106,7 +106,7 @@ As you can see there is nothing specific to containers in this code, you can run
 Now to have this run in a container, we need to build an image containing this code and it's dependencies.  
 As you saw in the tutorial, we will use a `Dockerfile` to do this.
 
-Here is the (very simple) `Dockerfile` that we are going to use for this model (located in `./src/Dockerfile`):
+Here is the (very simple) `Dockerfile` that we are going to use for this model (located in [`./src/Dockerfile`](./src/Dockerfile)):
 
 ```dockerfile
 FROM tensorflow/tensorflow:1.4.0
@@ -130,7 +130,7 @@ The two other instructions are pretty straightforward, first we copy our script 
 
 The next step is to build our image to be able to run it using docker. For that, we will use the command `docker build`.
 
-From the `./src` repository, we can build the image with
+From the [`./src`](./src) repository, we can build the image with
 
 ```console
 docker build -t ${DOCKER_USERNAME}/tf-mnist .
