@@ -155,8 +155,8 @@ Removing intermediate container 7acb7aac7a9f
 Successfully built 92c7ed17916b
 Successfully tagged wbuchwalter/tf-mnist:latest
 ```
-Let's analyse this image full name:
-* `wbuchwalter` is the name of the repository (same as your docker hub username), this is where we can find the image
+Let's analyse this image full name (`wbuchwalter/tf-mnist:latest`):
+* `wbuchwalter` is the name of my repository, this is where we can find the image. This will be different for you (same as your docker hub username).
 * `tf-mnist` is the name of the image itself
 * `latest` is the tag. `latest` is the default tag if you don't specify any. Tags are usually used to denote different versions or flavors of a same image. For example you could have a tag `v1` and `v2` to denote different versions, or `cpu` and `gpu` to denote what hardware it can run on.  
 
