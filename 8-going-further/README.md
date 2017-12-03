@@ -1,53 +1,52 @@
 # Going Further
 
-## Prerequisites
-
-All the previous modules
-
 ## Summary
 
-Here are some more advanced concepts and resources
+* Learn how to deal with very large amount of input data
+* Learn how to autoscale a kubernetes cluster on acs-engine.
+
+
+## Working with large amount of data
+
+In the previous modules, we saw how we could easily scale our trainings on Kubernetes to a large amount of nodes.  
+We also saw how Azure Files provides an easy way to add persistent storage to our trainings to save the output models, summaries etc.  
+
+However in every example we worked with so far, the training data was either downloaded at run time, or directly baked into the container. While this can work for very small datasets, it is not a scalable approach for larger ones.  
+Just as we used Azure Files to store models and logs, we can use Azure Files to store our dataset and mount the share in our containers. This work well only up to a certain point though (say a few GBs), as an Azure file share is limited to 1000 IOPS.
+
+So how can we deal with larger datasets?  
+One solution to this is to use a distributed file system.  
   
-## Distributed Storage, tools and concepts
+### Distributed File System, Tools and Concepts
 
-Storage and statefull containers is a bit tricky in the containerization space.
+A distributed file system aggregates various storages over network into a single large network file system.
+Such a file system can be deployed inside your Kubernetes cluster, and can use the disks already attached to your nodes as a partition of the overall network file system.
 
-Since in the most cases, you may have multiple containers running and reading or writing data you need to be able to centralize it somewhere and make it persisten. 
-
-Plus, you may want different tiers such as high I/O stored on SSD or cheaper on cold storage. 
-
-This concept is called distributed persistent storage. Kubernetes is handling it natively with Azure but you may want to use some standard, such as NFS for example, to be able to not be tight to your infrastructure or cloud provider.
 
 ![](NFSonAzureConcept.png)
 
-*High level architecture overview*
+Here are some tools and frameworks that can make it easy to deploy such a distributed file system on Kubernetes:
 
-Network File System (NFS) is a distributed file system protocol originally developed by Sun Microsystems in 1984,[1] allowing a user on a client computer to access files over a computer network much like local storage is accessed
+* [GlusterFS](http://www.gluster.org/)
+* [Rook](https://rook.io/)
+* [Portworks](https://portworx.com/)
+* [Pachyderm](http://pachyderm.io/)
 
-Some tools and framework, implementing this standard, are becoming standard nowaday, we will try to talk about few of them.
 
-### [GlusterFS](http://www.gluster.org/)
+## Autoscaling a Kubernetes Cluster
 
-GlusterFS is a distributed, software-defined filesystem.
-Storage devices, called “bricks”, are selected on one or more nodes to form logical storage volumes across a Gluster cluster.
-- Runs on commodity hardware (even a Raspberry Pi!)
-- Scale-out design: easy to increase storage by simply adding more nodes
-- Provides features like cross-node and cross-site replication, usage balancing, and iSCSI storage access
+As we saw in module [6 - Distributed TensorFlow](../6-distributed-tensorflow/) and [7 - Hyperparameters Sweep](../7-hyperparam-sweep), being able to autoscale our Kubernetes cluster can be extremly useful.  
+Indeed, automatic scale-out (adding more VMs to the cluster) would allow anyone to run any experiment they want, whenever they want without needing to involve an ops person to setup and prepare virtual machines.  
+And because the cluster can also automatically scale-in by deleting idle VMs once training jobs are completed, we can keep the cost as low as possible by just paying for what we actually use.  
 
-### [Pachyderm](http://pachyderm.io/)
+As of this writing, autoscaling is only supported on Kubernetes cluster created with [acs-engine](https://github.com/Azure/acs-engine).
 
-Pachyderm is a tool for production data pipelines. If you need to chain together data scraping, ingestion, cleaning, munging, wrangling, processing, modelling, and analysis in a sane way, then Pachyderm is for you. If you have an existing set of scripts which do this in an ad-hoc fashion and you're looking for a way to "productionize" them, Pachyderm can make this easy for you.
+See the following resources to get started:
+* [Kubernetes `acs-engine` Autoscaler](https://github.com/wbuchwalter/Kubernetes-acs-engine-autoscaler)
+* [Autoscaling a Kubernetes cluster created with acs-engine on Azure](https://medium.com/@wbuchwalter/autoscaling-a-kubernetes-cluster-created-with-acs-engine-on-azure-5e24ddc6402e)
+* [Case study: Autoscaling Deep Learning Training with Kubernetes](https://www.microsoft.com/developerblog/2017/11/21/autoscaling-deep-learning-training-kubernetes/)
 
-![](https://github.com/pachyderm/pachyderm/blob/master/doc/pachyderm_factory_gh.png?raw=true)
 
-This is well integrated with docker and kubernetes to run balanced computing processing.
+## Next Step
 
-### [Azure-storage-fuse](https://github.com/Azure/azure-storage-fuse)
-
-A virtual file system adapter for Azure Blob storage.
-
-blobfuse is an open source project developed to provide a virtual filesystem backed by the Azure Blob storage. It uses the libfuse open source library to communicate with the Linux FUSE kernel module, and implements the filesystem operations using the Azure Storage Blob REST APIs.
-
-### Autoscaling
-
-[Autoscaling concepts with a Kubernetes cluster on Azure](https://medium.com/@wbuchwalter/autoscaling-a-kubernetes-cluster-created-with-acs-engine-on-azure-5e24ddc6402e)
+[9 - Jupyter Notebooks on Kubernetes](../9-jupyter)
