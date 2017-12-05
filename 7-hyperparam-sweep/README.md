@@ -1,4 +1,4 @@
-# Hyper Parameters Sweep with `TfJob` and Helm
+# Automated Hyperparameters Sweep with `TfJob` and Helm
 
 ## Prerequisites
 
@@ -7,12 +7,12 @@
   
 ### "Vanilla" Hyperparameter Sweep
 
-Just as distributed training, hyperparameter sweep is barely used in many organizations.  
+Just as distributed training, automated hyperparameter sweep is barely used in many organizations.
 The reasons are similar: It takes a lot of resources, or time, to run more than a couple training for the same model.
   * Either you run different hypothesis in parallel, which will likely requires a lot of resources and VMs. These VMs need to be managed by someone, the model need to be deployed, logs and checkpoints have to be gathered etc.
   * Or you run everything sequentially on a few number of VMs, which takes a lot of time before being able to compare result
 
-So in practice most people just run a few trainings based on their intuition of what the optimal hyperparameters should be and pick a winner. 
+So in practice most people manually fine-tune their hyperparameters through a few runs and pick a winner.
 
 ### Kubernetes + Helm
 
@@ -27,8 +27,9 @@ As we saw in module [3 - Helm](../3-helm), Helm enables us to package an applica
 To do that, Helm allows us to use Golang templating engine in the chart definitions. This means we can use conditions, loops, variables and [much more](https://docs.helm.sh/chart_template_guide).  
 This will allow us to create complex deployment flow.   
 
-In the case of hyperparameters sweeping, we will want to deploy a number of `TfJobs` each trying different values for some hyperparameters.  
+In the case of hyperparameters sweeping, we will want a chart able to deploy a number of `TfJobs` each trying different values for some hyperparameters.  
 We will also want to deploy a single TensorBoard instance monitoring all these `TfJobs`, that way we can quickly compare all our hypothesis, and even early-stop jobs that clearly don't perform well if we want to reduce cost as much as possible.
+For now, this chart will simply do a grid search, and while it is less efficient than random search it will be a good place to start.
 
 ## Exercise
 
