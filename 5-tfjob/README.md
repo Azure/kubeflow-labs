@@ -11,7 +11,7 @@ In this module you will learn how [`tensorflow/k8s`](https://github.com/tensorfl
 
 ## `tensorflow/k8s`
 
-As we saw earlier, giving a container access to GPU is not exactly a breeze on Kubernetes: We need to manually mount the drivers from the node into the container and update some environment variables.    
+As we saw earlier, giving a container access to GPU is not exactly a breeze on Kubernetes: We need to manually mount the drivers from the node into the container.    
 If you already tried to run a distributed TensorFlow training, you know that it's not easy either. Getting the `ClusterSpec` right can be painful if you have more than a couple VMs, and it's also quite brittle (we will look more into distributed TensorFlow in module [6 - Distributed TensorFlow](../6-distributed-tensorflow/README.md)).
   
 `tensorflow/k8s` is a new project in TensorFlow's organization on GitHub that makes all of this much easier.  
@@ -120,10 +120,7 @@ spec:
         - name: bin
           mountPath: /usr/local/nvidia/bin
         - name: lib
-          mountPath: /usr/lib/nvidia
-        env:
-        - name: LD_LIBRARY_PATH
-          value: /usr/lib/nvidia:/usr/lib/x86_64-linux-gnu
+          mountPath: /usr/local/nvidia/lib64
 ```
 Here is what the same thing looks like using the new `TfJob` resource:
 
@@ -145,7 +142,7 @@ spec:
           restartPolicy: OnFailure
 ```
 
-No need to mount drivers nor specify any environment variable anymore! Note that we are note specifying `TfReplicaType` or `Replicas` as the default values are already what we want.
+No need to mount drivers anymore! Note that we are note specifying `TfReplicaType` or `Replicas` as the default values are already what we want.
 
 #### How does this work?
 
@@ -155,14 +152,14 @@ As we saw earlier, when we installed the Helm chart for `tensorflow/k8s`, 3 reso
 * And a `Pod` named `tf-job-operator`
 
 The `tf-job-operator` pod (simply called the operator, or `TfJob` operator), is going to monitor your cluster, and everytime you create a new resource of type `TfJob`, the operator will know what to do with it.    
-Specifically, when you create a new `TfJob`, the operator will create a new Kubernetes `Job` for it, and automatically mount the drivers and update the environment variable if needed (i.e. when you request a GPU).  
+Specifically, when you create a new `TfJob`, the operator will create a new Kubernetes `Job` for it, and automatically mount the drivers if needed (i.e. when you request a GPU).  
 
 You may wonder how the operator knows which directory needs to be mounted in the container for the NVIDIA drivers: that's where the `ConfigMap` comes into play.  
 
 In K8s, a [`ConfigMap`](https://kubernetes.io/docs/tasks/configure-pod-container/configmap/) is a simple object that contains key-value pairs. This `ConfigMap` can then be linked with a container to inject some configuration.   
 
 When we installed the Helm chart, we specified which cloud provider we are running on by doing `--set cloud=azure`. 
-This creates a `ConfigMap` that contains configuration options specific for Azure, including the list of directory to mount, and which environment variable to update.
+This creates a `ConfigMap` that contains configuration options specific for Azure, including the list of directory to mount.
 
 We can take a look at what is inside our `tf-job-operator-config` by doing:
 
@@ -185,12 +182,9 @@ controller_config_file.yaml:
 grpcServerFilePath: /opt/mlkube/grpc_tensorflow_server/grpc_tensorflow_server.py
 accelerators:
   alpha.kubernetes.io/nvidia-gpu:
-    envVars:
-      - name: LD_LIBRARY_PATH
-        value: /usr/lib/nvidia:/usr/lib/x86_64-linux-gnu
     volumes:
       - name: lib
-        mountPath: /usr/lib/nvidia
+        mountPath: /usr/local/nvidia/lib64
         hostPath:  /usr/lib/nvidia-384
       - name: bin
         mountPath: /usr/local/nvidia/bin

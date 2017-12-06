@@ -23,7 +23,7 @@ GPU support in K8s is still in it's early stage, and as such requires a bit of e
 While you don't need to do anything to access a CPU from inside your container (except specifying CPU request and limit optionnaly), getting access to the agent's  GPU is a little bit more tricky:  
 * First, the drivers needs to be installed on the agent, otherwise this agent will not report the presence of GPU, and you won't be able to use it (this is already done for you in ACS/AKS/acs-engine).
 * Then you need to explicitly ask for 1 or mutliple GPU(s) to be mounted into your container, otherwise you will simply not be able to access the GPU, even if is running on a GPU agent.
-* Finally, and most importantly, you need to mount the drivers from the agent VM into your container, and update the relevant environment variables.
+* Finally, and most importantly, you need to mount the drivers from the agent VM into your container.
 
 In Module 5, we will see how this process can be greatly simplified when using TensorFlow with `TfJob`, but for now, let's do it ourselves.
 
@@ -88,11 +88,6 @@ For ACS/AKS/acs-engine only Ubuntu nodes are supported so far, so it should be a
 For each of the above paths we need to create a corresponding `Volume` and a `VolumeMount` to expose them into our container.  
 
 > To understand how to configure `Volumes` and `VolumeMounts` take a look at [Volumes](https://kubernetes.io/docs/user-guide/walkthrough/#volumes) on the Kubernets documentation.
-
-Finally we may also need to update some environment variable to reflect where the drivers were mounted in the container. Typically, `LD_LIBRARY_PATH` (responsible for referencing native code libraries) needs to be updated to reflect the location of both the NVIDIA libraries and CUDA Driver API library.
-
-> See [Define Environment Variables for a Container](https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/).
-
 
 ## Excercices
 
@@ -186,7 +181,7 @@ spec:
         - name: bin
           mountPath: /usr/local/nvidia/bin
         - name: lib
-          mountPath: /usr/lib/nvidia
+          mountPath: /usr/local/nvidia/lib64
 ```
 </p>
 </details>
