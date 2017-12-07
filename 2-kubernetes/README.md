@@ -82,7 +82,7 @@ You can either create the cluster using the portal, or using Azure-CLI (`az`).
 ### A Note on GPUs with Kubernetes
 
 As of this writing, GPUs are still in preview with ACS.  
-You can deploy an ACS cluster with GPU VMs (such as `Standard_NC6`) in `uswest2` or `uksouth` but you should be aware of some pitfalls:
+You can deploy an ACS cluster with GPU VMs (such as `Standard_NC6`) in `westus2` or `uksouth` but you should be aware of some pitfalls:
 * Deploying a GPU cluster takes longer than a CPU cluster (about 10-15 minutes more) because the NVIDIA drivers need to be installed as well.
 * Since this is a preview, you might hit capacity issues if the location you chose does not have enough GPUs available to accommodate you.
 
