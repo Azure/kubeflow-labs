@@ -79,6 +79,8 @@ Let's try to deploy an official Chart such as the popular [Wordpress](https://gi
 helm install stable/wordpress
 ```
 
+> Note: If you have an error such has `Error: incompatible versions client[v2.7.0] server[v2.6.2]`, please run `helm init --upgrade`
+
 After a few seconds you should see the following output in your terminal :
 
 ```bash
