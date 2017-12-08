@@ -94,7 +94,7 @@ Let's look again at what the `TfJobSpec`and `TfReplicaSpec` objects looks like:
 
 **`TfReplicaSpec` Object**  
 
-Note the last two parameters `IsDefaultPS` and `TfPort` that we didn't talk about before.
+Note the last parameter `IsDefaultPS` that we didn't talk about before.
 
 | Field | Type| Description |
 |-------|-----|-------------|
