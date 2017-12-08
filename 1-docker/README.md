@@ -217,7 +217,7 @@ ENTRYPOINT ["python", "/app/main.py"]
 Then simply rebuild the image with a new tag (you can use docker or nvidia-docker interchangeably for any command except run):
 
 ```console
-docker build -t ${DOCKER_USERNAME}/tf-mnist:gpu
+docker build -t ${DOCKER_USERNAME}/tf-mnist:gpu .
 ```
 
 Finally run the container with nvidia-docker:
