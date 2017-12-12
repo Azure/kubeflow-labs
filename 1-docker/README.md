@@ -226,6 +226,8 @@ Finally run the container with nvidia-docker:
 nvidia-docker run -it ${DOCKER_USERNAME}/tf-mnist:gpu
 ```
 
+> Note: If the command fails with `Unknown runtime specified nvidia`, follow the steps described here (Systemd drop-in file): https://github.com/nvidia/nvidia-container-runtime#docker-engine-setup
+
 #### Publish the Image
 
 Our image is now built and running locally, but what about sharing it to be able to use it from anywhere by anyone?  
