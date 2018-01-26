@@ -18,7 +18,7 @@ Clone this repository somewhere so you can easily access the different source fi
 git clone https://github.com/wbuchwalter/tensorflow-k8s-azure
 ```
 
-## Content Sumary
+## Content Summary
 
 | | Module | Description |
 | --- | --- | --- |
@@ -27,8 +27,8 @@ git clone https://github.com/wbuchwalter/tensorflow-k8s-azure
 |2| **[Kubernetes](2-kubernetes)** | Kubernetes important concepts overview.|
 |3| **[Helm](3-helm)** | Introduction to Helm |
 |4| **[GPUs](4-gpus)** | How to use GPUs with Kubernetes.|
-|5| **[TfJob](5-tfjob)** | How to use `tensorflow/k8s` and `TfJob` to deploy a simple TensorFlow training.|
-|6| **[Distributed Tensorflow](6-distributed-tensorflow)** | Going distributed with `TfJob`|
+|5| **[TFJob](5-tfjob)** | How to use `tensorflow/k8s` and `TFJob` to deploy a simple TensorFlow training.|
+|6| **[Distributed Tensorflow](6-distributed-tensorflow)** | Going distributed with `TFJob`|
 |7| **[Hyperparameters Sweep with Helm](7-hyperparam-sweep)** | Using Helm to deploy a large number of training testing different hypothesis, monitoring and comparing them. |
 |8| **[Going Further](8-going-further)** | Links and resources to go further: Autoscaling, Distributed Storage. |
 |9| **[Jupyter Notebooks](9-jupyter)** | Easily deploy a Jupyter Notebook instance on Kubernetes. |

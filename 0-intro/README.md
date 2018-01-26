@@ -5,7 +5,7 @@
 Machine learning model development and operationalization currently has very few industry-wide best practices to help us reduce the time to market and optimize the different steps.
 
 However in traditional application development, DevOps practices are becoming ubiquitous. 
-We can benefit from many of these practices by applying them to model developement and operationalization.
+We can benefit from many of these practices by applying them to model development and operationalization.
 
 Here are a subset of pain points that exists in a typical ML workflow.
 #### A Typical (Simplified) ML Workflow and its Pain Points

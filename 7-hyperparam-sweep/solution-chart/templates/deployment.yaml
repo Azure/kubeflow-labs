@@ -9,11 +9,11 @@
 {{- $chartversion := .Chart.Version -}}
 
 # Then we loop over every value of $lrlist (learning rate) and $nblayerslist (hidden layer depth)
-# This will result in create 1 TfJob for every pair of learning rate and hidden layer depth
+# This will result in create 1 TFJob for every pair of learning rate and hidden layer depth
 {{- range $i, $lr := $lrlist }}
 {{- range $j, $nblayers := $nblayerslist }}
 apiVersion: tensorflow.org/v1alpha1
-kind: TfJob # Each one of our trainings will be a separate TfJob
+kind: TFJob # Each one of our trainings will be a separate TFJob
 metadata:
   name: module7-tf-paint-{{ $i }}-{{ $j }} # We give a unique name to each training
   labels:
@@ -56,7 +56,7 @@ spec:
 ---
 {{- end }}
 {{- end }}
-# We are not using TfJob integrated TensorBoard, because we want to create the Service and Deployment outside of the loop
+# We are not using TFJob integrated TensorBoard, because we want to create the Service and Deployment outside of the loop
 # since we only want one instance running for all our jobs, and not 1 per job.
 apiVersion: v1
 kind: Service
