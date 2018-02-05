@@ -136,7 +136,7 @@ helm install --name my-wordpress \
 
 ## Create your own Chart
 
-You can also create your own Chart by using the scafolding command `helm create mychart`
+You can also create your own Chart by using the scaffolding command `helm create mychart`
 
 This will create a folder which includes all the files necessary to create your own package :
 

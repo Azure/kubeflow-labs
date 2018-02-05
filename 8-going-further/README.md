@@ -35,7 +35,7 @@ Here are some tools and frameworks that can make it easy to deploy such a distri
 
 ## Autoscaling a Kubernetes Cluster
 
-As we saw in module [6 - Distributed TensorFlow](../6-distributed-tensorflow/) and [7 - Hyperparameters Sweep](../7-hyperparam-sweep), being able to autoscale our Kubernetes cluster can be extremly useful.  
+As we saw in module [6 - Distributed TensorFlow](../6-distributed-tensorflow/) and [7 - Hyperparameters Sweep](../7-hyperparam-sweep), being able to autoscale our Kubernetes cluster can be extremely useful.
 Indeed, automatic scale-out (adding more VMs to the cluster) would allow anyone to run any experiment they want, whenever they want without needing to involve an ops person to setup and prepare virtual machines.  
 And because the cluster can also automatically scale-in by deleting idle VMs once training jobs are completed, we can keep the cost as low as possible by just paying for what we actually use.  
 

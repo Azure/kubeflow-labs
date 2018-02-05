@@ -1,4 +1,4 @@
-# `tensorflow/k8s` and `TfJob`
+# `tensorflow/k8s` and `TFJob`
 
 ## Prerequisites
 
@@ -53,35 +53,35 @@ We will see in just a moment what each of them do.
 
 ### Kubernetes Custom Resource Definition
 
-Kubernetes has a concept of [Custom Resources](https://kubernetes.io/docs/concepts/api-extension/custom-resources/) (often abreviated CRD) that allows us to create custom object that we will then be able to use.  
-In the case of `tensorflow/k8s`, after installation, a new `TfJob` object will be available in our cluster. This object allows us to describe TensorFlow a training.
+Kubernetes has a concept of [Custom Resources](https://kubernetes.io/docs/concepts/api-extension/custom-resources/) (often abbreviated CRD) that allows us to create custom object that we will then be able to use.
+In the case of `tensorflow/k8s`, after installation, a new `TFJob` object will be available in our cluster. This object allows us to describe TensorFlow a training.
 
-#### `TfJob` Specifications
+#### `TFJob` Specifications
 
-Before going further, let's take a look at what the `TfJob` looks like:
+Before going further, let's take a look at what the `TFJob` looks like:
 
-> Note: Some of the fields are not described here for brievety. 
+> Note: Some of the fields are not described here for brevity.
 
-**`TfJob` Object**
+**`TFJob` Object**
   
 | Field | Type| Description |
 |-------|-----|-------------| 
 | apiVersion | `string` | Versioned schema of this representation of an object. In our case, it's `tensorflow.org/v1alpha1` |
-| kind | `string` |  Value representing the REST resource this object represents. In our case it's `TfJob` |
+| kind | `string` |  Value representing the REST resource this object represents. In our case it's `TFJob` |
 | metadata | [`ObjectMeta`](https://github.com/kubernetes/community/blob/master/contributors/devel/api-conventions.md#metadata)| Standard object's metadata. |
-| spec | `TfJobSpec` | The actual specification of our TensorFlow job, defined below. |
+| spec | `TFJobSpec` | The actual specification of our TensorFlow job, defined below. |
 
 `spec` is the most important part, so let's look at it too:
 
-**`TfJobSpec` Object**  
+**`TFJobSpec` Object**
 
 | Field | Type| Description |
 |-------|-----|-------------|
-| ReplicaSpecs | `TfReplicaSpec` array | Specification for a set of TensorFlow processes, defined below |
+| ReplicaSpecs | `TFReplicaSpec` array | Specification for a set of TensorFlow processes, defined below |
 
 Let's go deeper: 
 
-**`TfReplicaSpec` Object**  
+**`TFReplicaSpec` Object**
 
 | Field | Type| Description |
 |-------|-----|-------------|
@@ -122,11 +122,11 @@ spec:
         - name: lib
           mountPath: /usr/local/nvidia/lib64
 ```
-Here is what the same thing looks like using the new `TfJob` resource:
+Here is what the same thing looks like using the new `TFJob` resource:
 
 ```yaml
 apiVersion: tensorflow.org/v1alpha1
-kind: TfJob
+kind: TFJob
 metadata:
   name: example-tfjob
 spec:
@@ -151,8 +151,8 @@ As we saw earlier, when we installed the Helm chart for `tensorflow/k8s`, 3 reso
 * A `Deployment`
 * And a `Pod` named `tf-job-operator`
 
-The `tf-job-operator` pod (simply called the operator, or `TfJob` operator), is going to monitor your cluster, and everytime you create a new resource of type `TfJob`, the operator will know what to do with it.    
-Specifically, when you create a new `TfJob`, the operator will create a new Kubernetes `Job` for it, and automatically mount the drivers if needed (i.e. when you request a GPU).  
+The `tf-job-operator` pod (simply called the operator, or `TFJob` operator), is going to monitor your cluster, and every time you create a new resource of type `TFJob`, the operator will know what to do with it.
+Specifically, when you create a new `TFJob`, the operator will create a new Kubernetes `Job` for it, and automatically mount the drivers if needed (i.e. when you request a GPU).
 
 You may wonder how the operator knows which directory needs to be mounted in the container for the NVIDIA drivers: that's where the `ConfigMap` comes into play.  
 
@@ -200,20 +200,20 @@ If you want to know more:
 
 ## Exercises 
 
-### Exercise 1: A Simple `TfJob`
+### Exercise 1: A Simple `TFJob`
 
-Let's schedule a very simple TensorFlow job using `TfJob` first.  
+Let's schedule a very simple TensorFlow job using `TFJob` first.
 
-> Note: If you completed the excercise in Module 1 and 2, you can change the image to use the one you pushed instead.
+> Note: If you completed the exercise in Module 1 and 2, you can change the image to use the one you pushed instead.
 
-Depending on wether or not your cluster has GPU, choose the correct template:
+Depending on whether or not your cluster has GPU, choose the correct template:
 
 <details>
 <summary><strong>CPU Only</strong></summary>  
   
 ```yaml
 apiVersion: tensorflow.org/v1alpha1
-kind: TfJob
+kind: TFJob
 metadata:
   name: module5-ex1
 spec:
@@ -235,7 +235,7 @@ When using GPU, we need to request for one (or multiple), and the image we are u
 
 ```yaml
 apiVersion: tensorflow.org/v1alpha1
-kind: TfJob
+kind: TFJob
 metadata:
   name: module5-ex1-gpu
 spec:
@@ -255,14 +255,14 @@ spec:
   
 
 
-Save the template that applies to you in a file, and create the `TfJob`:
+Save the template that applies to you in a file, and create the `TFJob`:
 ```console
 kubectl create -f <template-path>
 ```
 
 Let's look at what has been created in our cluster.
 
-First a `TfJob` was created:
+First a `TFJob` was created:
 
 ```console
 kubectl get tfjob
@@ -270,7 +270,7 @@ kubectl get tfjob
 Returns:
 ```
 NAME            KIND
-module5-ex1   TfJob.v1alpha1.tensorflow.org
+module5-ex1   TFJob.v1alpha1.tensorflow.org
 ```
 
 As well as a `Job`, which was actually created by the operator:
@@ -328,7 +328,7 @@ kubectl delete tfjob module5-ex1
 
 Well currently we can't. As soon as the training is complete, the container stops and everything inside it, including model and logs are lost.  
 
-Thanksfully, Kubernetes `Volumes` can help us here.  
+Thankfully, Kubernetes `Volumes` can help us here.
 If you remember, we quickly introduced `Volumes` in module [2 - Kubernetes](../2-kubernetes/), and that's what we already used to mount the drivers from the node into the container.  
 But `Volumes` are not just for mounting things from a node, we can also use them to mount a lot of different storage solutions, you can see the full list [here](https://kubernetes.io/docs/concepts/storage/volumes/).  
 
@@ -348,7 +348,7 @@ Once you completed all the steps, run:
 kubectl get secrets
 ```
 
-Which sould return:
+Which should return:
 ```
 NAME                  TYPE                                  DATA      AGE
 azure-secret          Opaque                                2         4m
@@ -387,14 +387,14 @@ This means that when we run a training, all the important data is now stored in 
 
 #### Solution for Exercise 2
 
-*For brievety, the solution show here is for CPU-only training. If you are using GPU, don't forget to update the image tag as well as adding a GPU request.*
+*For brevity, the solution show here is for CPU-only training. If you are using GPU, don't forget to update the image tag as well as adding a GPU request.*
 
 <details>
 <summary><strong>Solution</strong></summary>  
 
 ```yaml
 apiVersion: tensorflow.org/v1alpha1
-kind: TfJob
+kind: TFJob
 metadata:
   name: module5-ex2
 spec:
@@ -427,33 +427,33 @@ spec:
 </details>
 
 
-**Don't forget to delete the `TfJob` once it is completed!**
+**Don't forget to delete the `TFJob` once it is completed!**
 
 > Great, but what if I want to check out the training in TensorBoard, do I need to download everything on my machine?
 
-Actually no, you don't. `TfJob` provides a very handy mechanism to monitor your trainings with TensorBaord easily!  
-We will try that in our third excercice.
+Actually no, you don't. `TFJob` provides a very handy mechanism to monitor your trainings with TensorBoard easily!
+We will try that in our third exercise.
 
-### Excercice 3: Adding TensorBoard
+### Exercise 3: Adding TensorBoard
 
 So far, we have a TensorFlow training running, and it's model and summaries are persisted to an Azure File share.  
 But having TensorBoard monitoring the training would be pretty useful as well.
-Turns out `TfJob` can also help us with that.
+Turns out `TFJob` can also help us with that.
 
-When we looked at the `TfJob` specification at the beginning of this module, we omitted some fields in `TfJobSpec` descriptions.
+When we looked at the `TFJob` specification at the beginning of this module, we omitted some fields in `TFJobSpec` descriptions.
 Here is a still incomplete but more accurate representation with one additional field:
 
-**`TfJobSpec` Object**  
+**`TFJobSpec` Object**
 
 | Field | Type| Description |
 |-------|-----|-------------|
-| ReplicaSpecs | `TfReplicaSpec` array | Specification for a set of TensorFlow processes. |
+| ReplicaSpecs | `TFReplicaSpec` array | Specification for a set of TensorFlow processes. |
 | **TensorBoard** | `TensorBoardSpec` | Configuration to start a TensorBoard deployment associated to our training job. Defined below. |
 
-That's right, `TfJobSpec` contains an object of type `TensorBoadSpec` which allows us to describe a TensorBoard instance!  
+That's right, `TFJobSpec` contains an object of type `TensorBoadSpec` which allows us to describe a TensorBoard instance!
 Let's look at it:
 
-**`TensorBoardSpec` Object**  
+**`TensorBoardSpec` Object**
 
 | Field | Type| Description |
 |-------|-----|-------------|
@@ -464,22 +464,22 @@ Let's look at it:
 
 
 Let's add TensorBoard to our job then.
-Here is how this will work: We will keep the same TensorFlow training job as in exercise 2. This `TfJob` will write the model and summaries in the Azure File share.  
+Here is how this will work: We will keep the same TensorFlow training job as in exercise 2. This `TFJob` will write the model and summaries in the Azure File share.
 We will also set up the configuration for TensorBoard so that it reads the summaries from the same Azure File share:
-* `Volumes` and `VolumeMounts` in `TensorBoardSpec` should be updated adequatly.
+* `Volumes` and `VolumeMounts` in `TensorBoardSpec` should be updated adequately.
 * For `ServiceType`, you should use `LoadBalancer`, this will create a public IP so it will be easier to access.
 * `LogDir` will depend on how you configure `VolumeMounts`, but on your file share, the summaries will be under the `training_summaries` sub directory.
 
 #### Solution for Exercise 3
 
-*For brievety, the solution show here is for CPU-only training. If you are using GPU, don't forget to update the image tag as well as adding a GPU request.*
+*For brevity, the solution show here is for CPU-only training. If you are using GPU, don't forget to update the image tag as well as adding a GPU request.*
 
 <details>
 <summary><strong>Solution</strong></summary>  
 
 ```yaml
 apiVersion: tensorflow.org/v1alpha1
-kind: TfJob
+kind: TFJob
 metadata:
   name: module5-ex3
 spec:
@@ -518,7 +518,7 @@ spec:
 
 #### Validation
 
-If you updated the `TfJob` template correctly, when doing:
+If you updated the `TFJob` template correctly, when doing:
 ```console
 kubectl get services
 ```

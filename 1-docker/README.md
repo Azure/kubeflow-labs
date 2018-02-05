@@ -72,7 +72,7 @@ Here a few other docker commands that are important to be aware of for the rest 
 
     The docker `rm` command allows to remove a container.
 
-    From the previous example, we can see that we have a container listed as exited in our environement, or maybe more if we run the same command `docker run -it ubuntu hostname` multiple times. If we want to do some cleaning and remove those executions from our environement we can use the command `docker rm`
+    From the previous example, we can see that we have a container listed as exited in our environment, or maybe more if we run the same command `docker run -it ubuntu hostname` multiple times. If we want to do some cleaning and remove those executions from our environment we can use the command `docker rm`
 
     ```
     $ docker rm gifted_darwin
@@ -84,7 +84,7 @@ Here a few other docker commands that are important to be aware of for the rest 
 
 1. `docker images`
 
-    This command allows us to list all the base images available in the environement.
+    This command allows us to list all the base images available in the environment.
 
     ```
     $ docker images
@@ -238,7 +238,7 @@ So let's push our image to Docker Hub:
 docker push ${DOCKER_USERNAME}/tf-mnist
 ```
 
-If this comand doesn't look familiar to you, make sure you went through part 1 and 2 of Docker's tutorial, and more precisely: [Tutorial - Share your image](https://docs.docker.com/get-started/part2/#share-your-image)
+If this command doesn't look familiar to you, make sure you went through part 1 and 2 of Docker's tutorial, and more precisely: [Tutorial - Share your image](https://docs.docker.com/get-started/part2/#share-your-image)
 
 
 ### Useful Links

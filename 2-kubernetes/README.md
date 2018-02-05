@@ -171,7 +171,7 @@ Capacity:
 
 ### Running our Model on Kubernetes
 
-> Note: If you didn't complete the exercise in module 1, you can use `wbuchwalter/tf-mnist` image for this exaercise.
+> Note: If you didn't complete the exercise in module 1, you can use `wbuchwalter/tf-mnist` image for this exercise.
 
 In module 1, we created an image for our MNIST classifier, ran a small training locally and pushed this image to Docker Hub.  
 Since we now have a running Kubernetes cluster, let's run our training on it!

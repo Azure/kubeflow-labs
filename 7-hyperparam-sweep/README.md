@@ -1,9 +1,9 @@
-# Automated Hyperparameters Sweep with `TfJob` and Helm
+# Automated Hyperparameters Sweep with `TFJob` and Helm
 
 ## Prerequisites
 
 * [3 - Helm](../3-helm)
-* [5 - TfJob](../5-tfjob)
+* [5 - TFJob](../5-tfjob)
   
 ### "Vanilla" Hyperparameter Sweep
 
@@ -27,14 +27,14 @@ As we saw in module [3 - Helm](../3-helm), Helm enables us to package an applica
 To do that, Helm allows us to use Golang templating engine in the chart definitions. This means we can use conditions, loops, variables and [much more](https://docs.helm.sh/chart_template_guide).  
 This will allow us to create complex deployment flow.   
 
-In the case of hyperparameters sweeping, we will want a chart able to deploy a number of `TfJobs` each trying different values for some hyperparameters.  
-We will also want to deploy a single TensorBoard instance monitoring all these `TfJobs`, that way we can quickly compare all our hypothesis, and even early-stop jobs that clearly don't perform well if we want to reduce cost as much as possible.
+In the case of hyperparameters sweeping, we will want a chart able to deploy a number of `TFJobs` each trying different values for some hyperparameters.
+We will also want to deploy a single TensorBoard instance monitoring all these `TFJobs`, that way we can quickly compare all our hypothesis, and even early-stop jobs that clearly don't perform well if we want to reduce cost as much as possible.
 For now, this chart will simply do a grid search, and while it is less efficient than random search it will be a good place to start.
 
 ## Exercise
 
 ### Creating and Deploying the Chart
-In this exercise, you will create a new Helm chart that will deploy a number of `TfJobs` as well as a TensorBoard instance.
+In this exercise, you will create a new Helm chart that will deploy a number of `TFJobs` as well as a TensorBoard instance.
 
 Here is what our `values.yaml` file could look like for example (you are free to go a different route):
 
@@ -53,7 +53,7 @@ hyperParamValues:
     - 7
 ```
 
-That way, when installing the chart, 9 `TfJob` will actually get deployed, testing all the combination of learning rate and hidden layers depth that we specified.  
+That way, when installing the chart, 9 `TFJob` will actually get deployed, testing all the combination of learning rate and hidden layers depth that we specified.
 This is a very simple example (our model is also very simple), but hopefully you start to see the possibilities than Helm offers.
 
 In this exercise, we are going to use a new model based on [Andrej Karpathy's Image painting demo](http://cs.stanford.edu/people/karpathy/convnetjs/demo/image_regression.html).  
