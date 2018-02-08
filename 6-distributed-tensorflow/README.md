@@ -260,7 +260,7 @@ A working code sample is available in [`solution-src/main.py`](./solution-src/ma
 <summary><strong>TFJob's Template</strong></summary>
 
 ```yaml
-apiVersion: tensorflow.org/v1alpha1
+apiVersion: kubeflow.org/v1alpha1
 kind: TFJob
 metadata:
   name: module6-ex1

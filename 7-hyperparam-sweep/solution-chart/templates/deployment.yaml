@@ -12,7 +12,7 @@
 # This will result in create 1 TFJob for every pair of learning rate and hidden layer depth
 {{- range $i, $lr := $lrlist }}
 {{- range $j, $nblayers := $nblayerslist }}
-apiVersion: tensorflow.org/v1alpha1
+apiVersion: kubeflow.org/v1alpha1
 kind: TFJob # Each one of our trainings will be a separate TFJob
 metadata:
   name: module7-tf-paint-{{ $i }}-{{ $j }} # We give a unique name to each training

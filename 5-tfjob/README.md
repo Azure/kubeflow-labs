@@ -66,7 +66,7 @@ Before going further, let's take a look at what the `TFJob` looks like:
   
 | Field | Type| Description |
 |-------|-----|-------------| 
-| apiVersion | `string` | Versioned schema of this representation of an object. In our case, it's `tensorflow.org/v1alpha1` |
+| apiVersion | `string` | Versioned schema of this representation of an object. In our case, it's `kubeflow.org/v1alpha1` |
 | kind | `string` |  Value representing the REST resource this object represents. In our case it's `TFJob` |
 | metadata | [`ObjectMeta`](https://github.com/kubernetes/community/blob/master/contributors/devel/api-conventions.md#metadata)| Standard object's metadata. |
 | spec | `TFJobSpec` | The actual specification of our TensorFlow job, defined below. |
@@ -125,7 +125,7 @@ spec:
 Here is what the same thing looks like using the new `TFJob` resource:
 
 ```yaml
-apiVersion: tensorflow.org/v1alpha1
+apiVersion: kubeflow.org/v1alpha1
 kind: TFJob
 metadata:
   name: example-tfjob
@@ -212,7 +212,7 @@ Depending on whether or not your cluster has GPU, choose the correct template:
 <summary><strong>CPU Only</strong></summary>  
   
 ```yaml
-apiVersion: tensorflow.org/v1alpha1
+apiVersion: kubeflow.org/v1alpha1
 kind: TFJob
 metadata:
   name: module5-ex1
@@ -234,7 +234,7 @@ spec:
 When using GPU, we need to request for one (or multiple), and the image we are using also needs to be based on TensorFlow's GPU image.
 
 ```yaml
-apiVersion: tensorflow.org/v1alpha1
+apiVersion: kubeflow.org/v1alpha1
 kind: TFJob
 metadata:
   name: module5-ex1-gpu
@@ -393,7 +393,7 @@ This means that when we run a training, all the important data is now stored in 
 <summary><strong>Solution</strong></summary>  
 
 ```yaml
-apiVersion: tensorflow.org/v1alpha1
+apiVersion: kubeflow.org/v1alpha1
 kind: TFJob
 metadata:
   name: module5-ex2
@@ -478,7 +478,7 @@ We will also set up the configuration for TensorBoard so that it reads the summa
 <summary><strong>Solution</strong></summary>  
 
 ```yaml
-apiVersion: tensorflow.org/v1alpha1
+apiVersion: kubeflow.org/v1alpha1
 kind: TFJob
 metadata:
   name: module5-ex3
