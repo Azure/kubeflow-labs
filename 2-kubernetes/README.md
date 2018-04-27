@@ -32,12 +32,12 @@ The worker nodes communicate with the master components, configure the networkin
 Kubernetes contains a number of abstractions that represent the state of your system: deployed containerized applications and workloads, their associated network and disk resources, and other information about what your cluster is doing. A Kubernetes object is a "record of intent" – once you create the object, the Kubernetes system will constantly work to ensure that object exists. By creating an object, you’re telling the Kubernetes system your cluster’s desired state.
 
 The basic Kubernetes objects include:
-* Pod - the smallest and simplest unit in the Kubernetes object model that you create or deploy. A Pod encapsulates an application container (or multiple containers), storage resources, a unique network IP, and options that govern how the container(s) should run.
-* Service - an abstraction which defines a logical set of Pods and a policy by which to access them.
-* Volume - an abstraction which allows data to be preserved across container restarts and allows data to be shared between different containers.
-* Namespace - a way to divide a physical cluster resources into multiple virtual clusters between multiple users.
-* Deployment - Manages pods and ensures a certain number of them are running. This is typically used to deploy pods that should always be up, such as a web server.
-* Job - A job creates one or more pods and ensures that a specified number of them successfully terminate. In other words, we use Job to run a task that finishes at some point, such as training a model.
+* **Pod** - the smallest and simplest unit in the Kubernetes object model that you create or deploy. A Pod encapsulates an application container (or multiple containers), storage resources, a unique network IP, and options that govern how the container(s) should run.
+* **Service** - an abstraction which defines a logical set of Pods and a policy by which to access them.
+* **Volume** - an abstraction which allows data to be preserved across container restarts and allows data to be shared between different containers.
+* **Namespace** - a way to divide a physical cluster resources into multiple virtual clusters between multiple users.
+* **Deployment** - Manages pods and ensures a certain number of them are running. This is typically used to deploy pods that should always be up, such as a web server.
+* **Job** - A job creates one or more pods and ensures that a specified number of them successfully terminate. In other words, we use Job to run a task that finishes at some point, such as training a model.
 
 ### Creating a Kubernetes Object
 
@@ -276,4 +276,3 @@ module2-ex1                    1         1            3m
 Currently our training doesn't do anything interesting. We are not even saving the model and summaries anywhere, but don't worry we are going to dive into this starting in Module 4.
 
 [Module 3: Helm](../3-helm/README.md)
-

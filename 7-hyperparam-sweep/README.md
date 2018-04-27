@@ -10,7 +10,7 @@
 Just as distributed training, automated hyperparameter sweep is barely used in many organizations.
 The reasons are similar: It takes a lot of resources, or time, to run more than a couple training for the same model.
   * Either you run different hypothesis in parallel, which will likely requires a lot of resources and VMs. These VMs need to be managed by someone, the model need to be deployed, logs and checkpoints have to be gathered etc.
-  * Or you run everything sequentially on a few number of VMs, which takes a lot of time before being able to compare result
+  * Or you run everything sequentially on a small number of VMs, which takes a lot of time before being able to compare results.
 
 So in practice most people manually fine-tune their hyperparameters through a few runs and pick a winner.
 
@@ -23,7 +23,7 @@ In practice, this process is still rudimentary today as the technologies involve
 
 ### Why Helm?
 
-As we saw in module [3 - Helm](../3-helm), Helm enables us to package an application in a chart and parametrize it's deployment easily.  
+As we saw in module [3 - Helm](../3-helm), Helm enables us to package an application in a chart and parametrize its deployment easily.  
 To do that, Helm allows us to use Golang templating engine in the chart definitions. This means we can use conditions, loops, variables and [much more](https://docs.helm.sh/chart_template_guide).  
 This will allow us to create complex deployment flow.   
 

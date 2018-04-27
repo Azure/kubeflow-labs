@@ -75,6 +75,19 @@ To use Helm, you need to have the [CLI installed on your machine](https://github
 
 Let's try to deploy an official Chart such as the popular [Wordpress](https://github.com/kubernetes/charts/tree/master/stable/wordpress)
 
+We'll need to initialize helm first, with this command:
+
+```bash
+helm init
+```
+
+Which should return something similar to:
+```bash
+Adding stable repo with URL: https://kubernetes-charts.storage.googleapis.com
+Adding local repo with URL: http://127.0.0.1:8879/charts
+$HELM_HOME has been configured at /Users/YOURUSER/.helm.
+```
+
 ```bash
 helm install stable/wordpress
 ```
