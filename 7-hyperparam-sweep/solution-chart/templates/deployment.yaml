@@ -1,0 +1,105 @@
+
+# First we copy the values of values.yaml in variable to make it easier to access them
+{{- $lrlist := .Values.hyperParamValues.learningRate -}}
+{{- $nblayerslist := .Values.hyperParamValues.hiddenLayers -}}
+{{- $image := .Values.image -}}
+{{- $useGPU := .Values.useGPU -}}
+{{- $shareName := .Values.shareName -}}
+{{- $chartname := .Chart.Name -}}
+{{- $chartversion := .Chart.Version -}}
+
+# Then we loop over every value of $lrlist (learning rate) and $nblayerslist (hidden layer depth)
+# This will result in create 1 TFJob for every pair of learning rate and hidden layer depth
+{{- range $i, $lr := $lrlist }}
+{{- range $j, $nblayers := $nblayerslist }}
+apiVersion: kubeflow.org/v1alpha1
+kind: TFJob # Each one of our trainings will be a separate TFJob
+metadata:
+  name: module7-tf-paint-{{ $i }}-{{ $j }} # We give a unique name to each training
+  labels:
+    chart: "{{ $chartname }}-{{ $chartversion | replace "+" "_" }}"
+spec: 
+  replicaSpecs:
+    - template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: tensorflow
+              image: {{ $image }} 
+              env:
+              - name: LC_ALL
+                value: C.UTF-8
+              args:
+                # Here we pass a unique learning rate and hidden layer count to each instance.
+                # We also put the values between quotes to avoid potential formatting issues
+                - --learning-rate  
+                - {{ $lr | quote }}
+                - --hidden-layers
+                - {{ $nblayers | quote }}
+                - --logdir
+                - /tmp/tensorflow/tf-paint-lr{{ $lr }}-d-{{ $nblayers }} # We save the summaries in a different directory
+{{ if $useGPU }}  # We only want to request GPUs if we asked for it in values.yaml with useGPU
+              resources:
+                requests:
+                  alpha.kubernetes.io/nvidia-gpu: 1 
+{{ end }}
+              volumeMounts:
+              - mountPath: /tmp/tensorflow
+                subPath: module7 # As usual we want to save everything in a separate subdirectory 
+                name: azurefile
+          volumes:
+            - name: azurefile
+              azureFile:
+                  secretName: azure-secret
+                  shareName: {{ $shareName }}
+                  readOnly: false
+---
+{{- end }}
+{{- end }}
+# We are not using TFJob integrated TensorBoard, because we want to create the Service and Deployment outside of the loop
+# since we only want one instance running for all our jobs, and not 1 per job.
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: tensorboard
+  name: module7-tensorboard
+spec:
+  ports:
+  - port: 80
+    targetPort: 6006
+  selector:
+    app: tensorboard
+  type: LoadBalancer
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: tensorboard
+  name: module7-tensorboard
+spec:
+  template:
+    metadata:
+      labels:
+        app: tensorboard
+    spec:
+      volumes:
+      - name: azurefile
+        azureFile:
+            secretName: azure-secret
+            shareName: {{ $shareName }}
+            readOnly: false      
+      containers:
+      - name: tensorboard
+        command:
+          - /usr/local/bin/tensorboard
+          - --logdir=/tmp/tensorflow
+          - --host=0.0.0.0
+        image: tensorflow/tensorflow
+        ports:
+        - containerPort: 6006
+        volumeMounts:
+        - mountPath: /tmp/tensorflow
+          subPath: module7
+          name: azurefile  
