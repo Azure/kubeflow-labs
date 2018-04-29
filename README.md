@@ -1,4 +1,4 @@
-# Train TensorFlow Models at Scale with Kubernetes on Azure
+# Labs for running and using Kubeflow on Azure Container Service (AKS)
 
 <!-- ## [Learning Objectives](./learningObjectives.md)
 ## [Presentation Content](./presentationContent.md)
@@ -11,11 +11,11 @@
 1. Azure-cli  (2.0) installed: [Installing the Azure CLI 2.0 | Microsoft Docs](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest)
 1. Git cli installed: [Installing Git CLI](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 1. Kubectl installed: [Installing Kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
-1. Helm installed: [Installing Helm CLI](https://docs.helm.sh/using_helm/#from-the-binary-releases) (**Note**: On Windows you can extract the `tar` file using a tool like 7Zip.
+1. Helm installed: [Installing Helm CLI](https://docs.helm.sh/using_helm/#from-the-binary-releases) (**Note**: On Windows you can extract the `tar` file using a tool like 7Zip.)
 
 Clone this repository somewhere so you can easily access the different source files:
 ```console
-git clone https://github.com/wbuchwalter/tensorflow-k8s-azure
+git clone https://github.com/Azure/kubeflow-labs
 ```
 
 ## Content Summary
@@ -26,12 +26,12 @@ git clone https://github.com/wbuchwalter/tensorflow-k8s-azure
 |1| **[Docker](1-docker)** | Docker and containers 101.|
 |2| **[Kubernetes](2-kubernetes)** | Kubernetes important concepts overview.|
 |3| **[Helm](3-helm)** | Introduction to Helm |
-|4| **[GPUs](4-gpus)** | How to use GPUs with Kubernetes.|
-|5| **[TFJob](5-tfjob)** | How to use `tensorflow/k8s` and `TFJob` to deploy a simple TensorFlow training.|
+|4| **[Kubeflow + TFJob](4-kubeflow-tfjob)** | Introduction to Kubeflow. How to use `tensorflow/k8s` and `TFJob` to deploy a simple TensorFlow training.|
+|5| **[JupyterHub](5-jupyterhub)** | Learn how Kubeflow can help starting and managing JupyterHub |
 |6| **[Distributed Tensorflow](6-distributed-tensorflow)** | Going distributed with `TFJob`|
 |7| **[Hyperparameters Sweep with Helm](7-hyperparam-sweep)** | Using Helm to deploy a large number of training testing different hypothesis, monitoring and comparing them. |
-|8| **[Going Further](8-going-further)** | Links and resources to go further: Autoscaling, Distributed Storage. |
-|9| **[Jupyter Notebooks](9-jupyter)** | Easily deploy a Jupyter Notebook instance on Kubernetes. |
+|8| **[Serving](8-serving)** | Using TensorFlow Serving to serve predictions |
+|9| **[Going Further](9-going-further)** | Links and resources to go further: Autoscaling, Distributed Storage etc. |
 
 
 # Contributing
