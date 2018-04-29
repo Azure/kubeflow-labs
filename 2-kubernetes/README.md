@@ -70,13 +70,12 @@ We will be creating a deployment in the exercise toward the end of this module, 
 ## Provisioning a Kubernetes cluster on Azure
 
 We are going to use AKS to create a GPU-enabled Kubernetes cluster.
-You could also use ACS or acs-engine if you prefer.
+You could also use [acs-engine](https://github.com/Azure/acs-engine) if you prefer, this guide will assume you are using aks.
 
 
 ### A Note on GPUs with Kubernetes
 
-As of this writing, GPUs are available for AKS in the `eastus` and `westeurope` regions.  
-Notet that currently, deploying a GPU cluster takes longer than a CPU cluster (about 10-15 minutes more).
+As of this writing, GPUs are available for AKS in the `eastus` and `westeurope` regions. If you wants more options you may want to use acs-engine for more flexibility.
 
 Only module 3 has an exercise which is specific for GPU VMs, all other modules can be followed on either CPU or GPU clusters, so if you are on a budget, feel free to create a CPU cluster instead.
 
@@ -97,8 +96,10 @@ With:
 #### Creating the cluster  
 ```console
 az aks create --agent-vm-size <AGENT_SIZE> --resource-group <RG> --name <NAME> 
---agent-count <AGENT_COUNT> --location <LOCATION> --generate-ssh-keys
+--agent-count <AGENT_COUNT> --kubernetes-version 1.9.6 --location <LOCATION> --generate-ssh-keys
 ```
+
+> Note : The kubernetes verion could change depending where you are deploying your cluster. You can get more informations running the `az aks get-versions` command.
 
 With:  
   
@@ -110,7 +111,7 @@ With:
 | AGENT_COUNT | The number of agents (virtual machines) that you want in your cluster. 2 or 3 is recommended to play with hyper-parameter tuning and distributed TensorFlow | 
 | LOCATION | Same location that was specified for the resource group creation. |
 
-The command should take a few minutes to complete (longer if you chose GPU VMs). Once it is done, the output should be a JSON object indicating among other things the `provisioningState`:
+The command should take a few minutes to complete. Once it is done, the output should be a JSON object indicating among other things the `provisioningState`:
 ```
 {
   [...]
@@ -125,7 +126,7 @@ The `kubeconfig` file is a configuration file that will allow Kubernetes's CLI (
 To download the `kubeconfig` file from the cluster we just created, run:
 
 ```console
-az aks kubernetes get-credentials --name <NAME> --resource-group <RG>
+az aks get-credentials --name <NAME> --resource-group <RG>
 ```
 
 Where `NAME` and `RG` should be the same values as for the cluster creation.
@@ -140,10 +141,10 @@ kubectl get nodes
 
 Should yield an output similar to this one:
 ```
-NAME                    STATUS    AGE       VERSION
-k8s-agent-ef2b999d-0    Ready     9d        v1.7.7
-k8s-agent-ef2b999d-1    Ready     9d        v1.7.7
-k8s-agent-ef2b999d-2    Ready     9d        v1.7.7
+NAME                       STATUS    ROLES     AGE       VERSION
+aks-nodepool1-42640332-0   Ready     agent     1h        v1.9.6
+aks-nodepool1-42640332-1   Ready     agent     1h        v1.9.6
+aks-nodepool1-42640332-2   Ready     agent     1h        v1.9.6
 ```
 
 If you provisioned GPU VM, describing one of the node should indicate the presence of GPU(s) on the node:
@@ -208,7 +209,7 @@ kubectl get job
 Should show your new job:
 
 ```bash
-NAME                                DESIRED   SUCCESSFUL   AGE
+NAME                             DESIRED   SUCCESSFUL   AGE
 module2-ex1                      1         0            1m
 ```
 
@@ -256,7 +257,7 @@ kubectl get job
 ```
 
 ```bash
-NAME                                DESIRED   SUCCESSFUL   AGE
+NAME                           DESIRED   SUCCESSFUL   AGE
 module2-ex1                    1         1            3m
 ```
 
