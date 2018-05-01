@@ -4,7 +4,6 @@
 {{- $nblayerslist := .Values.hyperParamValues.hiddenLayers -}}
 {{- $image := .Values.image -}}
 {{- $useGPU := .Values.useGPU -}}
-{{- $shareName := .Values.shareName -}}
 {{- $chartname := .Chart.Name -}}
 {{- $chartversion := .Chart.Version -}}
 
@@ -49,15 +48,12 @@ spec:
                 name: azurefile
           volumes:
             - name: azurefile
-              azureFile:
-                  secretName: azure-secret
-                  shareName: {{ $shareName }}
-                  readOnly: false
+              persistentVolumeClaim:
+                claimName: azurefile
 ---
 {{- end }}
 {{- end }}
-# We are not using TFJob integrated TensorBoard, because we want to create the Service and Deployment outside of the loop
-# since we only want one instance running for all our jobs, and not 1 per job.
+# We only want one instance running for all our jobs, and not 1 per job.
 apiVersion: v1
 kind: Service
 metadata:
@@ -85,11 +81,9 @@ spec:
         app: tensorboard
     spec:
       volumes:
-      - name: azurefile
-        azureFile:
-            secretName: azure-secret
-            shareName: {{ $shareName }}
-            readOnly: false      
+        - name: azurefile
+          persistentVolumeClaim:
+            claimName: azurefile      
       containers:
       - name: tensorboard
         command:

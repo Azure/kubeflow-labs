@@ -3,7 +3,7 @@
 ## Prerequisites
 
 * [3 - Helm](../3-helm)
-* [5 - TFJob](../5-tfjob)
+* [4 - Kubeflow and TFJob Basics](../4-kubeflow-tfjob)
   
 ### "Vanilla" Hyperparameter Sweep
 
@@ -39,9 +39,8 @@ In this exercise, you will create a new Helm chart that will deploy a number of 
 Here is what our `values.yaml` file could look like for example (you are free to go a different route):
 
 ```yaml
-image: wbuchwalter/tf-paint:cpu
+image: ritazh/tf-paint:cpu
 useGPU: false
-shareName: tensorflow
 hyperParamValues:
   learningRate:
     - 0.001
@@ -72,11 +71,11 @@ Our model takes 3 parameters:
 |`--log-dir` | Path to save TensorFlow's summaries | `None`| 
 
 For simplicity, docker images have already been created so you don't have to build and push yourself:
-* `wbuchwalter/tf-paint:cpu` for CPU only.
-* `wbuchwalter/tf-paint:gpu` for GPU.  
+* `ritazh/tf-paint:cpu` for CPU only.
+* `ritazh/tf-paint:gpu` for GPU.  
 
 The goal of this exercise is to create an Helm chart that will allow us to test as many variations and combinations of the two hyperparameters `--learning-rate`and `--hidden-layers` as we want by just adding them in our `values.yaml` file.   
-This chart should also deploy a single TensorBoard instance (and it's associated service), so we can quickly monitor and compare our different hypothesis.
+This chart should also deploy a single TensorBoard instance (and it's associated service with a public IP), so we can quickly monitor and compare our different hypothesis.
 
 If you are pretty new to Kubernetes and Helm and don't feel like building your own helm chart just yet, you can skip to the solution where details and explanations are provided.
 
@@ -102,6 +101,16 @@ module7-tf-paint-2-1-master-1urb-0-sq92z     1/1       Running   0          2m
 module7-tf-paint-2-2-master-ay57-0-0qt2c     1/1       Running   0          2m
 ```
 
+Once the TensorBoard service for this module is created, you can use the External-IP of that service to connect to the tensorboard.
+
+```console
+kubectl get service
+
+NAME                                 TYPE           CLUSTER-IP     EXTERNAL-IP      PORT(S)             AGE
+module7-tensorboard                  LoadBalancer   10.0.142.217   <PUBLIC IP>     80:30896/TCP        5m
+
+```
+
 Looking at TensorBoard, you should see something similar to this:
 ![TensorBoard](tensorboard.png)
 
@@ -115,8 +124,49 @@ After a few minutes, we can see that the two best performing models are:
 At this point we could decide to kill all the other models if we wanted to free some capacity in our cluster, or launch additional new experiments based on our initial findings.
 
 #### Solution
-
 Check out the commented solution chart: [./solution-chart/templates/deployment.yaml](./solution-chart/templates/deployment.yaml)
+<details>
+<summary><strong>Hyperparameter Sweep Helm Chart</strong></summary>
+
+Install the chart with command:
+
+```console
+cd 7-hyperparam-sweep/solution-chart/
+helm install .
+
+NAME:   telling-buffalo
+LAST DEPLOYED: 
+NAMESPACE: tfworkflow
+STATUS: DEPLOYED
+
+RESOURCES:
+==> v1/Service
+NAME                 TYPE          CLUSTER-IP    EXTERNAL-IP  PORT(S)       AGE
+module7-tensorboard  LoadBalancer  10.0.142.217  <pending>    80:30896/TCP  1s
+
+==> v1beta1/Deployment
+NAME                 DESIRED  CURRENT  UP-TO-DATE  AVAILABLE  AGE
+module7-tensorboard  1        1        1           0          1s
+
+==> v1alpha1/TFJob
+NAME                  AGE
+module7-tf-paint-0-0  1s
+module7-tf-paint-1-0  1s
+module7-tf-paint-1-1  1s
+module7-tf-paint-2-1  1s
+module7-tf-paint-2-2  1s
+module7-tf-paint-0-1  1s
+module7-tf-paint-0-2  1s
+module7-tf-paint-1-2  1s
+module7-tf-paint-2-0  0s
+
+==> v1/Pod(related)
+NAME                                  READY  STATUS             RESTARTS  AGE
+module7-tensorboard-6b6f5448ff-229cj  0/1    ContainerCreating  0         1s
+tensorboard-85dfc74f8d-4gf24          1/1    Running            0         4h
+
+```
+</details>
 
 ## Next Step
 
