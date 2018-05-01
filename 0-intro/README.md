@@ -1,5 +1,9 @@
 # Introduction
 
+This labs will walk you through setting up [Kubeflow](https://github.com/kubeflow/kubeflow) on a kubernetes cluster on Azure Container Service (AKS).
+
+We will then take a look at how to use the different components that make up Kubeflow.
+
 ## Motivations
 
 Machine learning model development and operationalization currently has very few industry-wide best practices to help us reduce the time to market and optimize the different steps.

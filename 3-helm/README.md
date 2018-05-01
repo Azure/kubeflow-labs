@@ -195,4 +195,4 @@ You should see the following web page from your deployment :
 
 ## Next Step
 
-[4 - GPUs](../4-gpus/README.md)
+[4 - Kubeflow](../4-kubeflow/README.md)

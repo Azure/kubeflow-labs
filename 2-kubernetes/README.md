@@ -77,8 +77,6 @@ You could also use [acs-engine](https://github.com/Azure/acs-engine) if you pref
 
 As of this writing, GPUs are available for AKS in the `eastus` and `westeurope` regions. If you wants more options you may want to use acs-engine for more flexibility.
 
-Only module 3 has an exercise which is specific for GPU VMs, all other modules can be followed on either CPU or GPU clusters, so if you are on a budget, feel free to create a CPU cluster instead.
-
 ### With the CLI
 
 #### Creating a resource group
@@ -172,6 +170,7 @@ We want our deployment to have a few characteristics:
 * It should run the image you created in module 1 (or `wbuchwalter/tf-mnist` if you skipped this module).
 * The `Job` should be named `2-mnist-training`.
 * We want our training to run for `500` steps.
+* We want our training to use 1 GPU
 
 Here is what this would look like in YAML format:
 
@@ -187,8 +186,11 @@ spec:
     spec:
       containers: # List of containers that should run inside the pod, in our case there is only one.
       - name: tensorflow
-        image: ${DOCKER_USERNAME}/tf-mnist # The image to run, you can replace by your own.
+        image: ${DOCKER_USERNAME}/tf-mnist:gpu # The image to run, you can replace by your own.
         args: ["--max_steps", "500"] # Optional arguments to pass to our command. By default the command is defined by ENTRYPOINT in the Dockerfile
+        resources:
+          limits:
+            alpha.kubernetes.io/nvidia-gpu: 1 # We ask Kubernetes to assign 1 GPU to this container 
       restartPolicy: OnFailure # restart the pod if it fails
 ```
 

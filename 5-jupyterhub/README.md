@@ -3,7 +3,7 @@
 ## Prerequisites  
 * [1 - Docker Basics](../1-docker)
 * [2 - Kubernetes Basics and cluster created](../2-kubernetes)
-* [4 - Kubeflow and tfjob Basics](../4-kubeflow-tfjob)
+* [4 - Kubeflow](../4-kubeflow)
 
 ## Summary
 
@@ -95,3 +95,8 @@ kubectl -n ${NAMESPACE} describe pods jupyter-${USERNAME}
 ```
 
 After the pod status changes to `running`, to verify you will see a new Jupyter notebook running at: http://127.0.0.1:8000/user/{USERNAME}/tree or http://{PUBLIC-IP}/user/{USERNAME}/tree
+
+
+## Next Step
+
+[6 - TfJob](../6-tfjob)

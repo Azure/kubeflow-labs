@@ -235,7 +235,7 @@ Most importantly we want to be able to reuse this image on the Kubernetes cluste
 So let's push our image to Docker Hub:
 
 ```console
-docker push ${DOCKER_USERNAME}/tf-mnist
+docker push ${DOCKER_USERNAME}/tf-mnist:gpu
 ```
 
 If this command doesn't look familiar to you, make sure you went through part 1 and 2 of Docker's tutorial, and more precisely: [Tutorial - Share your image](https://docs.docker.com/get-started/part2/#share-your-image)

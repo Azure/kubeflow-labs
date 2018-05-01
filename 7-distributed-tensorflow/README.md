@@ -3,7 +3,7 @@
 ## Prerequisites
 
 * [2 - Kubernetes Basics and cluster created](../2-kubernetes)
-* [4 - Kubeflow and TFJob Basics](../4-kubeflow-tfjob)
+* [6 - TfJob](../6-tfjob)
 
 ## Summary
 
@@ -371,4 +371,4 @@ There are two things to notice here:
 
 ## Next Step
 
-[7 - Hyperparameters Sweep with Helm](../7-hyperparam-sweep)
+[8 - Hyperparameters Sweep with Helm](../8-hyperparam-sweep)

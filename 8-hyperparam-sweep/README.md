@@ -3,7 +3,7 @@
 ## Prerequisites
 
 * [3 - Helm](../3-helm)
-* [4 - Kubeflow and TFJob Basics](../4-kubeflow-tfjob)
+* [6 - TfJob Basics](../6-tfjob)
   
 ### "Vanilla" Hyperparameter Sweep
 
@@ -170,4 +170,4 @@ tensorboard-85dfc74f8d-4gf24          1/1    Running            0         4h
 
 ## Next Step
 
-[8 - Going Further](../8-going-further)
+[9 - Serving](../9-serving)
