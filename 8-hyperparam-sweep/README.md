@@ -3,7 +3,7 @@
 ## Prerequisites
 
 * [3 - Helm](../3-helm)
-* [6 - TfJob Basics](../6-tfjob)
+* [6 - TFJob](../6-tfjob)
   
 ### "Vanilla" Hyperparameter Sweep
 
@@ -39,8 +39,8 @@ In this exercise, you will create a new Helm chart that will deploy a number of 
 Here is what our `values.yaml` file could look like for example (you are free to go a different route):
 
 ```yaml
-image: ritazh/tf-paint:cpu
-useGPU: false
+image: ritazh/tf-paint:gpu
+useGPU: true
 hyperParamValues:
   learningRate:
     - 0.001
@@ -89,25 +89,26 @@ kubectl get pods
 
 ```
 NAME                                      READY     STATUS    RESTARTS   AGE
-module7-tensorboard-3609490657-6w7zf             1/1       Running   0          23s
-module7-tf-paint-0-0-master-tduk-0-zqngf     1/1       Running   0          2m
-module7-tf-paint-0-1-master-ub9a-0-3rlbr     1/1       Running   0          2m
-module7-tf-paint-0-2-master-ekw1-0-cp0l3     1/1       Running   0          2m
-module7-tf-paint-1-0-master-jr7r-0-6jkwc     1/1       Running   0          2m
-module7-tf-paint-1-1-master-rqh2-0-0t4zw     1/1       Running   0          2m
-module7-tf-paint-1-2-master-le5b-0-34q38     1/1       Running   0          2m
-module7-tf-paint-2-0-master-g7i9-0-jq1c1     1/1       Running   0          2m
-module7-tf-paint-2-1-master-1urb-0-sq92z     1/1       Running   0          2m
-module7-tf-paint-2-2-master-ay57-0-0qt2c     1/1       Running   0          2m
+module8-tensorboard-7ccb598cdd-6vg7h       1/1       Running   0          16s
+module8-tf-paint-0-0-master-juc5-0-hw5cm   0/1       Pending   0          4s
+module8-tf-paint-0-1-master-pu49-0-jp06r   1/1       Running   0          14s
+module8-tf-paint-0-2-master-awhs-0-gfra0   0/1       Pending   0          6s
+module8-tf-paint-1-0-master-5tfm-0-dhhhv   1/1       Running   0          16s
+module8-tf-paint-1-1-master-be91-0-zw4gk   1/1       Running   0          16s
+module8-tf-paint-1-2-master-r2nd-0-zhws1   0/1       Pending   0          7s
+module8-tf-paint-2-0-master-7w37-0-ff0w9   0/1       Pending   0          13s
+module8-tf-paint-2-1-master-260j-0-l4o7r   0/1       Pending   0          10s
+module8-tf-paint-2-2-master-jtjb-0-5l84q   0/1       Pending   0          9s
 ```
+Note: Some pods are pending due to the GPU resource available in the cluster. If you have 3 GPUs in the cluster, then there can only be a maximum number of 3 parallel trainings at a given time.
 
-Once the TensorBoard service for this module is created, you can use the External-IP of that service to connect to the tensorboard.
+Once the TensorBoard service for this module is created, you can use the External-IP of that service to connect to the TensorBoard.
 
 ```console
 kubectl get service
 
 NAME                                 TYPE           CLUSTER-IP     EXTERNAL-IP      PORT(S)             AGE
-module7-tensorboard                  LoadBalancer   10.0.142.217   <PUBLIC IP>     80:30896/TCP        5m
+module8-tensorboard                  LoadBalancer   10.0.142.217   <PUBLIC IP>     80:30896/TCP        5m
 
 ```
 
@@ -131,7 +132,7 @@ Check out the commented solution chart: [./solution-chart/templates/deployment.y
 Install the chart with command:
 
 ```console
-cd 7-hyperparam-sweep/solution-chart/
+cd 8-hyperparam-sweep/solution-chart/
 helm install .
 
 NAME:   telling-buffalo
@@ -142,28 +143,27 @@ STATUS: DEPLOYED
 RESOURCES:
 ==> v1/Service
 NAME                 TYPE          CLUSTER-IP    EXTERNAL-IP  PORT(S)       AGE
-module7-tensorboard  LoadBalancer  10.0.142.217  <pending>    80:30896/TCP  1s
+module8-tensorboard  LoadBalancer  10.0.142.217  <pending>    80:30896/TCP  1s
 
 ==> v1beta1/Deployment
 NAME                 DESIRED  CURRENT  UP-TO-DATE  AVAILABLE  AGE
-module7-tensorboard  1        1        1           0          1s
+module8-tensorboard  1        1        1           0          1s
 
 ==> v1alpha1/TFJob
 NAME                  AGE
-module7-tf-paint-0-0  1s
-module7-tf-paint-1-0  1s
-module7-tf-paint-1-1  1s
-module7-tf-paint-2-1  1s
-module7-tf-paint-2-2  1s
-module7-tf-paint-0-1  1s
-module7-tf-paint-0-2  1s
-module7-tf-paint-1-2  1s
-module7-tf-paint-2-0  0s
+module8-tf-paint-0-0  1s
+module8-tf-paint-1-0  1s
+module8-tf-paint-1-1  1s
+module8-tf-paint-2-1  1s
+module8-tf-paint-2-2  1s
+module8-tf-paint-0-1  1s
+module8-tf-paint-0-2  1s
+module8-tf-paint-1-2  1s
+module8-tf-paint-2-0  0s
 
 ==> v1/Pod(related)
 NAME                                  READY  STATUS             RESTARTS  AGE
-module7-tensorboard-6b6f5448ff-229cj  0/1    ContainerCreating  0         1s
-tensorboard-85dfc74f8d-4gf24          1/1    Running            0         4h
+module8-tensorboard-7ccb598cdd-6vg7h   0/1    ContainerCreating  0         1s
 
 ```
 </details>

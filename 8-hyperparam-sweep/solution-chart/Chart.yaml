@@ -1,4 +1,4 @@
 apiVersion: v1
 description: A Helm chart for Kubernetes
-name: module7-hyperparam-sweep
+name: module8-hyperparam-sweep
 version: 0.1.0

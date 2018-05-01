@@ -1,5 +1,5 @@
-image: ritazh/tf-paint:cpu
-useGPU: false
+image: ritazh/tf-paint:gpu
+useGPU: true
 hyperParamValues:
   learningRate:
     - 0.001
