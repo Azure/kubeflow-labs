@@ -75,7 +75,7 @@ You could also use [acs-engine](https://github.com/Azure/acs-engine) if you pref
 
 ### A Note on GPUs with Kubernetes
 
-As of this writing, GPUs are available for AKS in the `eastus` and `westeurope` regions. If you wants more options you may want to use acs-engine for more flexibility.
+As of this writing, GPUs are available for AKS in the `eastus` and `westeurope` regions. If you want more options you may want to use acs-engine for more flexibility.
 
 ### With the CLI
 
@@ -93,8 +93,8 @@ With:
 
 #### Creating the cluster  
 ```console
-az aks create --agent-vm-size <AGENT_SIZE> --resource-group <RG> --name <NAME> 
---agent-count <AGENT_COUNT> --kubernetes-version 1.9.6 --location <LOCATION> --generate-ssh-keys
+az aks create --node-vm-size <AGENT_SIZE> --resource-group <RG> --name <NAME> 
+--node-count <AGENT_COUNT> --kubernetes-version 1.9.6 --location <LOCATION> --generate-ssh-keys
 ```
 
 > Note : The kubernetes verion could change depending where you are deploying your cluster. You can get more informations running the `az aks get-versions` command.
@@ -105,8 +105,8 @@ With:
 | --- | --- | 
 | AGENT_SIZE | The size of K8s's agent VM. Choose `Standard_NC6` for GPUs or `Standard_D2_v2` if you just want CPUs. |
 | RG | Name of the resource group that was created in the previous step. |
-| NAME | Name of the ACS resource (can be whatever you want). | 
-| AGENT_COUNT | The number of agents (virtual machines) that you want in your cluster. 2 or 3 is recommended to play with hyper-parameter tuning and distributed TensorFlow | 
+| NAME | Name of the AKS resource (can be whatever you want). | 
+| AGENT_COUNT | The number of agents (virtual machines) that you want in your cluster. 3 or 4 is recommended to play with hyper-parameter tuning and distributed TensorFlow | 
 | LOCATION | Same location that was specified for the resource group creation. |
 
 The command should take a few minutes to complete. Once it is done, the output should be a JSON object indicating among other things the `provisioningState`:
