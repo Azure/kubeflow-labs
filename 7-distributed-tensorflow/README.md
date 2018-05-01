@@ -3,7 +3,8 @@
 ## Prerequisites
 
 * [2 - Kubernetes Basics and cluster created](../2-kubernetes)
-* [6 - TfJob](../6-tfjob)
+* [4 - Kubeflow](../4-kubeflow)
+* [6 - TFJob](../6-tfjob)
 
 ## Summary
 
@@ -68,7 +69,7 @@ All this hurdles means that in practice very few people actually bother with dis
 
 Thankfully, with Kubernetes and `TFJob` things are much, much simpler, making distributed training something you might actually be able to benefit from. Before submitting a training job, you should have deployed Kubeflow to your cluster. Doing so ensures that the `TFJob` custom resource is available when you submit the training job. 
 
-As a prerequisite, you should already have a Kubernetes cluster running, you can follow [module 2 - Kubernetes](../2-kubernetes) to create your own cluster and you should already have Kubeflow running in your Kubernetes cluster, you can follow [module 4 - Kubeflow and TFJob Basics](../4-kubeflow-tfjob). 
+As a prerequisite, you should already have a Kubernetes cluster running, you can follow [module 2 - Kubernetes](../2-kubernetes) to create your own cluster and you should already have Kubeflow and TFJob running in your Kubernetes cluster, you can follow [module 4 - Kubeflow](../4-kubeflow) and [module 6 - TFJob](../6-tfjob). 
 
 #### A Small Disclaimer
 The issues we saw in the first part of this module can be categorized in two groups: 
@@ -204,7 +205,7 @@ You will then need to build the image and push it (you should push it under a di
 
 #### 1. b.
 
-Modify the yaml template from module [4 - Kubeflow and tfjob Basics](../4-kubeflow-tfjob), to instead deploy 1 master, 2 workers and 1 PS. Then create a yaml to deploy TensorBoard to monitor the training with TensorBoard.
+Modify the yaml template from module [6 - TFJob](../6-tfjob), to instead deploy 1 master, 2 workers and 1 PS. Then create a yaml to deploy TensorBoard to monitor the training with TensorBoard.
 Note that since our model is very simple, TensorFlow will likely use only 1 of the workers, but it will still work fine. Don't forget to update the image or tag.
 
 #### Validation
@@ -271,7 +272,7 @@ A working code sample is available in [`solution-src/main.py`](./solution-src/ma
 apiVersion: kubeflow.org/v1alpha1
 kind: TFJob
 metadata:
-  name: module6-ex1
+  name: module7-ex1-gpu
 spec:
   replicaSpecs:
     - replicas: 1 # 1 Master
@@ -279,42 +280,61 @@ spec:
       template:
         spec:
           volumes:
+            - name: nvidia
+              hostPath:
+                path: /usr/local/nvidia 
             - name: azurefile
               persistentVolumeClaim:
                 claimName: azurefile
           containers:
-            - image: ritazh/tf-mnist:distributed  # You can replace this by your own image           
-              name: tensorflow
-              imagePullPolicy: Always
-              volumeMounts:
-                - mountPath: /tmp/tensorflow
-                  subPath: module6-ex1
-                  name: azurefile
+          - image: ritazh/tf-mnist:distributedgpu  # You can replace this by your own image           
+            name: tensorflow
+            imagePullPolicy: Always
+            resources:
+              limits:
+                alpha.kubernetes.io/nvidia-gpu: 1
+            volumeMounts:
+              - name: nvidia
+                mountPath: /usr/local/nvidia
+              - mountPath: /tmp/tensorflow
+                subPath: module7-ex1-gpu
+                name: azurefile
           restartPolicy: OnFailure
-    - replicas: 2 # 2 Workers
+    - replicas: 1 # 1 or 2 Workers depends on how many gpus you have
       tfReplicaType: WORKER
       template:
         spec:
           containers:
-            - image: ritazh/tf-mnist:distributed  # You can replace this by your own image                       
-              name: tensorflow
-              imagePullPolicy: Always
+          - image: ritazh/tf-mnist:distributedgpu  # You can replace this by your own image                       
+            name: tensorflow
+            imagePullPolicy: Always
+            resources:
+              limits:
+                alpha.kubernetes.io/nvidia-gpu: 1
+            volumeMounts:
+            - name: nvidia
+              mountPath: /usr/local/nvidia
           restartPolicy: OnFailure
+          volumes:
+            - name: nvidia
+              hostPath:
+                path: /usr/local/nvidia
     - replicas: 1  # 1 Parameter server
       tfReplicaType: PS
       template:
         spec:
           containers:
-            - image: ritazh/tf-mnist:distributed  # You can replace this by your own image                       
-              name: tensorflow
-              imagePullPolicy: Always
+          - image: ritazh/tf-mnist:distributed  # You can replace this by your own image                       
+            name: tensorflow
+            imagePullPolicy: Always
           restartPolicy: OnFailure
 
 ```
 
-There are two things to notice here:
+There are few things to notice here:
 * Since only the master will be saving the model and the summaries, we only need to mount the Azure File share on the master's `replicaSpec`, not on the `workers` or `ps`.
 * We are not specifying anything for the `PS` `replicaSpec` except the number of replicas. This is because `IsDefaultPS` is set to `true` by default. This means that the parameter server(s) will be started with a pre-built docker image that is already configured to read the `TF_CONFIG` and act as a TensorFlow server, so we don't need to do anything here.
+* When you have limited GPU resources, you can specify Master and Worker nodes to request GPU resources and PS node will only request CPU resources.
 
 </details>
 
@@ -353,7 +373,7 @@ spec:
         - /tmp/tensorflow/logs
         volumeMounts:
           - mountPath: /tmp/tensorflow
-            subPath: module6-ex1
+            subPath: module7-ex1-gpu
             name: azurefile
         ports:
         - containerPort: 6006
