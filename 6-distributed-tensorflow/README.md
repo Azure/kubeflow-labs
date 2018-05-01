@@ -2,11 +2,12 @@
 
 ## Prerequisites
 
-[5 - TFJob](../5-tfjob/)
+* [2 - Kubernetes Basics and cluster created](../2-kubernetes)
+* [4 - Kubeflow and TFJob Basics](../4-kubeflow-tfjob)
 
 ## Summary
 
-In this module we will see how `TFJob` can greatly simplify the deployment and monitoring of distributed TensorFlow trainings.
+Distributed TensorFlow trainings can be complicated. In this module, we will see how `TFJob`, one of the components of Kubeflow, can be used to simplify the deployment and monitoring of distributed TensorFlow trainings.
   
 ## "Vanilla" Distributed TensorFlow is Hard
 
@@ -65,8 +66,9 @@ All this hurdles means that in practice very few people actually bother with dis
 
 ## Distributed TensorFlow with Kubernetes and `TFJob`
 
-Thankfully, with Kubernetes and `TFJob` things are much, much simpler, making distributed training something you might actually be able to benefit from.
+Thankfully, with Kubernetes and `TFJob` things are much, much simpler, making distributed training something you might actually be able to benefit from. Before submitting a training job, you should have deployed Kubeflow to your cluster. Doing so ensures that the `TFJob` custom resource is available when you submit the training job. 
 
+As a prerequisite, you should already have a Kubernetes cluster running, you can follow [module 2 - Kubernetes](../2-kubernetes) to create your own cluster and you should already have Kubeflow running in your Kubernetes cluster, you can follow [module 4 - Kubeflow and TFJob Basics](../4-kubeflow-tfjob). 
 
 #### A Small Disclaimer
 The issues we saw in the first part of this module can be categorized in two groups: 
@@ -74,15 +76,15 @@ The issues we saw in the first part of this module can be categorized in two gro
 * Issues with setting up the training itself
 
 The first group of issue is still very dependent on the processes in your company/group. If you need to go through a formal request to get access to extra VMs/GPU, it will still be a hassle and there is nothing Kubernetes can do about that.  
+
 However, Kubernetes makes this process much easier:
-* On ACS and AKS you can spin up new VMs with a single command: [`az <acs|aks> scale`](https://docs.microsoft.com/en-us/cli/azure/aks?view=azure-cli-latest#az_aks_scale)
-* On acs-engine you can setup autoscaling so that anytime you schedule a training on Kubernetes, the autoscaler will make sure your cluster has all the resources it need to run it, and when your training is completed, it will shut down any idle VMs, making this the best solution in term of cost and effort. While autoscaling is outside the scope of this workshop we will give you pointers in module [8 - Going Further](../8-going-further).
+On AKS, you can spin up new VMs with a single command: [`az aks scale`](https://docs.microsoft.com/en-us/cli/azure/aks?view=azure-cli-latest#az-aks-scale)
 
 Setting up the training, however, is drastically simplified with Kubernetes and `TFJob`.
 
 ### Overview of `TFJob` distributed training
 
-So, how does `TFJob` works for distributed training?
+So, how does `TFJob` work for distributed training?
 Let's look again at what the `TFJobSpec`and `TFReplicaSpec` objects looks like:
 
 **`TFJobSpec` Object**
@@ -202,9 +204,8 @@ You will then need to build the image and push it (you should push it under a di
 
 #### 1. b.
 
-Modify the yaml template from module [5 - TFJob](../5-tfjob) exercise 3, to instead deploy 1 master, 2 workers and 1 PS. We also want to monitor the training with TensorBoard.
-Note that since our model is very simple, TensorFlow will likely use only 1 of the workers, but it will still work fine.
-Don't forget to update the image or tag.
+Modify the yaml template from module [4 - Kubeflow and tfjob Basics](../4-kubeflow-tfjob), to instead deploy 1 master, 2 workers and 1 PS. Then create a yaml to deploy TensorBoard to monitor the training with TensorBoard.
+Note that since our model is very simple, TensorFlow will likely use only 1 of the workers, but it will still work fine. Don't forget to update the image or tag.
 
 #### Validation
 
@@ -215,12 +216,11 @@ kubectl get pods
 Should yield:
 
 ```
-NAME                                                 READY     STATUS    RESTARTS   AGE
-module6-ex1-master-3khk-0-fkm8p                 1/1       Running       0          39s
-module6-ex1-ps-3khk-0-rqkv5                     1/1       Running       0          39s
-module6-ex1-tensorboard-3khk-2845579357-75rtd   1/1       Running       0          39s
-module6-ex1-worker-3khk-0-jsm8c                 1/1       Running       0          39s
-module6-ex1-worker-3khk-1-8rgh4                 1/1       Running       0          39s
+NAME                                       READY     STATUS              RESTARTS   AGE
+module6-ex1-master-m8vi-0-rdr5o            1/1       Running   0          23s
+module6-ex1-ps-m8vi-0-0vhjm                1/1       Running   0          23s
+module6-ex1-worker-m8vi-0-eyb6l            1/1       Running   0          23s
+module6-ex1-worker-m8vi-1-bm2ue            1/1       Running   0          23s
 ```
 
 looking at the logs of the master with:
@@ -234,25 +234,33 @@ Should yield:
 ```
 [...]
 Initialize GrpcChannelCache for job master -> {0 -> localhost:2222}
-Initialize GrpcChannelCache for job ps -> {0 -> distributed-mnist-ps-5oz2-0:2222}
-Initialize GrpcChannelCache for job worker -> {0 -> distributed-mnist-worker-5oz2-0:2222, 1 -> distributed-mnist-worker-5oz2-1:2222}
-2017-12-01 20:10:11.826258: I tensorflow/core/distributed_runtime/rpc/grpc_server_lib.cc:324] Started server with target: grpc://localhost:2222
-2017-12-01 20:10:14.395476: I tensorflow/core/distributed_runtime/master_session.cc:1004] Start master session 87c6df6850b8f074 with config:
+Initialize GrpcChannelCache for job ps -> {0 -> module6-ex1-ps-m8vi-0:2222}
+Initialize GrpcChannelCache for job worker -> {0 -> module6-ex1-worker-m8vi-0:2222, 1 -> module6-ex1-worker-m8vi-1:2222}
+2018-04-30 22:45:28.963803: I tensorflow/core/distributed_runtime/rpc/grpc_server_lib.cc:333] Started server with target: grpc://localhost:2222
+...
+
+Accuracy at step 970: 0.9784
+Accuracy at step 980: 0.9791
+Accuracy at step 990: 0.9796
+Adding run metadata for 999
 ```
 
 This indicates that the `ClusterSpec` was correctly extracted from the environment variable and given to TensorFlow.
 
-Once TensorBoard public IP is successfully provisioned (check with `kubectl get svc`), go in TensorBoard's graph section and change the color to Device in the left menu.
-You should see that your model is indeed correctly distributed between workers and PS:  
+Once the TensorBoard pod is provisioned and running, we can connect to it using:
+
+```console
+PODNAME=$(kubectl get pod -l app=tensorboard -o jsonpath='{.items[0].metadata.name}')
+kubectl port-forward ${PODNAME} 6006:6006
+```
+
+From the browser, connect to it at http://127.0.0.1:6006, you should see that your model is indeed correctly distributed between workers and PS:  
 
 ![TensorBoard](./tensorboard.png)  
-
-Again, since our model is very simple, TensorFlow will most likely only use a single worker.
 
 After a few minutes, the status of both worker nodes should show as `Completed` when doing `kubectl get pods -a`.
 
 #### Solution
-
 
 A working code sample is available in [`solution-src/main.py`](./solution-src/main.py).
 
@@ -265,18 +273,6 @@ kind: TFJob
 metadata:
   name: module6-ex1
 spec:
-  tensorboard: # Specification fot the TensorBoard instance that is going to monitor our training
-    logDir: /tmp/tensorflow/logs
-    serviceType: LoadBalancer
-    volumes:
-      - name: azurefile
-        azureFile:
-            secretName: azure-secret
-            shareName: tensorflow
-    volumeMounts:
-      - mountPath: /tmp/tensorflow 
-        subPath: module6-ex1
-        name: azurefile
   replicaSpecs:
     - replicas: 1 # 1 Master
       tfReplicaType: MASTER
@@ -284,12 +280,10 @@ spec:
         spec:
           volumes:
             - name: azurefile
-              azureFile:
-                  secretName: azure-secret
-                  shareName: tensorflow
-                  readOnly: false
+              persistentVolumeClaim:
+                claimName: azurefile
           containers:
-            - image: wbuchwalter/tf-mnist:distributed  # You can replace this by your own image           
+            - image: ritazh/tf-mnist:distributed  # You can replace this by your own image           
               name: tensorflow
               imagePullPolicy: Always
               volumeMounts:
@@ -302,17 +296,75 @@ spec:
       template:
         spec:
           containers:
-            - image: wbuchwalter/tf-mnist:distributed  # You can replace this by your own image                       
+            - image: ritazh/tf-mnist:distributed  # You can replace this by your own image                       
               name: tensorflow
               imagePullPolicy: Always
           restartPolicy: OnFailure
     - replicas: 1  # 1 Parameter server
       tfReplicaType: PS
+      template:
+        spec:
+          containers:
+            - image: ritazh/tf-mnist:distributed  # You can replace this by your own image                       
+              name: tensorflow
+              imagePullPolicy: Always
+          restartPolicy: OnFailure
+
 ```
 
 There are two things to notice here:
 * Since only the master will be saving the model and the summaries, we only need to mount the Azure File share on the master's `replicaSpec`, not on the `workers` or `ps`.
 * We are not specifying anything for the `PS` `replicaSpec` except the number of replicas. This is because `IsDefaultPS` is set to `true` by default. This means that the parameter server(s) will be started with a pre-built docker image that is already configured to read the `TF_CONFIG` and act as a TensorFlow server, so we don't need to do anything here.
+
+</details>
+
+<details>
+<summary><strong>TensorBoard Template</strong></summary>
+
+```yaml
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: tensorboard
+  name: tensorboard
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tensorboard
+  template:
+    metadata:
+      labels:
+        app: tensorboard
+    spec:
+      volumes:
+        - name: azurefile
+          persistentVolumeClaim:
+            claimName: azurefile
+      containers:
+      - name: tensorboard
+        image: tensorflow/tensorflow:1.7.0
+        imagePullPolicy: Always
+        command:
+         - /usr/local/bin/tensorboard
+        args:
+        - --logdir
+        - /tmp/tensorflow/logs
+        volumeMounts:
+          - mountPath: /tmp/tensorflow
+            subPath: module6-ex1
+            name: azurefile
+        ports:
+        - containerPort: 6006
+          protocol: TCP
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+
+```
+There are two things to notice here:
+* To view logs and to get saved models from previous trainings, we need to mount `/tmp/tensorflow` from the Azure File share to TensorBoard as that is the mounting point for all the persisted data from TFJob Master.
+* To access TensorBoard pod locally, we need to port-forward traffic against the port specified by `containerPort: 6006`.
 
 </details>
 
