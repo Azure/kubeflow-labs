@@ -11,7 +11,7 @@ Here are a subset of pain points that exists in a typical ML workflow.
 #### A Typical (Simplified) ML Workflow and its Pain Points
 ![Typical Workflow](workflow.png)
 
-This workshop is going to focus on improving the training process by leveraging  containers and Kubernetes.
+This workshop is going to focus on improving the training and serving process by leveraging containers and Kubernetes.
 
 Today many data scientists are training their models either on their physical workstation (be it a laptop or a desktop with multiple GPUs) or using a VM (sometime, but rarely, a couple of them) in the cloud.
 

@@ -69,25 +69,15 @@ We will be creating a deployment in the exercise toward the end of this module, 
 
 ## Provisioning a Kubernetes cluster on Azure
 
-There are multiple ways to provision a Kubernetes (K8s) on Azure:
-* ACS
-* AKS
-* acs-engine
+We are going to use AKS to create a GPU-enabled Kubernetes cluster.
+You could also use [acs-engine](https://github.com/Azure/acs-engine) if you prefer, this guide will assume you are using aks.
 
-AKS is currently still in preview and acs-engine is a bit more complex to setup, so we advice you to create your cluster using ACS.
-
-We are going to create a Linux-based K8s cluster.
-You can either create the cluster using the portal, or using Azure-CLI (`az`).
 
 ### A Note on GPUs with Kubernetes
 
-As of this writing, GPUs are still in preview with ACS.  
-You can deploy an ACS cluster with GPU VMs (such as `Standard_NC6`) in `westus2` or `uksouth` but you should be aware of some pitfalls:
-* Deploying a GPU cluster takes longer than a CPU cluster (about 10-15 minutes more) because the NVIDIA drivers need to be installed as well.
-* Since this is a preview, you might hit capacity issues if the location you chose does not have enough GPUs available to accommodate you.
+As of this writing, GPUs are available for AKS in the `eastus` and `westeurope` regions. If you wants more options you may want to use acs-engine for more flexibility.
 
-**Unless you are already pretty familiar with docker and Kubernetes, we recommend that you create a cluster with CPU VMs to save some time.**
-Only module 3 has an exercise which is specific for GPU VMs, all other modules can be followed on either CPU or GPU clusters.
+Only module 3 has an exercise which is specific for GPU VMs, all other modules can be followed on either CPU or GPU clusters, so if you are on a budget, feel free to create a CPU cluster instead.
 
 ### With the CLI
 
@@ -105,22 +95,23 @@ With:
 
 #### Creating the cluster  
 ```console
-az acs create --agent-vm-size <AGENT_SIZE> --resource-group <RG> --name <NAME> 
---orchestrator-type Kubernetes --agent-count <AGENT_COUNT> 
---location <LOCATION> --generate-ssh-keys
+az aks create --agent-vm-size <AGENT_SIZE> --resource-group <RG> --name <NAME> 
+--agent-count <AGENT_COUNT> --kubernetes-version 1.9.6 --location <LOCATION> --generate-ssh-keys
 ```
+
+> Note : The kubernetes verion could change depending where you are deploying your cluster. You can get more informations running the `az aks get-versions` command.
 
 With:  
   
 | Parameter | Description |
 | --- | --- | 
-| AGENT_SIZE | The size of K8s's agent VM. `Standard_D2_v2` is enough for this workshop. |
+| AGENT_SIZE | The size of K8s's agent VM. Choose `Standard_NC6` for GPUs or `Standard_D2_v2` if you just want CPUs. |
 | RG | Name of the resource group that was created in the previous step. |
 | NAME | Name of the ACS resource (can be whatever you want). | 
 | AGENT_COUNT | The number of agents (virtual machines) that you want in your cluster. 2 or 3 is recommended to play with hyper-parameter tuning and distributed TensorFlow | 
 | LOCATION | Same location that was specified for the resource group creation. |
 
-The command should take a few minutes to complete (longer if you chose GPU VMs). Once it is done, the output should be a JSON object indicating among other things the `provisioningState`:
+The command should take a few minutes to complete. Once it is done, the output should be a JSON object indicating among other things the `provisioningState`:
 ```
 {
   [...]
@@ -135,7 +126,7 @@ The `kubeconfig` file is a configuration file that will allow Kubernetes's CLI (
 To download the `kubeconfig` file from the cluster we just created, run:
 
 ```console
-az acs kubernetes get-credentials --name <NAME> --resource-group <RG>
+az aks get-credentials --name <NAME> --resource-group <RG>
 ```
 
 Where `NAME` and `RG` should be the same values as for the cluster creation.
@@ -150,11 +141,10 @@ kubectl get nodes
 
 Should yield an output similar to this one:
 ```
-NAME                    STATUS    AGE       VERSION
-k8s-agent-ef2b999d-0    Ready     9d        v1.7.7
-k8s-agent-ef2b999d-1    Ready     9d        v1.7.7
-k8s-agent-ef2b999d-2    Ready     9d        v1.7.7
-k8s-master-ef2b999d-0   Ready     9d        v1.7.7
+NAME                       STATUS    ROLES     AGE       VERSION
+aks-nodepool1-42640332-0   Ready     agent     1h        v1.9.6
+aks-nodepool1-42640332-1   Ready     agent     1h        v1.9.6
+aks-nodepool1-42640332-2   Ready     agent     1h        v1.9.6
 ```
 
 If you provisioned GPU VM, describing one of the node should indicate the presence of GPU(s) on the node:
@@ -219,7 +209,7 @@ kubectl get job
 Should show your new job:
 
 ```bash
-NAME                                DESIRED   SUCCESSFUL   AGE
+NAME                             DESIRED   SUCCESSFUL   AGE
 module2-ex1                      1         0            1m
 ```
 
@@ -267,7 +257,7 @@ kubectl get job
 ```
 
 ```bash
-NAME                                DESIRED   SUCCESSFUL   AGE
+NAME                           DESIRED   SUCCESSFUL   AGE
 module2-ex1                    1         1            3m
 ```
 
