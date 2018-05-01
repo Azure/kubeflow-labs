@@ -1,4 +1,4 @@
-# Labs for running and using Kubeflow on Azure Container Service (AKS)
+# Labs for Training and Serving TensorFlow Models with Kubernetes and Kubeflow on Azure Container Service (AKS)
 
 <!-- ## [Learning Objectives](./learningObjectives.md)
 ## [Presentation Content](./presentationContent.md)
@@ -6,12 +6,13 @@
 
 ## Prerequisites
 
-1. Have a valid Microsoft Azure subscription allowing the creation of an ACS cluster
+1. Have a valid Microsoft Azure subscription allowing the creation of an AKS cluster
 1. Docker client installed: [Installing Docker](https://www.docker.com/community-edition)
 1. Azure-cli  (2.0) installed: [Installing the Azure CLI 2.0 | Microsoft Docs](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest)
 1. Git cli installed: [Installing Git CLI](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 1. Kubectl installed: [Installing Kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
 1. Helm installed: [Installing Helm CLI](https://docs.helm.sh/using_helm/#from-the-binary-releases) (**Note**: On Windows you can extract the `tar` file using a tool like 7Zip.)
+1. ksonnet installed: [Installing ksonnet CLI](https://ksonnet.io/#get-started)
 
 Clone this repository somewhere so you can easily access the different source files:
 ```console
@@ -27,9 +28,9 @@ git clone https://github.com/Azure/kubeflow-labs
 |2| **[Kubernetes](2-kubernetes)** | Kubernetes important concepts overview.|
 |3| **[Helm](3-helm)** | Introduction to Helm |
 |4| **[Kubeflow + TFJob](4-kubeflow-tfjob)** | Introduction to Kubeflow. How to use `tensorflow/k8s` and `TFJob` to deploy a simple TensorFlow training.|
-|5| **[JupyterHub](5-jupyterhub)** | Learn how Kubeflow can help starting and managing JupyterHub |
-|6| **[Distributed Tensorflow](6-distributed-tensorflow)** | Going distributed with `TFJob`|
-|7| **[Hyperparameters Sweep with Helm](7-hyperparam-sweep)** | Using Helm to deploy a large number of training testing different hypothesis, monitoring and comparing them. |
+|5| **[JupyterHub](5-jupyterhub)** | Learn how to run JupyterHub to create and manage Jupyter notebooks using Kubeflow |
+|6| **[Distributed Tensorflow](6-distributed-tensorflow)** | Learn how to deploy and monitor distributed TensorFlow trainings with `TFJob`|
+|7| **[Hyperparameters Sweep with Helm](7-hyperparam-sweep)** | Using Helm to deploy a large number of trainings testing different hypothesis, and TensorBoard to monitor and compare the results |
 |8| **[Serving](8-serving)** | Using TensorFlow Serving to serve predictions |
 |9| **[Going Further](9-going-further)** | Links and resources to go further: Autoscaling, Distributed Storage etc. |
 
