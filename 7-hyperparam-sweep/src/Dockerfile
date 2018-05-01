@@ -1,4 +1,4 @@
-FROM tensorflow/tensorflow:1.4.0
+FROM tensorflow/tensorflow:1.7.0
 COPY requirements.txt /app/requirements.txt
 WORKDIR /app
 RUN mkdir ./output
