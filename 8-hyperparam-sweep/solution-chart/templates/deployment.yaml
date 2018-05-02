@@ -14,7 +14,7 @@
 apiVersion: kubeflow.org/v1alpha1
 kind: TFJob # Each one of our trainings will be a separate TFJob
 metadata:
-  name: module7-tf-paint-{{ $i }}-{{ $j }} # We give a unique name to each training
+  name: module8-tf-paint-{{ $i }}-{{ $j }} # We give a unique name to each training
   labels:
     chart: "{{ $chartname }}-{{ $chartversion | replace "+" "_" }}"
 spec: 
@@ -39,17 +39,26 @@ spec:
                 - /tmp/tensorflow/tf-paint-lr{{ $lr }}-d-{{ $nblayers }} # We save the summaries in a different directory
 {{ if $useGPU }}  # We only want to request GPUs if we asked for it in values.yaml with useGPU
               resources:
-                requests:
-                  alpha.kubernetes.io/nvidia-gpu: 1 
+                limits:
+                  alpha.kubernetes.io/nvidia-gpu: 1
 {{ end }}
               volumeMounts:
               - mountPath: /tmp/tensorflow
-                subPath: module7 # As usual we want to save everything in a separate subdirectory 
+                subPath: module8 # As usual we want to save everything in a separate subdirectory 
                 name: azurefile
+{{ if $useGPU }}
+              - name: nvidia
+                mountPath: /usr/local/nvidia
+{{ end }}
           volumes:
             - name: azurefile
               persistentVolumeClaim:
                 claimName: azurefile
+{{ if $useGPU }}
+            - name: nvidia
+              hostPath:
+                path: /usr/local/nvidia
+{{ end }}
 ---
 {{- end }}
 {{- end }}
@@ -59,7 +68,7 @@ kind: Service
 metadata:
   labels:
     app: tensorboard
-  name: module7-tensorboard
+  name: module8-tensorboard
 spec:
   ports:
   - port: 80
@@ -73,7 +82,7 @@ kind: Deployment
 metadata:
   labels:
     app: tensorboard
-  name: module7-tensorboard
+  name: module8-tensorboard
 spec:
   template:
     metadata:
@@ -95,5 +104,5 @@ spec:
         - containerPort: 6006
         volumeMounts:
         - mountPath: /tmp/tensorflow
-          subPath: module7
+          subPath: module8
           name: azurefile  
