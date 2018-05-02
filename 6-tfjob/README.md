@@ -85,7 +85,7 @@ When using GPU, we need to request for one (or multiple), and the image we are u
 apiVersion: kubeflow.org/v1alpha1
 kind: TFJob
 metadata:
-  name: module5-ex1-gpu
+  name: module6-ex1-gpu
 spec:
   replicaSpecs:
     - template:
@@ -114,7 +114,7 @@ kubectl get tfjob
 Returns:
 ```
 NAME              AGE
-module5-ex1-gpu   5s
+module6-ex1-gpu   5s
 ```
 
 As well as a `Job`, which was actually created by the operator:
@@ -125,7 +125,7 @@ kubectl get job
 Returns:
 ```bash
 NAME                        DESIRED   SUCCESSFUL   AGE
-module5-ex1-master-xs4b-0   1         0            2m
+module6-ex1-master-xs4b-0   1         0            2m
 ```
 and a `Pod`:
 
@@ -135,7 +135,7 @@ kubectl get pod
 Returns:
 ```
 NAME                                            READY     STATUS      RESTARTS   AGE
-module5-ex1-master-xs4b-0-6gpfn                 1/1       Running     0          2m
+module6-ex1-master-xs4b-0-6gpfn                 1/1       Running     0          2m
 ```
 
 Note that the `Pod` might take a few minutes before actually running, the docker image needs to be pulled on the node first.
@@ -176,26 +176,27 @@ In our case we are going to use Azure Files, as it is really easy to use with Ku
 
 ### Creating a New File Share and Kubernetes Secret
 
-In the official documentation: [Using Azure Files with Kubernetes](https://docs.microsoft.com/en-us/azure/aks/azure-files-volume), follow the steps listed under `Create an Azure file share` and `Create Kubernetes Secret`, but be aware of a few details first:
-* It is **very** important that you create you storage account (hence your resource group) in the **same** region as your Kubernetes cluster: because Azure File uses the `SMB` protocol it won't work cross-regions. `AKS_PERS_LOCATION` should be updated accordingly.
+In the official documentation: [Persistent volumes with Azure files](https://docs.microsoft.com/en-us/azure/aks/azure-files-dynamic-pv), follow the steps listed under `Create storage account`, `Create storage class`, and `Create persistent volume claim`.
+ Be aware of a few details first:
+* It is **very** important that you create your storage account in the **same** region and the same resource group (with MC_ prefix) as your Kubernetes cluster: because Azure File uses the `SMB` protocol it won't work cross-regions. `AKS_PERS_LOCATION` should be updated accordingly.
 * While this document specifically refers to AKS, it will work for any K8s cluster
-* Name your file share `tensorflow`. While the share could be named anything, it will make it easier to follow the examples later on. `AKS_PERS_SHARE_NAME` should be updated accordingly.
+* Once the PVC is created, you will see a new file share under that storage account. All subsequent modules will be writing to that file share.
 
 Once you completed all the steps, run:
 ```console
-kubectl get secrets
+kubectl get pvc
 ```
 
 Which should return:
 ```
-NAME                  TYPE         DATA      AGE
-azure-secret          Opaque       2         4m
+NAME             STATUS    VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   AGE
+azurefile        Bound     pvc-346ab93b-4cbf-11e8-9fed-000d3a17b5e9   5Gi        RWO            azurefile      5m
 ```
 
 ### Updating our example to use our Azure File Share
 
 Now we need to mount our new file share into our container so the model and the summaries can be persisted.  
-Turns out mounting an Azure File share into a container is really easy, we simply need to reference our secret in the `Volume` definition:
+Turns out mounting an Azure File share into a container is really easy, we simply need to reference our PVC in the `Volume` definition:
 
 ```yaml
 [...]
@@ -210,14 +211,12 @@ Turns out mounting an Azure File share into a container is really easy, we simpl
         mountPath: <MOUNT_PATH>
  volumes:
   - name: azurefile
-    azureFile:
-      secretName: azure-secret
-      shareName: tensorflow
-      readOnly: false
+    persistentVolumeClaim:
+      claimName: azurefile
 ```
 
 Update your template from exercise 1 to mount the Azure File share into your container,and create your new job.
-Note that by default our container saves everything into `/app/tf_files` so that's the value you will want to use for `MOUNT_PATH`.
+Note that by default our container saves everything into `/tmp/tensorflow` so that's the value you will want to use for `MOUNT_PATH`.
 
 Once the container starts running, if you go to the Azure Portal, into your storage account, and browse your `tensorflow` file share, you should see something like that:
 
@@ -234,7 +233,7 @@ This means that when we run a training, all the important data is now stored in 
 apiVersion: kubeflow.org/v1alpha1
 kind: TFJob
 metadata:
-  name: module5-ex2
+  name: module6-ex2
 spec:
   replicaSpecs:
     - template:
@@ -252,16 +251,12 @@ spec:
                   # The subPath allows us to mount a subdirectory within the azure file share instead of root
                   # this is useful so that we can save the logs for each run in a different subdirectory
                   # instead of overwriting what was done before.
-                  subPath: module5-ex2
+                  subPath: module6-ex2
                   mountPath: /tmp/tensorflow 
           volumes:
             - name: azurefile
-              azureFile:
-                # We reference the secret we created just earlier 
-                # so that the account name and key are passed securely and not directly in a template
-                secretName: azure-secret
-                shareName: tensorflow
-                readOnly: false
+              persistentVolumeClaim:
+                claimName: azurefile
           restartPolicy: OnFailure
 ```
 
