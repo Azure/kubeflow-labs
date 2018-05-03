@@ -247,3 +247,7 @@ outputs {
 ............................
 Your model says the above number is... 7!
 ```
+
+## Next Step
+
+[10 - Going Further](../10-going-further)
