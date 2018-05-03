@@ -38,7 +38,7 @@ helm install --name minio --set accessKey=$ACCESS_KEY,secretKey=$ACCESS_SECRET_K
 
 ```console
 SERVICE_IP=$(kubectl get svc minio --template="{{range .status.loadBalancer.ingress}}{{.ip}}{{end}}")
-S3_ENDPOINT=http://${SERVICE_IP}:9000
+S3_ENDPOINT=${SERVICE_IP}:9000
 ```
 
 Setting up Minio host:
@@ -86,7 +86,6 @@ S3_VERIFY_SSL=0
 JOB_NAME=myjob
 MODEL_COMPONENT=mnist
 MODEL_NAME=mnist
-VERSION=0.1.2
 MODEL_PATH=s3://${BUCKET_NAME}/models/${JOB_NAME}/export/${MODEL_NAME}/
 MODEL_SERVER_IMAGE=sozercan/tensorflow-model-server
 ```
@@ -123,6 +122,7 @@ ks param set --env azure ${MODEL_COMPONENT} s3SecretName serving-creds
 ks param set --env azure ${MODEL_COMPONENT} s3SecretAccesskeyidKeyName accessKeyID
 ks param set --env azure ${MODEL_COMPONENT} s3SecretSecretaccesskeyKeyName secretAccessKey
 ks param set --env azure ${MODEL_COMPONENT} s3Endpoint $S3_ENDPOINT
+ks param set --env azure ${MODEL_COMPONENT} s3AwsRegion us-east-1
 ks param set --env azure ${MODEL_COMPONENT} s3UseHttps $S3_USE_HTTPS --as-string
 ks param set --env azure ${MODEL_COMPONENT} s3VerifySsl $S3_VERIFY_SSL --as-string
 ks param set --env azure ${MODEL_COMPONENT} serviceType LoadBalancer
@@ -164,16 +164,14 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-Getting public IP:
-
-```console
-TF_MODEL_SERVER_HOST=$(kubectl get svc ${MODEL_NAME} -n ${NAMESPACE} --template="{{range .status.loadBalancer.ingress}}{{.ip}}{{end}}")
-```
-
 Starting our query from the client:
 
 ```console
-TF_MNIST_IMAGE_PATH=data/7.png python mnist_client.py
+export TF_MODEL_SERVER_HOST=$(kubectl get svc ${MODEL_NAME} -n ${NAMESPACE} --template="{{range .status.loadBalancer.ingress}}{{.ip}}{{end}}")
+
+export TF_MNIST_IMAGE_PATH=data/7.png
+
+python mnist_client.py
 ```
 
 If everything is working correctly, you should see the output from the model and the inference.
