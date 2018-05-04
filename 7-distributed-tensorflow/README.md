@@ -280,9 +280,6 @@ spec:
       template:
         spec:
           volumes:
-            - name: nvidia
-              hostPath:
-                path: /usr/local/nvidia 
             - name: azurefile
               persistentVolumeClaim:
                 claimName: azurefile
@@ -294,8 +291,6 @@ spec:
               limits:
                 alpha.kubernetes.io/nvidia-gpu: 1
             volumeMounts:
-              - name: nvidia
-                mountPath: /usr/local/nvidia
               - mountPath: /tmp/tensorflow
                 subPath: module7-ex1-gpu
                 name: azurefile
@@ -312,13 +307,7 @@ spec:
               limits:
                 alpha.kubernetes.io/nvidia-gpu: 1
             volumeMounts:
-            - name: nvidia
-              mountPath: /usr/local/nvidia
           restartPolicy: OnFailure
-          volumes:
-            - name: nvidia
-              hostPath:
-                path: /usr/local/nvidia
     - replicas: 1  # 1 Parameter server
       tfReplicaType: PS
       template:

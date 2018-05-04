@@ -44,21 +44,12 @@ spec:
 {{ end }}
               volumeMounts:
               - mountPath: /tmp/tensorflow
-                subPath: module8 # As usual we want to save everything in a separate subdirectory 
+                subPath: module8-tf-paint # As usual we want to save everything in a separate subdirectory 
                 name: azurefile
-{{ if $useGPU }}
-              - name: nvidia
-                mountPath: /usr/local/nvidia
-{{ end }}
           volumes:
             - name: azurefile
               persistentVolumeClaim:
                 claimName: azurefile
-{{ if $useGPU }}
-            - name: nvidia
-              hostPath:
-                path: /usr/local/nvidia
-{{ end }}
 ---
 {{- end }}
 {{- end }}
@@ -104,5 +95,5 @@ spec:
         - containerPort: 6006
         volumeMounts:
         - mountPath: /tmp/tensorflow
-          subPath: module8
+          subPath: module8-tf-paint
           name: azurefile  
