@@ -239,7 +239,7 @@ spec:
     - template:
         spec:
           containers:
-            - image: wbuchwalter/tf-mnist:cpu
+            - image: wbuchwalter/tf-mnist:gpu
               name: tensorflow
               resources:
                 limits:
