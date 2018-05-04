@@ -40,7 +40,7 @@ kubectl create namespace ${NAMESPACE}
 # Which version of Kubeflow to use
 # For a list of releases refer to:
 # https://github.com/kubeflow/kubeflow/releases
-VERSION=v0.1.2
+VERSION=v0.1.1
 
 # Initialize a ksonnet app. Set the namespace for it's default environment.
 APP_NAME=my-kubeflow
@@ -59,8 +59,9 @@ ks pkg install kubeflow/tf-job@${VERSION}
 # Create templates for core components
 ks generate kubeflow-core kubeflow-core
 
-# Customize Kubeflow's installation for AKS
+# Customize Kubeflow's installation for AKS or acs-engine
 ks param set kubeflow-core cloud aks
+# ks param set kubeflow-core cloud acsengine
 
 # Enable collection of anonymous usage metrics
 # Skip this step if you don't want to enable collection.
@@ -88,7 +89,7 @@ tf-job-dashboard-8699ccb5ff-9phmv   1/1       Running   0          1d
 tf-job-operator-646bdbcb7-bc479     1/1       Running   0          1d
 ```
 
-The most important components for the puporse of this lab are `tf-hub-0` which is the JupyterHub spawner running on your cluster, and `tf-job-operator-646bdbcb7-bc479` which is a controller that will monitor your cluster for new TensorFlow training jobs (called `TfJobs`) specifications and manages the training, we will look at this two components later.
+The most important components for the purpose of this lab are `tf-hub-0` which is the JupyterHub spawner running on your cluster, and `tf-job-operator-646bdbcb7-bc479` which is a controller that will monitor your cluster for new TensorFlow training jobs (called `TfJobs`) specifications and manages the training, we will look at this two components later.
 
 ## Next Step
 
