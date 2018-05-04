@@ -190,7 +190,14 @@ spec:
         args: ["--max_steps", "500"] # Optional arguments to pass to our command. By default the command is defined by ENTRYPOINT in the Dockerfile
         resources:
           limits:
-            alpha.kubernetes.io/nvidia-gpu: 1 # We ask Kubernetes to assign 1 GPU to this container 
+            alpha.kubernetes.io/nvidia-gpu: 1 # We ask Kubernetes to assign 1 GPU to this container
+        volumeMounts:
+        - name: nvidia
+          mountPath: /usr/local/nvidia
+      volumes:
+      - name: nvidia
+        hostPath:
+          path: /usr/local/nvidia
       restartPolicy: OnFailure # restart the pod if it fails
 ```
 
