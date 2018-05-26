@@ -67,6 +67,8 @@ To update the default service created for JupyterHub, run the following command 
 ```
 ks param set kubeflow-core jupyterHubServiceType LoadBalancer
 ks apply ${YOUR_KF_ENV}
+
+# YOUR_KF_ENV=default if you are continuing from previous module
 ```
 
 Create a new Jupyter Notebook instance:
