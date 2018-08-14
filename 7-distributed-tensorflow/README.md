@@ -81,7 +81,7 @@ The first group of issue is still very dependent on the processes in your compan
 However, Kubernetes makes this process much easier:
 On AKS, you can spin up new VMs with a single command: [`az aks scale`](https://docs.microsoft.com/en-us/cli/azure/aks?view=azure-cli-latest#az-aks-scale)
 
-Setting up the training, however, is drastically simplified with Kubernetes and `TFJob`.
+Setting up the training, however, is drastically simplified with Kubernetes, KubeFlow and `TFJob`.
 
 ### Overview of `TFJob` distributed training
 
@@ -200,8 +200,13 @@ As for any distributed TensorFlow training, you will then also need to modify yo
 ### 1 - Modifying Our MNIST Example to Support Distributed Training
 
 #### 1. a.
-Starting from the MNIST sample we have been working with so far, modify it to work with distributed TensorFlow and `TFJob`.
+
+Starting from the MNIST sample wie have been working with so far, modify it to work with distributed TensorFlow and `TFJob`.
 You will then need to build the image and push it (you should push it under a different name or tag to avoid overwriting what you did before).
+
+```
+docker build -t ${DOCKER_USERNAME}/tf-mnist-dist .
+```
 
 #### 1. b.
 
@@ -353,7 +358,7 @@ spec:
             claimName: azurefile
       containers:
       - name: tensorboard
-        image: tensorflow/tensorflow:1.7.0
+        image: tensorflow/tensorflow:1.10.0
         imagePullPolicy: Always
         command:
          - /usr/local/bin/tensorboard

@@ -8,7 +8,7 @@
 
 ## Summary
 
-In this module you will learn how to describe a TensorFlow training using `TfJob` object.
+In this module you will learn how to describe a TensorFlow training using `TFJob` object.
 
 
 ### Kubernetes Custom Resource Definition
@@ -52,7 +52,7 @@ Let's go deeper:
 Here is what a simple TensorFlow training looks like using this `TFJob` object:
 
 ```yaml
-apiVersion: kubeflow.org/v1alpha1
+apiVersion: kubeflow.org/v1alpha2
 kind: TFJob
 metadata:
   name: example-tfjob
@@ -61,7 +61,7 @@ spec:
     - template:
         spec:
           containers:
-            - image: wbuchwalter/<SAMPLE IMAGE>
+            - image: wbuchwalter/tf-mnist:gpu
               name: tensorflow
               resources:
                 limits:
@@ -82,7 +82,7 @@ Let's schedule a very simple TensorFlow job using `TFJob` first.
 When using GPU, we need to request for one (or multiple), and the image we are using also needs to be based on TensorFlow's GPU image.
 
 ```yaml
-apiVersion: kubeflow.org/v1alpha1
+apiVersion: kubeflow.org/v1alpha2
 kind: TFJob
 metadata:
   name: module6-ex1-gpu
@@ -91,7 +91,7 @@ spec:
     - template:
         spec:
           containers:
-            - image: wbuchwalter/tf-mnist:gpu
+            - image: <DOCKER_USERNAME>/tf-mnist  # From module 1
               name: tensorflow
               resources:
                 limits:
@@ -117,17 +117,7 @@ NAME              AGE
 module6-ex1-gpu   5s
 ```
 
-As well as a `Job`, which was actually created by the operator:
-
-```console
-kubectl get job
-```
-Returns:
-```bash
-NAME                        DESIRED   SUCCESSFUL   AGE
-module6-ex1-master-xs4b-0   1         0            2m
-```
-and a `Pod`:
+As well as a `Pod`, which was actually created by the operator:
 
 ```console
 kubectl get pod
@@ -181,6 +171,13 @@ In the official documentation: [Persistent volumes with Azure files](https://doc
 * It is **very** important that you create your storage account in the **same** region and the same resource group (with MC_ prefix) as your Kubernetes cluster: because Azure File uses the `SMB` protocol it won't work cross-regions. `AKS_PERS_LOCATION` should be updated accordingly.
 * While this document specifically refers to AKS, it will work for any K8s cluster
 * Once the PVC is created, you will see a new file share under that storage account. All subsequent modules will be writing to that file share.
+* PVC are namespaced so be sure to create it on the same namespace that is launching the TFJob objects
+* If you are using RBAC you might need to run this to create the permissions on your Kubernetes cluster:
+
+```console
+kubectl create clusterrole system:azure-cloud-provider --verb=get,create --resource=secrets
+kubectl create clusterrolebinding system:azure-cloud-provider --clusterrole=system:azure-cloud-provider --serviceaccount=kube-system:persistent-volume-binder
+```
 
 Once you completed all the steps, run:
 ```console
@@ -230,20 +227,19 @@ This means that when we run a training, all the important data is now stored in 
 <summary><strong>Solution</strong></summary>  
 
 ```yaml
-apiVersion: kubeflow.org/v1alpha1
+apiVersion: kubeflow.org/v1alpha2
 kind: TFJob
 metadata:
   name: module6-ex2
 spec:
-  replicaSpecs:
-    - template:
+  tfReplicaSpecs:
+    Master:
+      replicas: 1
+      template:
         spec:
           containers:
-            - image: wbuchwalter/tf-mnist:gpu
+            - image: danielfrg/tf-mnist:1.0
               name: tensorflow
-              resources:
-                limits:
-                  alpha.kubernetes.io/nvidia-gpu: 1
               volumeMounts:
                 # By default our classifier saves the summaries in /tmp/tensorflow,
                 # so that's where we want to mount our Azure File Share.
@@ -252,7 +248,7 @@ spec:
                   # this is useful so that we can save the logs for each run in a different subdirectory
                   # instead of overwriting what was done before.
                   subPath: module6-ex2
-                  mountPath: /tmp/tensorflow 
+                  mountPath: /tmp/tensorflow
           volumes:
             - name: azurefile
               persistentVolumeClaim:

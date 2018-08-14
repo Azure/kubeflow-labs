@@ -94,7 +94,7 @@ With:
 #### Creating the cluster  
 ```console
 az aks create --node-vm-size <AGENT_SIZE> --resource-group <RG> --name <NAME> 
---node-count <AGENT_COUNT> --kubernetes-version 1.9.6 --location <LOCATION> --generate-ssh-keys
+--node-count <AGENT_COUNT> --kubernetes-version 1.11.1 --location <LOCATION> --generate-ssh-keys
 ```
 
 > Note : The kubernetes verion could change depending where you are deploying your cluster. You can get more informations running the `az aks get-versions` command.
@@ -103,7 +103,7 @@ With:
   
 | Parameter | Description |
 | --- | --- | 
-| AGENT_SIZE | The size of K8s's agent VM. Choose `Standard_NC6` for GPUs or `Standard_D2_v2` if you just want CPUs. |
+| AGENT_SIZE | The size of K8s's agent VM. Choose `Standard_NC6` for GPUs or `Standard_D2_v2` if you just want CPUs. Full list of [options here](https://github.com/Azure/azure-sdk-for-python/blob/master/azure-mgmt-containerservice/azure/mgmt/containerservice/models/container_service_client_enums.py#L21). |
 | RG | Name of the resource group that was created in the previous step. |
 | NAME | Name of the AKS resource (can be whatever you want). | 
 | AGENT_COUNT | The number of agents (virtual machines) that you want in your cluster. 3 or 4 is recommended to play with hyper-parameter tuning and distributed TensorFlow | 

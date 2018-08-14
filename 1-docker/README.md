@@ -8,8 +8,6 @@ In this section you will learn about:
 * Containerizing a simple application
 * Building and Pushing an Image
 
-
-
 ### Basics of Docker and Containers
 
 Docker has a very well structured six-part tutorial. 
@@ -109,7 +107,7 @@ As you saw in the tutorial, we will use a `Dockerfile` to do this.
 Here is the (very simple) `Dockerfile` that we are going to use for this model (located in [`./src/Dockerfile`](./src/Dockerfile)):
 
 ```dockerfile
-FROM tensorflow/tensorflow:1.4.0
+FROM tensorflow/tensorflow:1.10.0
 COPY main.py /app/main.py
 
 ENTRYPOINT ["python", "/app/main.py"]
@@ -208,7 +206,7 @@ You also need to make sure the image you are going to use is optimized for GPU.
 In our example you need to modify the `Dockerfile` to use a TensorFlow image built for GPU:
 
 ```dockerfile 
-FROM tensorflow/tensorflow:1.4.0-gpu
+FROM tensorflow/tensorflow:1.10.0-gpu
 COPY main.py /app/main.py
 
 ENTRYPOINT ["python", "/app/main.py"]
