@@ -73,7 +73,14 @@ You can find a list of the official ones here : [https://github.com/kubernetes/c
 
 To use Helm, you need to have the [CLI installed on your machine](https://github.com/kubernetes/helm/blob/master/docs/install.md)
 
-Let's try to deploy an official Chart such as the popular [Wordpress](https://github.com/kubernetes/charts/tree/master/stable/wordpress)
+Before using Helm with your cluster, make sure you have the Tiller component running in your cluster. 
+```bash
+kubectl get pod --all-namespaces | grep tiller
+```
+
+If you do not see Tiller running and if you have an RBAC-enabled cluster, you need a service account and role binding for the Tiller service in your cluster. To install these components, refer to these guides to [create a service account](https://docs.microsoft.com/en-us/azure/aks/kubernetes-helm#create-a-service-account) and [configure helm](https://docs.microsoft.com/en-us/azure/aks/kubernetes-helm#configure-helm) to initialize Tiller in the cluster.  
+
+Once Tiller service is up and running in the cluster and you have initialized helm, let's try to deploy an official Chart such as the popular [Wordpress](https://github.com/kubernetes/charts/tree/master/stable/wordpress)
 
 ```bash
 helm install stable/wordpress
