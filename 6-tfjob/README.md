@@ -91,7 +91,7 @@ spec:
     - template:
         spec:
           containers:
-            - image: <DOCKER_USERNAME>/tf-mnist  # From module 1
+            - image: <DOCKER_USERNAME>/tf-mnist:gpu  # From module 1
               name: tensorflow
               resources:
                 limits:
@@ -172,12 +172,7 @@ In the official documentation: [Persistent volumes with Azure files](https://doc
 * While this document specifically refers to AKS, it will work for any K8s cluster
 * Once the PVC is created, you will see a new file share under that storage account. All subsequent modules will be writing to that file share.
 * PVC are namespaced so be sure to create it on the same namespace that is launching the TFJob objects
-* If you are using RBAC you might need to run this to create the permissions on your Kubernetes cluster:
-
-```console
-kubectl create clusterrole system:azure-cloud-provider --verb=get,create --resource=secrets
-kubectl create clusterrolebinding system:azure-cloud-provider --clusterrole=system:azure-cloud-provider --serviceaccount=kube-system:persistent-volume-binder
-```
+* If you are using RBAC might need to run the cluster role and binding: [see docs here](https://docs.microsoft.com/en-us/azure/aks/azure-files-dynamic-pv#create-a-cluster-role-and-binding)
 
 Once you completed all the steps, run:
 ```console
@@ -238,7 +233,7 @@ spec:
       template:
         spec:
           containers:
-            - image: danielfrg/tf-mnist:1.0
+            - image: <DOCKER_USERNAME>/tf-mnist:1.0
               name: tensorflow
               volumeMounts:
                 # By default our classifier saves the summaries in /tmp/tensorflow,

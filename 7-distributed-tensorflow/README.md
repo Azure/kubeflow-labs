@@ -201,11 +201,16 @@ As for any distributed TensorFlow training, you will then also need to modify yo
 
 #### 1. a.
 
-Starting from the MNIST sample wie have been working with so far, modify it to work with distributed TensorFlow and `TFJob`.
+Starting from the MNIST sample we have been working with so far, modify it to work with distributed TensorFlow and `TFJob`.
 You will then need to build the image and push it (you should push it under a different name or tag to avoid overwriting what you did before).
 
 ```
-docker build -t ${DOCKER_USERNAME}/tf-mnist-dist .
+cd 7-distributed-tensorflow/solution-src
+# build from tensorflow/tensorflow:gpu for master and workers
+docker build -t ${DOCKER_USERNAME}/tf-mnist:distributedgpu -f ./Dockerfile.gpu .
+
+# builld from tensorflow/tensorflow for the parameter server
+docker build -t ${DOCKER_USERNAME}/tf-mnist:distributed .
 ```
 
 #### 1. b.
