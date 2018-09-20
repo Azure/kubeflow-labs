@@ -279,14 +279,14 @@ A working code sample is available in [`solution-src/main.py`](./solution-src/ma
 <summary><strong>TFJob's Template</strong></summary>
 
 ```yaml
-apiVersion: kubeflow.org/v1alpha1
+apiVersion: kubeflow.org/v1alpha2
 kind: TFJob
 metadata:
   name: module7-ex1-gpu
 spec:
-  replicaSpecs:
-    - replicas: 1 # 1 Master
-      tfReplicaType: MASTER
+  tfReplicaSpecs:
+    MASTER:
+      replicas: 1
       template:
         spec:
           volumes:
@@ -294,45 +294,46 @@ spec:
               persistentVolumeClaim:
                 claimName: azurefile
           containers:
-          - image: ritazh/tf-mnist:distributedgpu  # You can replace this by your own image           
+          - image: <DOCKER_USERNAME>/tf-mnist:distributedgpu  # You can replace this by your own image
             name: tensorflow
             imagePullPolicy: Always
             resources:
               limits:
-                alpha.kubernetes.io/nvidia-gpu: 1
+                nvidia.com/gpu: 1
             volumeMounts:
               - mountPath: /tmp/tensorflow
                 subPath: module7-ex1-gpu
                 name: azurefile
           restartPolicy: OnFailure
-    - replicas: 1 # 1 or 2 Workers depends on how many gpus you have
-      tfReplicaType: WORKER
+    WORKER:
+      replicas: 2
       template:
         spec:
           containers:
-          - image: ritazh/tf-mnist:distributedgpu  # You can replace this by your own image                       
+          - image: <DOCKER_USERNAME>/tf-mnist:distributedgpu  # You can replace this by your own image    
             name: tensorflow
             imagePullPolicy: Always
             resources:
               limits:
-                alpha.kubernetes.io/nvidia-gpu: 1
+                nvidia.com/gpu: 1
             volumeMounts:
           restartPolicy: OnFailure
-    - replicas: 1  # 1 Parameter server
-      tfReplicaType: PS
+    PS:
+      replicas: 1
       template:
         spec:
           containers:
-          - image: ritazh/tf-mnist:distributed  # You can replace this by your own image                       
+          - image: <DOCKER_USERNAME>/tf-mnist:distributed  # You can replace this by your own image 
             name: tensorflow
             imagePullPolicy: Always
+            ports:
+            - containerPort: 6006
           restartPolicy: OnFailure
-
 ```
 
 There are few things to notice here:
-* Since only the master will be saving the model and the summaries, we only need to mount the Azure File share on the master's `replicaSpec`, not on the `workers` or `ps`.
-* We are not specifying anything for the `PS` `replicaSpec` except the number of replicas. This is because `IsDefaultPS` is set to `true` by default. This means that the parameter server(s) will be started with a pre-built docker image that is already configured to read the `TF_CONFIG` and act as a TensorFlow server, so we don't need to do anything here.
+* Since only the master will be saving the model and the summaries, we only need to mount the Azure File share on the master's `tfReplicaSpecs`, not on the `WORKER`s or `PS`.
+* We are not specifying anything for the `PS` `tfReplicaSpecs` except the number of replicas. This is because `IsDefaultPS` is set to `true` by default. This means that the parameter server(s) will be started with a pre-built docker image that is already configured to read the `TF_CONFIG` and act as a TensorFlow server, so we don't need to do anything here.
 * When you have limited GPU resources, you can specify Master and Worker nodes to request GPU resources and PS node will only request CPU resources.
 
 </details>

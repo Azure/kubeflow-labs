@@ -117,8 +117,8 @@ As you can see, we are not building a new image from scratch, instead we are usi
 You can see the full list here: https://hub.docker.com/r/tensorflow/tensorflow/tags/.
 
 What is important to note is that different tags need to be used depending on if you want to use GPU or not.  
-For example, if you wanted to run your model with TensorFlow 1.4.0 and CPU only, you would use `tensorflow/tensorflow:1.4.0`.  
-If instead you wanted to use GPU, you would start from `tensorflow/tensorflow:1.4.0-gpu`.
+For example, if you wanted to run your model with TensorFlow 1.10.0 and CPU only, you would use `tensorflow/tensorflow:1.10.0`.  
+If instead you wanted to use GPU, you would start from `tensorflow/tensorflow:1.10.0-gpu`.
 
 The two other instructions are pretty straightforward, first we copy our script into the container, and then we set this script as the entry point for our container, so that any argument passed to our container would actually get passed to our script.
 
@@ -141,7 +141,7 @@ The output from this command should look like this:
 
 ```
 Sending build context to Docker daemon  11.26kB
-Step 1/3 : FROM tensorflow/tensorflow:1.4.0
+Step 1/3 : FROM tensorflow/tensorflow:1.10.0
  ---> a61a91cc0d1b
 Step 2/3 : COPY main.py /app/main.py
  ---> b264d6e9a5ef

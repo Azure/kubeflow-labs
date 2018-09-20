@@ -72,7 +72,7 @@ ks apply ${YOUR_KF_ENV}
 ```
 
 Create a new Jupyter Notebook instance:
-- open http://127.0.0.1:8000 in your browser
+- open http://127.0.0.1:8000 in your browser (or use the public IP for the service `tf-hub-lb`)
 - log in using any username and password 
 - click the "Start My Server" button to sprawn a new Jupyter notebook
 - from the image dropdown, select a tensorflow image for your notebook
@@ -81,7 +81,7 @@ Create a new Jupyter Notebook instance:
 ```
 kubectl get nodes "-o=custom-columns=NAME:.metadata.name,GPU:.status.allocatable.alpha\.kubernetes\.io\/nvidia-gpu"
 ```
-- for GPU, enter values in json format `{"alpha.kubernetes.io/nvidia-gpu":"1"}`
+- for GPU, enter values in json format `{"nvidia.com/gpu":"1"}`
 - click the "Spawn" button
 
 ![jupyterhub](./jupyterhub.png)

@@ -151,9 +151,11 @@ If you provisioned GPU VM, describing one of the node should indicate the presen
 
 [...]
 Capacity:
- alpha.kubernetes.io/nvidia-gpu:	1
+ nvidia.com/gpu:     1
 [...]
  ```
+
+> Note: In some scenarios, you might not see GPU resources under Capacity. To resolve this, you must install a daemonset as described in the troubleshooting section here: https://docs.microsoft.com/en-us/azure/aks/gpu-cluster 
 
 ## Exercise
 
@@ -190,7 +192,7 @@ spec:
         args: ["--max_steps", "500"] # Optional arguments to pass to our command. By default the command is defined by ENTRYPOINT in the Dockerfile
         resources:
           limits:
-            alpha.kubernetes.io/nvidia-gpu: 1 # We ask Kubernetes to assign 1 GPU to this container
+            nvidia.com/gpu: 1 # We ask Kubernetes to assign 1 GPU to this container
         volumeMounts:
         - name: nvidia
           mountPath: /usr/local/nvidia

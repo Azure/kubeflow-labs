@@ -11,15 +11,16 @@
 # This will result in create 1 TFJob for every pair of learning rate and hidden layer depth
 {{- range $i, $lr := $lrlist }}
 {{- range $j, $nblayers := $nblayerslist }}
-apiVersion: kubeflow.org/v1alpha1
+apiVersion: kubeflow.org/v1alpha2
 kind: TFJob # Each one of our trainings will be a separate TFJob
 metadata:
   name: module8-tf-paint-{{ $i }}-{{ $j }} # We give a unique name to each training
   labels:
     chart: "{{ $chartname }}-{{ $chartversion | replace "+" "_" }}"
 spec: 
-  replicaSpecs:
-    - template:
+  tfReplicaSpecs:
+    MASTER:
+      template:
         spec:
           restartPolicy: OnFailure
           containers:
@@ -40,7 +41,7 @@ spec:
 {{ if $useGPU }}  # We only want to request GPUs if we asked for it in values.yaml with useGPU
               resources:
                 limits:
-                  alpha.kubernetes.io/nvidia-gpu: 1
+                  nvidia.com/gpu: 1
 {{ end }}
               volumeMounts:
               - mountPath: /tmp/tensorflow

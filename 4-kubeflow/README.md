@@ -54,7 +54,6 @@ ks registry add kubeflow github.com/kubeflow/kubeflow/tree/${VERSION}/kubeflow
 # Install Kubeflow components
 ks pkg install kubeflow/core@${VERSION}
 ks pkg install kubeflow/tf-serving@${VERSION}
-# ks pkg install kubeflow/tf-job@${VERSION} # TODO: delete this one?
 
 # Create templates for core components
 ks generate kubeflow-core kubeflow-core

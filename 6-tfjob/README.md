@@ -65,7 +65,7 @@ spec:
               name: tensorflow
               resources:
                 limits:
-                  alpha.kubernetes.io/nvidia-gpu: 1
+                  nvidia.com/gpu: 1
           restartPolicy: OnFailure
 ```
 
@@ -95,7 +95,7 @@ spec:
               name: tensorflow
               resources:
                 limits:
-                  alpha.kubernetes.io/nvidia-gpu: 1
+                  nvidia.com/gpu: 1
           restartPolicy: OnFailure
 ```
 
@@ -197,18 +197,18 @@ Turns out mounting an Azure File share into a container is really easy, we simpl
     name: tensorflow
     resources:
       limits:
-        alpha.kubernetes.io/nvidia-gpu: 1
+        nvidia.com/gpu: 1
     volumeMounts:
       - name: azurefile
-        mountPath: <MOUNT_PATH>
+        subPath: module6-ex2-gpu
+        mountPath: /tmp/tensorflow
  volumes:
   - name: azurefile
     persistentVolumeClaim:
       claimName: azurefile
 ```
 
-Update your template from exercise 1 to mount the Azure File share into your container,and create your new job.
-Note that by default our container saves everything into `/tmp/tensorflow` so that's the value you will want to use for `MOUNT_PATH`.
+Update your template from exercise 1 to mount the Azure File share into your container, and create your new job.
 
 Once the container starts running, if you go to the Azure Portal, into your storage account, and browse your `tensorflow` file share, you should see something like that:
 
@@ -228,13 +228,16 @@ metadata:
   name: module6-ex2
 spec:
   tfReplicaSpecs:
-    Master:
+    MASTER:
       replicas: 1
       template:
         spec:
           containers:
-            - image: <DOCKER_USERNAME>/tf-mnist:1.0
+            - image: <DOCKER_USERNAME>/tf-mnist:gpu
               name: tensorflow
+              resources:
+                limits:
+                  nvidia.com/gpu: 1
               volumeMounts:
                 # By default our classifier saves the summaries in /tmp/tensorflow,
                 # so that's where we want to mount our Azure File Share.
@@ -242,13 +245,13 @@ spec:
                   # The subPath allows us to mount a subdirectory within the azure file share instead of root
                   # this is useful so that we can save the logs for each run in a different subdirectory
                   # instead of overwriting what was done before.
-                  subPath: module6-ex2
+                  subPath: module6-ex2-gpu
                   mountPath: /tmp/tensorflow
+          restartPolicy: OnFailure
           volumes:
             - name: azurefile
               persistentVolumeClaim:
                 claimName: azurefile
-          restartPolicy: OnFailure
 ```
 
 </details>
