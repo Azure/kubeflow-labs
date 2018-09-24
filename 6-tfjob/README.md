@@ -37,7 +37,7 @@ Before going further, let's take a look at what the `TFJob` object looks like:
 
 | Field | Type| Description |
 |-------|-----|-------------|
-| ReplicaSpecs | `TFReplicaSpec` array | Specification for a set of TensorFlow processes, defined below |
+| TFReplicaSpec | `TFReplicaSpec` array | Specification for a set of TensorFlow processes, defined below |
 
 Let's go deeper: 
 
@@ -57,11 +57,13 @@ kind: TFJob
 metadata:
   name: example-tfjob
 spec:
-  replicaSpecs:
-    - template:
+  tfReplicaSpecs:
+    MASTER:
+      replicas: 1
+      template:
         spec:
           containers:
-            - image: wbuchwalter/tf-mnist:gpu
+            - image: <DOCKER_USERNAME>/tf-mnist:gpu
               name: tensorflow
               resources:
                 limits:
@@ -87,8 +89,10 @@ kind: TFJob
 metadata:
   name: module6-ex1-gpu
 spec:
-  replicaSpecs:
-    - template:
+  tfReplicaSpecs:
+    MASTER:
+      replicas: 1
+      template:
         spec:
           containers:
             - image: <DOCKER_USERNAME>/tf-mnist:gpu  # From module 1

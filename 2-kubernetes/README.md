@@ -140,9 +140,9 @@ kubectl get nodes
 Should yield an output similar to this one:
 ```
 NAME                       STATUS    ROLES     AGE       VERSION
-aks-nodepool1-42640332-0   Ready     agent     1h        v1.9.6
-aks-nodepool1-42640332-1   Ready     agent     1h        v1.9.6
-aks-nodepool1-42640332-2   Ready     agent     1h        v1.9.6
+aks-nodepool1-42640332-0   Ready     agent     1h        v1.11.1
+aks-nodepool1-42640332-1   Ready     agent     1h        v1.11.1
+aks-nodepool1-42640332-2   Ready     agent     1h        v1.11.1
 ```
 
 If you provisioned GPU VM, describing one of the node should indicate the presence of GPU(s) on the node:

@@ -131,6 +131,7 @@ The next step is to build our image to be able to run it using docker. For that,
 From the [`./src`](./src) repository, we can build the image with
 
 ```console
+cd src
 docker build -t ${DOCKER_USERNAME}/tf-mnist .
 ```
 > Reminder: the `-t` argument allows to **tag** the image with a specific name.  
@@ -215,7 +216,8 @@ ENTRYPOINT ["python", "/app/main.py"]
 Then simply rebuild the image with a new tag (you can use docker or nvidia-docker interchangeably for any command except run):
 
 ```console
-docker build -t ${DOCKER_USERNAME}/tf-mnist:gpu .
+cd src
+docker build -t ${DOCKER_USERNAME}/tf-mnist:gpu -f Dockerfile.gpu .
 ```
 
 Finally run the container with nvidia-docker:
