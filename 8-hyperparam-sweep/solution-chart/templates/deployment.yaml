@@ -11,13 +11,13 @@
 # This will result in create 1 TFJob for every pair of learning rate and hidden layer depth
 {{- range $i, $lr := $lrlist }}
 {{- range $j, $nblayers := $nblayerslist }}
-apiVersion: kubeflow.org/v1alpha2
+apiVersion: kubeflow.org/v1beta1
 kind: TFJob # Each one of our trainings will be a separate TFJob
 metadata:
   name: module8-tf-paint-{{ $i }}-{{ $j }} # We give a unique name to each training
   labels:
     chart: "{{ $chartname }}-{{ $chartversion | replace "+" "_" }}"
-spec: 
+spec:
   tfReplicaSpecs:
     MASTER:
       template:
@@ -25,14 +25,14 @@ spec:
           restartPolicy: OnFailure
           containers:
             - name: tensorflow
-              image: {{ $image }} 
+              image: {{ $image }}
               env:
               - name: LC_ALL
                 value: C.UTF-8
               args:
                 # Here we pass a unique learning rate and hidden layer count to each instance.
                 # We also put the values between quotes to avoid potential formatting issues
-                - --learning-rate  
+                - --learning-rate
                 - {{ $lr | quote }}
                 - --hidden-layers
                 - {{ $nblayers | quote }}
@@ -45,7 +45,7 @@ spec:
 {{ end }}
               volumeMounts:
               - mountPath: /tmp/tensorflow
-                subPath: module8-tf-paint # As usual we want to save everything in a separate subdirectory 
+                subPath: module8-tf-paint # As usual we want to save everything in a separate subdirectory
                 name: azurefile
           volumes:
             - name: azurefile
@@ -84,7 +84,7 @@ spec:
       volumes:
         - name: azurefile
           persistentVolumeClaim:
-            claimName: azurefile      
+            claimName: azurefile
       containers:
       - name: tensorboard
         command:
@@ -97,4 +97,4 @@ spec:
         volumeMounts:
         - mountPath: /tmp/tensorflow
           subPath: module8-tf-paint
-          name: azurefile  
+          name: azurefile

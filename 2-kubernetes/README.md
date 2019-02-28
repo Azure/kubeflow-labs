@@ -1,19 +1,21 @@
 # Kubernetes
 
-### Prerequisites  
-* [Docker Basics](../1-docker/README.md)
+### Prerequisites
+
+- [Docker Basics](../1-docker/README.md)
 
 ### Summary
 
 In this module you will learn:
-* The basic concepts of Kubernetes
-* How to create a Kubernetes cluster on Azure
 
-> *Important* : Kubernetes is very often abbreviated to **K8s**. This is the name we are going to use in this workshop.
+- The basic concepts of Kubernetes
+- How to create a Kubernetes cluster on Azure
+
+> _Important_ : Kubernetes is very often abbreviated to **K8s**. This is the name we are going to use in this lab.
 
 ## The basic concepts of Kubernetes
 
-[Kubernetes](https://kubernetes.io/) is an open-source technology that makes it easier to automate deployment, scale, and manage containerized applications in a clustered environment. The ability to use GPUs with Kubernetes allows the clusters to facilitate running frequent experimentations, using it for high-performing serving, and auto-scaling of deep learning models, and much more. 
+[Kubernetes](https://kubernetes.io/) is an open-source technology that makes it easier to automate deployment, scale, and manage containerized applications in a clustered environment. The ability to use GPUs with Kubernetes allows the clusters to facilitate running frequent experimentations, using it for high-performing serving, and auto-scaling of deep learning models, and much more.
 
 ### Overview
 
@@ -32,12 +34,13 @@ The worker nodes communicate with the master components, configure the networkin
 Kubernetes contains a number of abstractions that represent the state of your system: deployed containerized applications and workloads, their associated network and disk resources, and other information about what your cluster is doing. A Kubernetes object is a "record of intent" – once you create the object, the Kubernetes system will constantly work to ensure that object exists. By creating an object, you’re telling the Kubernetes system your cluster’s desired state.
 
 The basic Kubernetes objects include:
-* Pod - the smallest and simplest unit in the Kubernetes object model that you create or deploy. A Pod encapsulates an application container (or multiple containers), storage resources, a unique network IP, and options that govern how the container(s) should run.
-* Service - an abstraction which defines a logical set of Pods and a policy by which to access them.
-* Volume - an abstraction which allows data to be preserved across container restarts and allows data to be shared between different containers.
-* Namespace - a way to divide a physical cluster resources into multiple virtual clusters between multiple users.
-* Deployment - Manages pods and ensures a certain number of them are running. This is typically used to deploy pods that should always be up, such as a web server.
-* Job - A job creates one or more pods and ensures that a specified number of them successfully terminate. In other words, we use Job to run a task that finishes at some point, such as training a model.
+
+- Pod - the smallest and simplest unit in the Kubernetes object model that you create or deploy. A Pod encapsulates an application container (or multiple containers), storage resources, a unique network IP, and options that govern how the container(s) should run.
+- Service - an abstraction which defines a logical set of Pods and a policy by which to access them.
+- Volume - an abstraction which allows data to be preserved across container restarts and allows data to be shared between different containers.
+- Namespace - a way to divide a physical cluster resources into multiple virtual clusters between multiple users.
+- Deployment - Manages pods and ensures a certain number of them are running. This is typically used to deploy pods that should always be up, such as a web server.
+- Job - A job creates one or more pods and ensures that a specified number of them successfully terminate. In other words, we use Job to run a task that finishes at some point, such as training a model.
 
 ### Creating a Kubernetes Object
 
@@ -52,64 +55,70 @@ metadata:
   name: nginx-deployment # Name of the deployment
 spec: # Actual specifications of this deployment
   replicas: 3 # Number of replicas (instances) for this deployment. 1 replica = 1 pod
-  template: 
+  template:
     metadata:
       labels:
         app: nginx
-    spec: # Specification for the Pod 
+    spec: # Specification for the Pod
       containers: # These are the containers running inside our Pod, in our case a single one
-      - name: nginx # Name of this container
-        image: nginx:1.7.9 # Image to run
-        ports: # Ports to expose
-        - containerPort: 80
+        - name: nginx # Name of this container
+          image: nginx:1.7.9 # Image to run
+          ports: # Ports to expose
+            - containerPort: 80
 ```
 
-To create all the objects described in a Deployment using a `.yaml` file like the one above in your own Kubernetes cluster you can use Kubernetes' CLI (`kubectl`). 
+To create all the objects described in a Deployment using a `.yaml` file like the one above in your own Kubernetes cluster you can use Kubernetes' CLI (`kubectl`).
 We will be creating a deployment in the exercise toward the end of this module, but first we need a cluster.
 
 ## Provisioning a Kubernetes cluster on Azure
 
 We are going to use AKS to create a GPU-enabled Kubernetes cluster.
-You could also use [acs-engine](https://github.com/Azure/acs-engine) if you prefer, this guide will assume you are using aks.
-
+You could also use [aks-engine](https://github.com/Azure/aks-engine) if you prefer, this guide will assume you are using aks.
 
 ### A Note on GPUs with Kubernetes
 
-As of this writing, GPUs are available for AKS in the `eastus` and `westeurope` regions. If you want more options you may want to use acs-engine for more flexibility.
+You can view AKS region availability in [Azure AKS docs](https://docs.microsoft.com/en-us/azure/aks/container-service-quotas#region-availability)
+
+You can find NVIDIA GPUs (N-series) availability in [region availability documentation](https://azure.microsoft.com/en-us/global-infrastructure/services/?products=virtual-machines&regions=all)
+
+If you want more options, you may want to use aks-engine for more flexibility.
 
 ### With the CLI
 
 #### Creating a resource group
+
 ```console
 az group create --name <RESOURCE_GROUP_NAME> --location <LOCATION>
-```  
+```
 
-With:  
-  
-| Parameter | Description |
-| --- | --- | 
-| RESOURCE_GROUP_NAME | Name of the resource group where the cluster will be deployed.  |
-| LOCATION | Name of the region where the cluster should be deployed. |
+With:
 
-#### Creating the cluster  
+| Parameter           | Description                                                    |
+| ------------------- | -------------------------------------------------------------- |
+| RESOURCE_GROUP_NAME | Name of the resource group where the cluster will be deployed. |
+| LOCATION            | Name of the region where the cluster should be deployed.       |
+
+#### Creating the cluster
+
 ```console
-az aks create --node-vm-size <AGENT_SIZE> --resource-group <RG> --name <NAME> 
---node-count <AGENT_COUNT> --kubernetes-version 1.11.1 --location <LOCATION> --generate-ssh-keys
+az aks create --node-vm-size <AGENT_SIZE> --resource-group <RG> --name <NAME>
+--node-count <AGENT_COUNT> --kubernetes-version 1.12.5 --location <LOCATION> --generate-ssh-keys
 ```
 
 > Note : The kubernetes verion could change depending where you are deploying your cluster. You can get more informations running the `az aks get-versions` command.
 
-With:  
-  
-| Parameter | Description |
-| --- | --- | 
-| AGENT_SIZE | The size of K8s's agent VM. Choose `Standard_NC6` for GPUs or `Standard_D2_v2` if you just want CPUs. Full list of [options here](https://github.com/Azure/azure-sdk-for-python/blob/master/azure-mgmt-containerservice/azure/mgmt/containerservice/models/container_service_client_enums.py#L21). |
-| RG | Name of the resource group that was created in the previous step. |
-| NAME | Name of the AKS resource (can be whatever you want). | 
-| AGENT_COUNT | The number of agents (virtual machines) that you want in your cluster. 3 or 4 is recommended to play with hyper-parameter tuning and distributed TensorFlow | 
-| LOCATION | Same location that was specified for the resource group creation. |
+With:
+
+| Parameter   | Description                                                                                                                                                                                                                                                                                        |
+| ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| AGENT_SIZE  | The size of K8s's agent VM. Choose `Standard_NC6` for GPUs or `Standard_D2_v2` if you just want CPUs. Full list of [options here](https://github.com/Azure/azure-sdk-for-python/blob/master/azure-mgmt-containerservice/azure/mgmt/containerservice/models/container_service_client_enums.py#L21). |
+| RG          | Name of the resource group that was created in the previous step.                                                                                                                                                                                                                                  |
+| NAME        | Name of the AKS resource (can be whatever you want).                                                                                                                                                                                                                                               |
+| AGENT_COUNT | The number of agents (virtual machines) that you want in your cluster. 3 or 4 is recommended to play with hyper-parameter tuning and distributed TensorFlow                                                                                                                                        |
+| LOCATION    | Same location that was specified for the resource group creation.                                                                                                                                                                                                                                  |
 
 The command should take a few minutes to complete. Once it is done, the output should be a JSON object indicating among other things the `provisioningState`:
+
 ```
 {
   [...]
@@ -129,6 +138,24 @@ az aks get-credentials --name <NAME> --resource-group <RG>
 
 Where `NAME` and `RG` should be the same values as for the cluster creation.
 
+#### Installing NVIDIA Device Plugin (AKS only)
+
+For AKS, install NVIDIA Device Plugin using:
+
+For Kubernetes 1.10:
+
+```bash
+kubectl apply -f https://raw.githubusercontent.com/nvidia/k8s-device-plugin/v1.10/nvidia-device-plugin.yml
+```
+
+For Kubernetes 1.11 and above:
+
+```bash
+kubectl apply -f https://raw.githubusercontent.com/nvidia/k8s-device-plugin/v1.11/nvidia-device-plugin.yml
+```
+
+For AKS Engine, NVIDIA Device Plugin will automatically installed with N-Series GPU clusters.
+
 ##### Validation
 
 Once you are done with the cluster creation, and downloaded the `kubeconfig` file, running the following command:
@@ -138,6 +165,7 @@ kubectl get nodes
 ```
 
 Should yield an output similar to this one:
+
 ```
 NAME                       STATUS    ROLES     AGE       VERSION
 aks-nodepool1-42640332-0   Ready     agent     1h        v1.11.1
@@ -146,6 +174,7 @@ aks-nodepool1-42640332-2   Ready     agent     1h        v1.11.1
 ```
 
 If you provisioned GPU VM, describing one of the node should indicate the presence of GPU(s) on the node:
+
 ```console
 > kubectl describe node <NODE_NAME>
 
@@ -153,9 +182,9 @@ If you provisioned GPU VM, describing one of the node should indicate the presen
 Capacity:
  nvidia.com/gpu:     1
 [...]
- ```
+```
 
-> Note: In some scenarios, you might not see GPU resources under Capacity. To resolve this, you must install a daemonset as described in the troubleshooting section here: https://docs.microsoft.com/en-us/azure/aks/gpu-cluster 
+> Note: In some scenarios, you might not see GPU resources under Capacity. To resolve this, you must install a daemonset as described in the troubleshooting section here: https://docs.microsoft.com/en-us/azure/aks/gpu-cluster
 
 ## Exercise
 
@@ -163,16 +192,17 @@ Capacity:
 
 > Note: If you didn't complete the exercise in module 1, you can use `wbuchwalter/tf-mnist` image for this exercise.
 
-In module 1, we created an image for our MNIST classifier, ran a small training locally and pushed this image to Docker Hub.  
+In module 1, we created an image for our MNIST classifier, ran a small training locally and pushed this image to Docker Hub.
 Since we now have a running Kubernetes cluster, let's run our training on it!
 
 First, we need to create a YAML template to define what we want to deploy.
 We want our deployment to have a few characteristics:
-* It should be a `Job` since we expect the training to finish successfully after some time.
-* It should run the image you created in module 1 (or `wbuchwalter/tf-mnist` if you skipped this module).
-* The `Job` should be named `2-mnist-training`.
-* We want our training to run for `500` steps.
-* We want our training to use 1 GPU
+
+- It should be a `Job` since we expect the training to finish successfully after some time.
+- It should run the image you created in module 1 (or `wbuchwalter/tf-mnist` if you skipped this module).
+- The `Job` should be named `2-mnist-training`.
+- We want our training to run for `500` steps.
+- We want our training to use 1 GPU
 
 Here is what this would look like in YAML format:
 
@@ -187,19 +217,19 @@ spec:
       name: module2-ex1 # Name of the pod
     spec:
       containers: # List of containers that should run inside the pod, in our case there is only one.
-      - name: tensorflow
-        image: ${DOCKER_USERNAME}/tf-mnist:gpu # The image to run, you can replace by your own.
-        args: ["--max_steps", "500"] # Optional arguments to pass to our command. By default the command is defined by ENTRYPOINT in the Dockerfile
-        resources:
-          limits:
-            nvidia.com/gpu: 1 # We ask Kubernetes to assign 1 GPU to this container
-        volumeMounts:
-        - name: nvidia
-          mountPath: /usr/local/nvidia
+        - name: tensorflow
+          image: ${DOCKER_USERNAME}/tf-mnist:gpu # The image to run, you can replace by your own.
+          args: ["--max_steps", "500"] # Optional arguments to pass to our command. By default the command is defined by ENTRYPOINT in the Dockerfile
+          resources:
+            limits:
+              nvidia.com/gpu: 1 # We ask Kubernetes to assign 1 GPU to this container
+          volumeMounts:
+            - name: nvidia
+              mountPath: /usr/local/nvidia
       volumes:
-      - name: nvidia
-        hostPath:
-          path: /usr/local/nvidia
+        - name: nvidia
+          hostPath:
+            path: /usr/local/nvidia
       restartPolicy: OnFailure # restart the pod if it fails
 ```
 
@@ -225,10 +255,13 @@ module2-ex1                      1         0            1m
 ```
 
 Looking at the Pods:
+
 ```console
 kubectl get pods
-````
+```
+
 You should see your training running
+
 ```bash
 NAME                                      READY     STATUS      RESTARTS   AGE
 module2-ex1-c5b8q                      1/1       Runing      0          1m
@@ -239,6 +272,7 @@ Finally you can look at the logs of your pod with:
 ```console
 kubectl logs <pod-name>
 ```
+
 > Be careful to use the Pod name (from `kubectl get pods`) not the Job name.
 
 And you should see the training happening
@@ -263,6 +297,7 @@ Accuracy at step 50: 0.888
 ```
 
 After a few minutes, looking again at the Job should show that it has completed successfully:
+
 ```console
 kubectl get job
 ```
@@ -277,4 +312,3 @@ module2-ex1                    1         1            3m
 Currently our training doesn't do anything interesting. We are not even saving the model and summaries anywhere, but don't worry we are going to dive into this starting in Module 4.
 
 [Module 3: Helm](../3-helm/README.md)
-
