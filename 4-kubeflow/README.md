@@ -34,7 +34,7 @@ First, install ksonnet version [0.13.1](https://ksonnet.io/#get-started), or you
 Then run the following commands to download Kubeflow:
 
 ```bash
-KUBEFLOW_SRC=kubeflow
+KUBEFLOW_SRC=$(realpath kubeflow)
 
 mkdir ${KUBEFLOW_SRC}
 cd ${KUBEFLOW_SRC}
@@ -51,14 +51,14 @@ curl https://raw.githubusercontent.com/kubeflow/kubeflow/${KUBEFLOW_TAG}/scripts
 ```bash
 # Initialize a kubeflow app
 KFAPP=mykubeflowapp
-${KUBEFLOW_SOURCE}/scripts/kfctl.sh init ${KFAPP} --platform none
+${KUBEFLOW_SRC}/scripts/kfctl.sh init ${KFAPP} --platform none
 
 # Generate kubeflow app
 cd ${KFAPP}
-${KUBEFLOW_SOURCE}/scripts/kfctl.sh generate k8s
+${KUBEFLOW_SRC}/scripts/kfctl.sh generate k8s
 
 # Deploy Kubeflow app
-${KUBEFLOW_SOURCE}/scripts/kfctl.sh apply k8s
+${KUBEFLOW_SRC}/scripts/kfctl.sh apply k8s
 ```
 
 ### Validation
